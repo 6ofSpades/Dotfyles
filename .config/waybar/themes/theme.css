@@ -1,0 +1,29 @@
+/* Glass-purple */
+
+@define-color text			  rgba(255, 255, 255, 0.9);
+@define-color subtext		  rgba(255, 255, 255, 0.85);
+
+@define-color overlay5    rgba(0, 0, 0, 0.4);
+@define-color overlay4    rgba(0, 0, 0, 0.3);
+@define-color overlay3		rgba(0, 0, 0, 0.25);
+@define-color overlay2		rgba(0, 0, 0, 0.15);
+@define-color overlay17		rgba(0, 0, 0, 0.13);
+@define-color overlay15		rgba(0, 0, 0, 0.10);
+@define-color overlay1		rgba(0, 0, 0, 0.05);
+
+@define-color yellow  #e0af68;
+@define-color red     #de646e;
+@define-color green   #00bfb7;
+@define-color cyan    #00ffff;
+@define-color blue    #1A75CF;
+
+/* main colors */
+@define-color accent		  #8325af;
+@define-color clock       #c9c0f5;
+
+@define-color hover-bg		alpha(@accent, 0.5);
+
+/* state colors */
+@define-color warning		  @yellow;
+@define-color critical		@red;
+@define-color charging		@green;

@@ -1,0 +1,109 @@
+
+/* hyprland windowcount */
+#windowcount {
+	margin-right: 0px;
+}
+#windowcount label {
+	color: @text;
+}
+
+#custom-left_div.4 {
+	color: @overlay2;
+  background-color: transparent;
+  margin-left: 0px;
+  padding: 0 0 0 5px;
+}
+
+/* temperature */
+#temperature {
+  background-color: @overlay2;
+}
+
+/* disk */
+#disk {
+  padding: 0 4px 0 6px;
+	background-color: @overlay2;
+}
+
+/* memory */
+#custom-left_div.3 {
+	background-color: @overlay2;
+  color: @overlay15;
+}
+#memory {
+	background-color: @overlay3;
+}
+
+/* cpu */
+#custom-left_div.2 {
+	background-color: @overlay3;
+	color: @overlay15;
+}
+#cpu {
+	background-color: @overlay4;
+  padding: 0 2px 0 0
+}
+#custom-left_inv.1 {
+	color: @overlay4;
+  background-color: transparent;
+}
+
+
+/* distro icon */
+#custom-left_div.1,
+#custom-right_div.1 {
+	color: @overlay5;
+  background-color: transparent
+}
+#custom-distro {
+	padding: 0 10px 0 5px;
+	font-size: 26px;
+  background-color: @overlay5;
+	color: @accent;
+}
+
+
+/* time */
+#custom-right_inv.1 {
+	color: @overlay4;
+  background-color: transparent
+}
+#clock.time {
+  font-weight: bold;
+  color: @clock;
+	background-color: @overlay4;
+}
+#custom-right_div.2 {
+	background-color: @overlay3;
+	color: @overlay15;
+}
+
+/* date */
+#clock.date {
+	padding-left: 6px;
+	background-color: @overlay3;
+}
+#custom-right_div.3 {
+	background-color: @overlay2;
+	color: @overlay15;
+}
+
+/* quick settings */
+#network {
+	background-color: @overlay2;
+	padding: 0 0px 0 0px; /*top right bottom left*/
+}
+#bluetooth {
+	background-color: @overlay2;
+	padding: 0 3px 0 0;
+}
+#custom-virtual_keyboard{
+	background-color: @overlay2;
+	padding: 0 10px 0 2px;
+}
+#custom-right_div.4 {
+	color: @overlay2;
+  background-color: transparent;
+  margin-right: 15px
+}
+

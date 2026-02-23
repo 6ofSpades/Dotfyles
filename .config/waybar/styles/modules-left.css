@@ -1,0 +1,52 @@
+/* theme switcher */
+#custom-user {
+  padding-right: 12px;
+}
+
+/* hyprland submap */
+#submap {
+  padding: 6px;
+  font-weight: bold;
+  text-decoration: underline;
+}
+#submap.MAIN {
+  color: @blue;
+}
+#submap.MOUSE {
+  color: @yellow;
+}
+#submap.PLCTL {
+  color: @red;
+}
+#submap.MVRSW {
+  color: @cyan;
+}
+#submap.DYNAM {
+  color: @yellow;
+}
+#submap.NVIMA {
+  color: @green;
+}
+
+/* workspaces */
+#custom-left_div.5,
+#custom-right_div.5 {
+  color: @overlay3;
+}
+#workspaces {
+  padding: 0 1px;
+  background-color: @overlay3;
+}
+#workspaces .active label {
+  font-size: 23px;
+  color: @accent;
+}
+
+/* window title */
+#window {
+  margin-left: 10px;
+}
+#window label {
+  font-weight: normal;
+  color: @subtext;
+}

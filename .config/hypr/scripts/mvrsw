@@ -1,0 +1,26 @@
+#!/bin/bash
+
+if [[ "$1" == opacityp ]]; then
+  opacity=$(hyprctl getprop active opacity)
+  if [[ "$opacity" < 1 ]]; then
+    hyprctl dispatch setprop active opacity $(echo "$opacity" + 0.1 | bc) $(echo "$opacity" + 0.1 | bc)
+    exit 0
+  fi
+fi
+
+if [[ "$1" == opacitym ]]; then
+  opacity=$(hyprctl getprop active opacity)
+  if [[ "$opacity" > 0 ]]; then
+    hyprctl dispatch setprop active opacity $(echo "$opacity" - 0.1 | bc) $(echo "$opacity" - 0.1 | bc)
+    exit 0
+  fi
+fi
+
+if [[ "$1" == blur ]]; then
+  if $(hyprctl getprop active no_blur); then
+    hyprctl dispatch setprop active no_blur 0
+  else
+    hyprctl dispatch setprop active no_blur 1
+  fi
+  exit 0
+fi

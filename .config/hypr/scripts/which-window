@@ -1,0 +1,11 @@
+#!/bin/bash
+
+
+opacity=$(hyprctl getprop active opacity)
+
+hyprctl keyword general:col.active_border "rgba(eeaa00ff) rgba(ee0800ff) rgba(ee0800ff) rgba(ee00f7ff) 90deg"
+sleep 0.2
+hyprctl keyword general:col.active_border "rgba(ee0800ff) rgba(eeaa00ff) rgba(ee00f7ff) rgba(ee0800ff) 90deg"
+sleep 0.3
+
+hyprctl reload

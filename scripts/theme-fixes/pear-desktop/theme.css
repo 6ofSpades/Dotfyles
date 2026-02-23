@@ -1,0 +1,40 @@
+:root {
+  --accent-color: 105,0,133 !important;
+}
+
+* {
+    font-family: JetBrainsMono Nerd Font !important;
+}
+
+.play-pause-button-wrapper.ytmusic-player-controls {
+    background: rgb(var(--accent-color)) !important;
+    border-radius: 0% !important;
+}
+#button > yt-icon > span > div {
+    fill: white !important;
+}
+
+tp-yt-paper-tabs {
+    font-size: 9pt !important;
+}
+
+.byline.ytmusic-player-controls {
+    font-size: 9pt !important;
+}
+
+.current-time.ytmusic-player-controls, .total-time.ytmusic-player-controls {
+    font-size: 9pt !important;
+    top: -8pt !important;
+}
+
+#progressContainer.tp-yt-paper-progress, .indeterminate.tp-yt-paper-progress::after {
+    height: 9pt !important;
+}
+#primaryProgress.tp-yt-paper-progress {
+    background: rgb(var(--accent-color)) !important;
+}
+.slider-knob-inner.tp-yt-paper-slider {
+    display: none !important;
+}
+
+

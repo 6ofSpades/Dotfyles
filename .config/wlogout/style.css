@@ -1,0 +1,54 @@
+* {
+  background-image: none;
+  box-shadow: none;
+  transition: 20ms;
+  font-family: "JetBrainsMono Nerd Font";
+}
+
+window {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+button {
+  border-width: 2px;
+  border-radius: 10px;
+  border-color: black;
+  margin: 10px;
+
+  background-color: rgba(0, 0, 0, 0.3);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 25%;
+
+  color: #ffffff;
+
+  animation: gradient_f 20s ease-in infinite;
+  transition:
+    all 0.3s cubic-bezier(0.55, 0, 0.28, 1.682),
+    box-shadow 0.2s ease-in-out,
+    background-color 0.2s ease-in-out;
+}
+
+#lock {
+  background-image: image(url("icons/lock-colored.png"));
+}
+
+#logout {
+  background-image: image(url("icons/logout-colored.png"));
+}
+
+#suspend {
+  background-image: image(url("icons/suspend-colored.png"));
+}
+
+#hibernate {
+  background-image: image(url("icons/hibernate-colored.png"));
+}
+
+#shutdown {
+  background-image: image(url("icons/shutdown-colored.png"));
+}
+
+#reboot {
+  background-image: image(url("icons/reboot-colored.png"));
+}

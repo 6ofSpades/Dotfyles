@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+
+import re
+
+def hex_to_rgb(hex_code):
+    hex_code = hex_code.lstrip('#')
+    if len(hex_code) == 6:
+        r, g, b = [int(hex_code[i:i+2], 16) for i in (0, 2, 4)]
+        return f"rgb({r}, {g}, {b})"
+    elif len(hex_code) == 8:
+        r, g, b, a = [int(hex_code[i:i+2], 16) for i in (0, 2, 4, 6)]
+        return f"rgba({r}, {g}, {b}, {a/255:.2f})"
+    else:
+        return "Invalid hex color."
+
+def rgb_to_hex(color):
+    match = re.match(r"rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)", color)
+    if not match:
+        return "Invalid rgb/rgba color."
+    r, g, b = map(int, match.groups()[:3])
+    a = match.group(4)
+    if a is None:
+        return f"#{r:02X}{g:02X}{b:02X}"
+    else:
+        alpha = round(float(a) * 255)
+        return f"#{r:02X}{g:02X}{b:02X}{alpha:02X}"
+
+def convert(color):
+    if color.startswith('#'):
+        return hex_to_rgb(color)
+    else:
+        return rgb_to_hex(color)
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) != 2:
+        print("Usage: colorconv.py <color>")
+    else:
+        print(convert(sys.argv[1]))
+

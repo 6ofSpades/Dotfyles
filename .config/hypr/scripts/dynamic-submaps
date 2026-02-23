@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [[ ! $(ps -el | grep rofi) ]]; then  # don't activate if rofi is open
+  activeclass=$(hyprctl -j activewindow  | jq -r '.class')
+
+  case $activeclass in
+    zen) hyprctl dispatch submap DYNAM ;;
+    vesktop) hyprctl dispatch submap DYNAM ;;
+    discord-canary) hyprctl dispatch submap DYNAM ;;
+  esac
+fi

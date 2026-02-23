@@ -1,0 +1,23 @@
+#!/bin/bash
+
+TEMP="/tmp/swapwindow"
+SOUND="$HOME/.config/hypr/scripts/.pop-alert.mp3"
+
+# Create temporary file if it doesn't exist
+if [[ ! -e $TEMP ]]; then 
+  touch $TEMP
+fi
+
+# save activewindow address to file if file is empty
+address="$(<$TEMP)"
+if [[ -z "$address" ]]; then
+  echo 'Saving active window address'
+  echo $(hyprctl -j activewindow  | jq -r '.address') > "$TEMP"
+  paplay $SOUND   # play confirmation sound
+# swap window if file has a pid
+else
+  echo 'Swapping window and emptying temp file'
+  hyprctl dispatch swapwindow address:"$address"
+  hyprctl dispatch focuswindow address:"$address"
+  echo '' > "$TEMP"
+fi

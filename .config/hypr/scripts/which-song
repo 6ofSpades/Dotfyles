@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [[ $(playerctl status) == 'Playing' ]]; then
+  echo -ne '  '
+
+elif [[ $(playerctl status) == 'Paused' ]]; then
+  echo -ne '  '
+fi
+
+playerctl metadata --format "{{title}}   {{artist}}"

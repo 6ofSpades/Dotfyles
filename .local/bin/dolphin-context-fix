@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Without this, Dolphin is very buggy and doesn't show
+# items in the "open with" menu. Also, it won't open the terminal
+# in the current folder. So this is important
+
+XDG_MENU_PREFIX=arch- kbuildsycoca6

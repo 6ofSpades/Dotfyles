@@ -1,0 +1,8 @@
+#!/bin/bash
+
+pacnum=$(yay -Qu 2>/dev/null | wc -l)
+
+if [ "$pacnum" -gt 0 ]; then
+  notify-send "It's update time!" "You have $pacnum packages to update" -a update-reminder -i org.kde.archUpdate
+fi
+

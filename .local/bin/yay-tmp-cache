@@ -1,0 +1,51 @@
+#!/bin/bash
+#yay_tmp_cache.sh
+
+# This makes yay store cache in the /tmp folder, meaning it won't be stored in disk but rather in memory
+# This also means the vcs.json file will be excluded on a reboot along with the rest of the cache
+# The vcs.json file is needed in order to be able to updated git packages, so we need a way to keep only that persistent
+# Putting vcs.json in another folder and symlinking it should work fine
+
+tmpcachefolder="/tmp/yay"
+vcsfolder="$HOME/.cache/yayvcs"
+
+
+if [ -d "$tmpcachefolder" ]; then
+
+	echo "Yay's cache folder already created"
+
+else
+	## SET YAY'S CACHE ON /TMP
+  echo "Removing yay's original cache folder..."
+	rm -fr ~/.cache/yay
+  echo "Creating cache in /tmp..."
+	mkdir -p $tmpcachefolder
+  echo "Linking /tmp to .cache..."
+	ln -s $tmpcachefolder ~/.cache/yay
+fi
+
+if [ -e "$vcsfolder/vcs.json" ]; then
+
+  echo "Yay's vcs folder already created and vcs.json already there"
+
+else
+  ## Create vcs folder
+  echo "Making vcs folder..."
+  mkdir -p $vcsfolder
+  echo "Creating vcs.json inside the new vcs folder..."
+  touch $vcsfolder/vcs.json
+  echo "{}" > $vcsfolder/vcs.json
+fi
+
+if [ -h $HOME/.cache/yay/vcs.json ]; then
+
+  echo "vcs.json already linked"
+
+else
+  ## Link the vcs to the cache folder
+  echo "Linking vcs.json to the cache folder"
+  ln -s $vcsfolder/vcs.json ~/.cache/yay/vcs.json
+fi
+
+echo "Done."
+exit 0

@@ -1,0 +1,1 @@
+/home/six/.config/nvim/lua/plugins/hop.lua

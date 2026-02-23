@@ -1,0 +1,377 @@
+/* These are necessary if you want transparent background
+   If you don't then just comment it out */
+body.dark-theme {
+  background-color: #00000000 !important;
+}
+.App.dark-theme {
+  background-color: #00000000 !important;
+}
+
+/* Accent color */
+:root {
+  --accent-color: 105, 0, 133;
+}
+
+/*
+######################
+###### NAV BARS ######
+######################
+*/
+
+/* left most bar */
+.NavTabs {
+  background-color: #00000080 !important;
+}
+
+/* message number */
+.NavTabs__ItemUnreadBadge {
+  background-color: rgb(var(--accent-color)) !important;
+}
+
+.NavTabs__ItemButton:hover {
+  background-color: rgba(var(--accent-color), 0.2) !important;
+  border: 1px solid rgba(var(--accent-color), 0.4) !important;
+}
+
+.NavTabs__Item[aria-selected="true"] > span > .NavTabs__ItemButton {
+  background-color: rgba(var(--accent-color), 0.5) !important;
+  border: 1px solid rgba(var(--accent-color), 0.9) !important;
+}
+
+/* buttons in qr and link section of personal user profile */
+.UsernameLinkModalBody__actions__save,
+.UsernameLinkModalBody__actions__color {
+  background-color: #45475a !important;
+}
+
+/* second to left bar */
+.NavSidebar {
+  background-color: #00000080 !important;
+}
+
+/* verified badge */
+.ContactModal__official-badge::after {
+  background-color: rgb(var(--accent-color)) !important;
+}
+
+/* message number */
+.dark-theme
+  .module-conversation-list__item--contact-or-conversation
+  .module-conversation-list__item--contact-or-conversation__unread-indicator {
+  background-color: rgb(var(--accent-color)) !important;
+}
+
+/* view archive button when clicking on ... */
+.ContextMenu__popper--single-item {
+  background-color: #252a84 !important;
+}
+
+.module-conversation-list__item--contact-or-conversation--is-selected {
+  background-color: rgba(var(--accent-color), 0.5) !important;
+  border: 1px solid rgba(var(--accent-color), 0.9) !important;
+}
+
+/* no archived chat text */
+.module-left-pane__archive-helper-text {
+  background-color: #1c24b1 !important;
+}
+
+.module-conversation-list__item--contact-or-conversation:hover,
+.module-conversation-list__item--contact-or-conversation:focus,
+.module-conversation-list__item--archive-button:hover,
+.module-conversation-list__item--archive-button:focus {
+  background-color: rgba(var(--accent-color), 0.2) !important;
+  border: 1px solid rgba(var(--accent-color), 0.4) !important;
+}
+
+/*
+######################
+###### HOMEPAGE ######
+######################
+*/
+
+.Inbox__no-conversation-open {
+  background-color: #00000080 !important;
+}
+
+/*
+##########################
+###### TEXTING AREA ######
+##########################
+*/
+
+/* the bar at the top containing your contact name */
+.module-ConversationHeader {
+  background-color: #11111b78 !important;
+}
+
+/* call, search, etc button present at conversation header */
+.module-ConversationHeader__button:hover,
+.module-ConversationHeader__button:focus {
+  background-color: rgba(var(--accent-color), 0.3) !important;
+}
+
+/* ... menu at conversation header */
+.react-contextmenu {
+  background-color: #000000a0 !important;
+  backdrop-filter: blur(10px);
+}
+
+/* ... menu hover */
+.react-contextmenu-item--selected {
+  background-color: rgba(var(--accent-color), 0.3) !important;
+  border: 1px solid rgba(var(--accent-color), 0.5) !important;
+}
+
+/* the vm player that appears at top */
+.MiniPlayer {
+  background-color: #000000a0 !important;
+}
+
+/* conversation area */
+.module-timeline {
+  background-color: #00000000 !important;
+}
+.dark-theme .ConversationView__pane {
+  background-color: #00000000 !important;
+}
+.ConversationPanel,
+.ConversationPanel__header {
+  background-color: #00000059 !important;
+}
+
+/* other people's messages */
+.module-message__container--incoming {
+  background-color: #00000060 !important;
+}
+/* your own messages*/
+/* cause over here you have more control than on the config */
+.dark-theme .module-message__container--outgoing {
+  background-color: #00000000 !important;
+}
+.module-message__container--outgoing-ultramarine {
+  background-image: linear-gradient(
+    90deg,
+    #69008580,
+    #69008580,
+    #69008580,
+    #1d169180
+  ) !important;
+}
+
+/* replying box */
+.module-quote--incoming > .module-quote__primary,
+.module-quote--incoming > .module-quote__icon-container {
+  background-color: #00000080 !important;
+  border: 0px !important;
+}
+.dark-theme .module-quote--compose-ultramarine,
+.dark-theme .module-quote--incoming-ultramarine,
+.dark-theme .module-quote--outgoing-ultramarine {
+  background-image: none !important;
+  background-color: rgba(var(--accent-color), 0.8) !important;
+}
+.module-quote--outgoing-ultramarine .module-quote__primary,
+.module-quote--outgoing-ultramarine.module-quote__reference-warning {
+  background-color: #00000080 !important;
+}
+
+/* call again button */
+.dark-theme .module-Button--system-message {
+  background-color: #00000080 !important;
+}
+
+/* the area where you write message, attach file, send vm, etc. */
+.CompositionArea {
+  background-color: #1111117a !important;
+}
+
+/* the actual typing box */
+.module-composition-input__input {
+  background-color: #0000007a !important;
+}
+
+.module-composition-input__input:focus-within {
+  border: 1px solid rgb(var(--accent-color)) !important;
+}
+
+/* the today or yesterday thing that appears when you scroll up */
+.TimelineDateHeader--floating {
+  background-color: #00000080 !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.TimelineFloatingHeader__spinner-container {
+  background-color: #313244 !important;
+}
+
+.ScrollDownButton {
+  background-color: #00000080 !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+/*
+##########################
+###### CALLING AREA ######
+##########################
+*/
+
+/* background when contact isn't selected */
+.CallsTab__EmptyState {
+  background-color: #1e1e2e !important;
+}
+
+/* background when contact is selected */
+.CallsTab__ConversationCallDetails {
+  background-color: #1e1e2e !important;
+}
+
+/* contact list sidebar item */
+.CallsList__ItemTile:hover {
+  background-color: #313244 !important;
+}
+
+.CallsList__ItemTile[aria-selected="true"] {
+  background-color: #45475a !important;
+}
+
+.CallsNewCall_ItemActionButton {
+  background-color: #585b70 !important;
+}
+
+/*
+########################
+###### STORY AREA ######
+########################
+*/
+
+.Stories__placeholder {
+  background-color: #1e1e2e !important;
+}
+
+/*
+##########################
+###### USER PROFILE ######
+##########################
+*/
+
+/* background of user details panel */
+/* .ConversationPanel, */
+/* .ConversationPanel__header { */
+/*   background-color: #1e1e2e00 !important; */
+/* } */
+
+/* disappering message timer */
+.module-select > select {
+  background-color: #313244 !important;
+}
+
+/* nickname, chatcolor, add to group and other button */
+.ConversationDetails-panel-row__root--button:hover {
+  background-color: #313244 !important;
+}
+
+/* nickname edit menu*/
+.Input__container {
+  background-color: #313244 !important;
+  border-color: #9399b2 !important;
+}
+
+/* add to group button background color */
+.ConversationDetails-groups__add-to-group-icon {
+  background-color: #313244 !important;
+}
+
+/* the user profile, signal connection and safety number popup */
+.module-Modal {
+  background-color: #1e1e2e !important;
+}
+
+/* mark as varified or clear verification button */
+.module-SafetyNumberViewer__button > button {
+  background-color: #45475a !important;
+}
+
+/*
+##################
+###### MISC ######
+##################
+*/
+
+/* background when viewing image */
+.Lightbox__animated {
+  background-color: #1e1e2e !important;
+}
+
+/* many of the buttons */
+.module-Button {
+  background-color: #45475a !important;
+}
+
+.module-Button:hover {
+  background-color: #313244 !important;
+}
+
+/*
+######################
+###### SETTINGS ######
+######################
+*/
+
+/* side pannel of settings */
+.Preferences__page-selector {
+  background-color: #11111b !important;
+}
+
+/* main settings pannel */
+.Preferences__settings-pane {
+  background-color: #1e1e2e !important;
+}
+
+/* page selector selected background */
+.Preferences__button--selected {
+  background-color: #45475a !important;
+}
+
+.Preferences__button:focus {
+  background-color: #313244 !important;
+}
+
+/* language and chat color button */
+.Preferences__control--clickable:hover {
+  background-color: #313244 !important;
+}
+
+.module-Button--secondary--destructive {
+  color: #f38ba8 !important;
+}
+
+/*
+##################
+###### CALL ######
+##################
+*/
+
+.module-calling__container {
+  background-color: #1e1e2e !important;
+}
+
+/* cancel and settings button */
+.CallSettingsButton__Button {
+  background-color: #313244 !important;
+}
+
+/* the bar at the bottom during calls */
+.CallControls {
+  background-color: #313244 !important;
+}
+
+/* mike and camera button */
+.CallingButton__icon {
+  background-color: #585b70 !important;
+}
+
+/* your pfp box during call */
+.module-calling__background {
+  background-color: #313244 !important;
+}

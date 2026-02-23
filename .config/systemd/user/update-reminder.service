@@ -1,0 +1,7 @@
+[Unit]
+Description=Notify me about Arch updates
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/update-reminder
+

@@ -1,0 +1,29 @@
+#!/bin/bash
+
+TEMP="/tmp/mark-cursor"
+
+# Create temporary file if it doesn't exist
+if [[ ! -e $TEMP ]]; then 
+  touch $TEMP
+fi
+
+
+function mark {
+  echo $(hyprctl cursorpos) > $TEMP
+}
+
+function move {
+  pos="$(<$TEMP)"
+
+  [[ -z $pos ]] && notify-send -a Cursor-Mark "There is no mark" -t 1000 -i script-error && exit 1
+
+  pos=$(echo $pos | tr -d ',')
+
+  ydotool mousemove -a $pos
+}
+
+
+case $1 in
+  mark) mark ;;
+  move) move ;;
+esac

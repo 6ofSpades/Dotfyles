@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# When switching workspaces, will auto focus the last
+# focused window on that workspace, so you don't need to
+# focus manually after switching
+
+hyprctl dispatch workspace "$1"
+lastwindow=$(hyprctl activeworkspace -j | jq -r '.lastwindow')
+if [[ -n $lastwindow ]];then
+  hyprctl dispatch focuswindow address:$lastwindow
+fi

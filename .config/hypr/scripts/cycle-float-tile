@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Normally when trying to cycle window focus and change from floating to tiled
+# or vice versa, you end up having to cycle between multiple windows until
+# you finally change the focus to tiled or float.
+# With this, it should change to tiled if you're in floating, and floating if you're int tiled
+
+floating=$(hyprctl -j activewindow | jq -r '.floating')
+
+if [[ "$floating" == "false" ]]; then
+  hyprctl dispatch cyclenext floating
+else
+  hyprctl dispatch cyclenext tiled
+fi

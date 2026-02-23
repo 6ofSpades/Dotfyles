@@ -1,0 +1,28 @@
+
+@theme "~/.config/rofi/themes/rounded-purple-dark.rasi"
+
+configuration {
+  kb-row-up: "Up,Control+k,Shift+Tab,Shift+ISO_Left_Tab";
+  kb-row-down: "Down,Control+j";
+  kb-row-left: "Left,Control+h";
+  kb-row-right: "Right,Control+l";
+  kb-accept-entry: "Control+m,Return,KP_Enter";
+  kb-remove-to-eol: "Control+Shift+e";
+  kb-mode-next: "Shift+Right,Control+Tab,Shift+l";
+  kb-mode-previous: "Shift+Left,Control+Shift+Tab,Shift+h";
+  kb-remove-char-back: "BackSpace";
+
+  kb-move-char-back: "Alt+h";
+  kb-move-char-forward: "Alt+l";
+  kb-move-word-back: "Alt+b,Control+Left";
+  kb-move-word-forward: "Alt+e,Control+Right";
+  kb-move-front: "Alt+0";
+  kb-move-end: "Alt+dollar";
+  kb-remove-word-forward: "Alt+d";
+  kb-remove-char-forward: "Alt+x";
+
+// unbinds
+  kb-custom-10: "";
+  kb-custom-14: "";
+  kb-mode-complete: "";
+} 

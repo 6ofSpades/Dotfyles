@@ -1,0 +1,26 @@
+#!/bin/bash
+
+PROMPT=$(kitty @ get-colors | awk '$1 == "color2" {print $2}')
+SELECTION=$(kitty @ get-colors | awk '$1 == "color5" {print $2}')
+
+gum confirm --timeout 10s --default "Do you want to disable download timeout?" \
+  --prompt.foreground="$PROMPT" \
+  --selected.background="$SELECTION" \
+  && yay -Syu --disable-download-timeout \
+  || yay -Syu
+
+gum confirm --timeout 10s --default "Update Hyprland plugins?" \
+  --prompt.foreground="$PROMPT" \
+  --selected.background="$SELECTION" \
+  && hyprpm update
+
+if flatpak list; then
+  gum confirm --timeout 10s --default "Update flatpak?" \
+  --prompt.foreground="$PROMPT" \
+  --selected.background="$SELECTION" \
+    && flatpak update
+else
+  gum style "No flatpak installed. Nice job  " --faint --padding "1 1"
+fi
+
+gum style "Done" --foreground "$PROMPT" --bold --padding "1 1"

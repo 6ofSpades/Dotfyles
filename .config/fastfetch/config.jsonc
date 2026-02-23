@@ -1,0 +1,151 @@
+{
+  "$schema": "https:#github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {
+    "padding": {
+      "top": 2
+    }
+  },
+  "display": {
+    "separator": "",
+    "color": {
+      "keys": "red",
+      "title": "red"
+    },
+    "percent": {
+      "type": 2,         // 1=number, 2=bar, 3=both, 9=colored number
+      "color": {
+          "green": "green",
+          "yellow": "blue",
+          "red": "magenta"
+      }
+    }
+  },
+  "modules": [
+    {
+      "type": "break"
+    },
+    {
+      "color": {
+        "host": "magenta",
+        "user": "magenta"
+      },
+      "keyColor": "magenta",
+      "type": "title"
+    },
+    {
+      "format": " ",
+      "key": "────── OS Info ──────",
+      "keyColor": "blue",
+      "type": "custom"
+    },
+    
+    {
+      "key": "  -> ",
+      "keyColor": "magenta",
+      "type": "os"
+    }, {
+      "key": "  -> ",
+      "keyColor": "magenta",
+      "type": "kernel"
+    },
+    {
+      "key": "  -> ",
+      "keyColor": "magenta",
+      "type": "packages"
+    },
+    {
+      "key": "  -> ",
+      "keyColor": "magenta",
+      "type": "shell"
+    },
+    // {
+    //   "format": " ",
+    //   "key": "────── Software Info ──────",
+    //   "keyColor": "blue",
+    //   "type": "custom"
+    // },
+    {
+      "key": "  -> ",
+      "keyColor": "magenta",
+      "type": "wm"
+    },
+    {
+      "key": "  -> ",
+      "keyColor": "magenta",
+      "type": "terminal"
+    },
+    {
+      "key": "  -> ",
+      "keyColor": "magenta",
+      "type": "terminalfont"
+    },
+    // {
+    //   "key": "  -> ",
+    //   "keyColor": "magenta",
+    //   "type": "font"
+    // },
+    {
+      "format": " ",
+      "key": "────── Hardware Info ──────",
+      "keyColor": "blue",
+      "type": "custom"
+    },
+    {
+      "key": " 󰍹 -> ",
+      "keyColor": "magenta",
+      "type": "display"
+    },
+    {
+      "key": "  -> ",
+      "keyColor": "magenta",
+      "type": "cpu"
+    },
+    {
+      "key": "  -> ",
+      "keyColor": "magenta",
+      "type": "gpu"
+    },
+    {
+      "key": "  -> ",
+      "keyColor": "magenta",
+      "type": "memory",
+      "percent": {
+          // "type": 2     // Show both percentage number and bar
+      }
+    },
+    {
+      "key": "  -> ",
+      "keyColor": "magenta",
+      "type": "disk"
+    },
+    {
+      "format": " ",
+      // "key": "────── Misc Info ──────",
+      "key": " ",
+      "keyColor": "blue",
+      "type": "custom"
+    },
+    {
+      "key": "  -> ",
+      "keyColor": "magenta",
+      "type": "localip"
+    },
+    {
+      "key": "  -> ",
+      "keyColor": "magenta",
+      "type": "uptime"
+    },
+    {
+      "format": " ",
+      "key": " ",
+      "keyColor": "blue",
+      "type": "custom"
+    },
+    {
+      "key": " \u001b[90m   \u001b[31m   \u001b[32m   \u001b[33m   \u001b[34m   \u001b[35m   \u001b[36m   \u001b[37m ",
+      "type": "custom"
+    },
+    
+    "break"
+  ]
+}

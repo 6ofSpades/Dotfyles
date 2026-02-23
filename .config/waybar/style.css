@@ -1,0 +1,88 @@
+@import "styles/modules-center.css";
+@import "styles/modules-left.css";
+@import "styles/modules-right.css";
+@import "themes/theme.css";
+
+/* Font */
+* {
+  font-family: "JetBrainsMono Nerd Font";
+  font-size: 10px;
+  color: @text;
+  box-shadow: 0 0 0 0;
+}
+
+/* main outline */
+window#waybar {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* main background */
+window#waybar > box {
+  margin: 3px;
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+/* hoverables */
+#custom-theme_switcher:hover,
+#idle_inhibitor:hover,
+#clock.date:hover,
+#network:hover,
+#bluetooth:hover,
+#custom-system_update:hover,
+#mpris:hover,
+#pulseaudio:hover,
+#custom-virtual_keyboard:hover,
+#wireplumber:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* states */
+.warning {
+  color: @warning;
+}
+.critical {
+  color: @critical;
+}
+.charging {
+  color: @charging;
+}
+.deactivated,
+.paused,
+#pulseaudio.output.muted,
+#pulseaudio.input.source-muted,
+#wireplumber.muted {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* dividers */
+#custom-left_div,
+#custom-left_inv,
+#custom-right_div,
+#custom-right_inv {
+  font-size: 26px;
+}
+
+/* buttons */
+button {
+  border-radius: 16px;
+  padding: 0 10px;
+}
+button:hover {
+  background-color: @hover-bg;
+}
+
+/* tooltips */
+tooltip {
+  border: 2px solid @accent;
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.25);
+}
+tooltip label {
+  margin: 2px 4px;
+  font-weight: normal;
+  font-size: 9pt;
+}
+tooltip decoration {
+  border: none;
+  background-color: transparent;
+}

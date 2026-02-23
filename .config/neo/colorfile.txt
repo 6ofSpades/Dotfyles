@@ -1,0 +1,20 @@
+# This is a neo color file. To use this file, run:
+#
+#   neo --colorfile=colorfile.txt
+#
+# This example shows how to set custom 32-bit colors.
+#
+# The color palette comes from gruvbox:
+#
+# https://github.com/morhetz/gruvbox
+#
+
+neo_color_version 1
+
+0   # transparent background
+19  # (foreground)
+57  # 
+54  #
+92  #
+51  # (glitch/blink color)
+255 # (bottom of droplet)

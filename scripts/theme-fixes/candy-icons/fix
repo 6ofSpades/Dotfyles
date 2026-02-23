@@ -1,0 +1,24 @@
+#!/bin/bash
+
+ICONS_DIR='/usr/share/icons/candy-icons'
+OVERRIDES='~/.local/share/icons/candy-icons'
+
+# Check if candy icons is installed first
+[[ -d "$ICONS_DIR" ]] || ( echo "Candy-Icons not installed" && exit 0 )
+
+mkdir -p "$OVERRIDES/apps/scalable"
+
+ln -s ${ICONS_DIR}/apps/scalable/zen.svg ${OVERRIDES}/apps/scalable/zen-browser.svg
+ln -s ${ICONS_DIR}/apps/scalable/burp.svg ${OVERRIDES}/apps/scalable/burpsuite.svg
+ln -s ${ICONS_DIR}/apps/scalable/electron.svg ${OVERRIDES}/apps/scalable/electron37.svg
+ln -s ${ICONS_DIR}/apps/scalable/org.kde.kolourpaint.svg ${OVERRIDES}/apps/scalable/kolourpaint.svg
+ln -s ${ICONS_DIR}/apps/scalable/java.svg ${OVERRIDES}/apps/scalable/java25-openjdk.svg
+ln -s ${ICONS_DIR}/apps/scalable/kmenuedit.svg ${OVERRIDES}/apps/scalable/rofi.svg
+ln -s ${ICONS_DIR}/apps/scalable/syncthing-gtk.svg ${OVERRIDES}/apps/scalable/syncthingtray-qt6.svg
+ln -s ${ICONS_DIR}/apps/scalable/audacity.svg ${OVERRIDES}/apps/scalable/tenacity.svg
+ln -s ${ICONS_DIR}/apps/scalable/org.zim_wiki.Zim.svg ${OVERRIDES}/apps/scalable/kiwix-desktop.svg   # definitely not the best icon for kiwix but will do until a I decide on a better icon
+
+ln -s /usr/share/icons/al-beautyline/apps/scalable/audio-speakers.svg ${OVERRIDES}/apps/scalable/audiorelay.svg
+ln -s /usr/share/icons/al-beautyline/apps/scalable/duckstation.svg ${OVERRIDES}/apps/scalable/yazi.svg
+ln -s /usr/share/icons/al-beautyline/apps/scalable/qasmixer.svg ${OVERRIDES}/apps/scalable/wiremix.svg
+ln -s /usr/share/icons/al-beautyline/apps/scalable/qtscrcpy.svg ${OVERRIDES}/apps/scalable/scrcpy.svg

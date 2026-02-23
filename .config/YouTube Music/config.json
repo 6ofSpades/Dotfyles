@@ -1,0 +1,82 @@
+{
+	"window-size": {
+		"width": 1892,
+		"height": 1010
+	},
+	"window-maximized": false,
+	"window-position": {
+		"x": 14,
+		"y": 56
+	},
+	"url": "https://music.youtube.com/watch?v=WU3FMGIqiys&list=PLyYwcYI5fxBXoaWXjVayyrTT4-EWmEVS1&index=0",
+	"options": {
+		"tray": true,
+		"appVisible": true,
+		"autoUpdates": false,
+		"alwaysOnTop": false,
+		"hideMenu": false,
+		"hideMenuWarned": false,
+		"startAtLogin": false,
+		"disableHardwareAcceleration": false,
+		"removeUpgradeButton": false,
+		"restartOnConfigChanges": false,
+		"trayClickPlayPause": false,
+		"autoResetAppCache": false,
+		"resumeOnStart": true,
+		"likeButtons": "",
+		"proxy": "",
+		"startingPage": "",
+		"overrideUserAgent": false,
+		"usePodcastParticipantAsArtist": false,
+		"themes": []
+	},
+	"plugins": {
+		"notifications": {},
+		"video-toggle": {
+			"mode": "custom"
+		},
+		"precise-volume": {
+			"enabled": true,
+			"steps": "1",
+			"arrowsShortcut": true,
+			"globalShortcuts": {
+				"volumeUp": "",
+				"volumeDown": ""
+			},
+			"savedVolume": 40
+		},
+		"discord": {
+			"listenAlong": true
+		},
+		"shortcuts": {
+			"enabled": true
+		},
+		"equalizer": {
+			"enabled": true
+		},
+		"audio-compressor": {
+			"enabled": false
+		},
+		"amuse": {
+			"enabled": false
+		},
+		"in-app-menu": {
+			"enabled": true,
+			"hideDOMWindowControls": true
+		},
+		"blur-nav-bar": {
+			"enabled": true
+		},
+		"ambient-mode": {
+			"enabled": true
+		},
+		"compact-sidebar": {
+			"enabled": false
+		}
+	},
+	"__internal__": {
+		"migrations": {
+			"version": "3.11.0"
+		}
+	}
+}

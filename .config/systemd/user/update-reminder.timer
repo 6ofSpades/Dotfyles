@@ -1,0 +1,12 @@
+[Unit]
+Description=Runs update reminder every Saturday and hourly
+
+[Timer]
+# Every Saturday at every hour
+# DayOfWeek Year-Month-Day Hour:Minute:Second
+OnCalendar=Sat *-*-* *:00:00
+Persistent=false
+
+[Install]
+WantedBy=timers.target
+

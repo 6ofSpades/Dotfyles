@@ -1,0 +1,23 @@
+#!/bin/bash
+
+terminal=kitty
+
+
+hyprctl dispatch exec "[workspace 1 silent]" "$terminal" &
+# wait for kitty to open
+until hyprctl clients | grep '~'; do
+  sleep 0.1
+done
+
+hyprctl dispatch exec "[workspace 1 silent]" "$terminal" cava &
+# wait
+until hyprctl clients | grep 'cava'; do
+  sleep 0.1
+done
+
+hyprctl dispatch exec "[workspace 1 silent]" "$terminal tte-anim lunara" &
+until hyprctl clients | grep 'tte-anim'; do
+  sleep 0.1
+done
+
+hyprctl dispatch exec "[workspace 1 silent]" "$terminal genact -m cryptomining -m mkinitcpio" &

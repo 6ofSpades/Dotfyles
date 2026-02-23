@@ -1,0 +1,84 @@
+#!/bin/bash
+
+TEMP="/tmp/plctl"
+
+# Create temporary file if it doesn't exist
+if [[ ! -e $TEMP ]]; then 
+  touch $TEMP
+fi
+
+
+# rofi selection menu
+if [[ $1 == select ]]; then
+
+  # Get current selected player
+  current="$(<$TEMP)"
+
+  selected=$(playerctl -l | rofi -dmenu -p "PLCTL" -mesg "Current: ${current:-none}" -theme-str 'window {width: 21%;}')
+
+  # Don't save to file if none was selected on the rofi menu
+  [[ -n $selected ]] && echo $selected > $TEMP
+
+  exit 0
+fi
+
+# quick select using tab
+if [[ $1 == tab ]]; then
+  current="$(<"$TEMP")"
+
+  mapfile -t list < <(playerctl -l)
+
+  for i in "${!list[@]}"; do
+    if [[ "${list[i]}" == "$current" ]]; then
+      selected="${list[i+1]}"
+      break
+    fi
+  done
+
+  [[ -z "$selected" ]] && selected="${list[0]}"
+
+  echo "Selected: $selected"
+  notify-send -a PLCTL-SELECTED "$selected" -t 2000 -i text-x-script -u low -r 2426
+  echo "$selected" > "$TEMP"
+
+  exit 0
+fi
+
+function pos_percentage() {
+  ## Control the media player in percentage, as opposed to only absolute values
+  local length=$(playerctl --player="$(<$TEMP)" metadata mpris:length)
+  local percentage="$1"
+
+  local length=${length::-6}
+  local percentage=${percentage::-1}
+
+  local result=$(($length * $percentage / 100))
+
+  echo "Media length is $length seconds"
+  echo "$1 is $result seconds"
+
+  cmd="position $result"
+}
+
+case "$1" in
+  h)  cmd="position 10-" ;;
+  l)  cmd="position 10+" ;;
+  j)  cmd="volume 0.1-" ;;
+  k)  cmd="volume 0.1+" ;;
+  next|previous|play-pause) cmd="$1" ;;
+
+  *%) pos_percentage "$1" ;;  # function to control the player in percentage
+
+  clear) echo '' > $TEMP && exit 0 ;; # clear selection so it defaults back to last active player
+  *) echo "???" && exit 0 ;;
+esac
+
+
+if $(playerctl --player="$(<$TEMP)" $cmd); then
+  # confirmation if command succeeds
+  echo ok
+else
+  # notification for 2 seconds if command fails
+  notify-send -a PLCTL "Some error happened :(" -t 2000 -i script-error
+fi
+

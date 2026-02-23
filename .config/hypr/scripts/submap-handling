@@ -1,0 +1,18 @@
+#!/bin/bash
+
+subon="$HOME/.config/hypr/scripts/.submap-on.mp3"
+suboff="$HOME/.config/hypr/scripts/.submap-off.mp3"
+
+
+# reset submap if no arugment was passed to the script
+if [[ -z "$1" ]]; then
+  [[ $(hyprctl submap) != 'default' ]] && hyprctl dispatch submap reset && paplay $suboff  # play a sound to alert submap has changed
+  exit 0
+fi
+
+# change to specified submap
+if [[ $(hyprctl submap) == "$1" ]]; then
+  hyprctl dispatch submap reset && paplay $suboff  # reset if already in submap
+else
+  hyprctl dispatch submap "$1" && paplay $subon   # change to submap
+fi

@@ -1,0 +1,96 @@
+#!/bin/bash
+
+set -eo pipefail
+
+ASK_EXT=false
+KEYSTROKE_MODE=true # will type the text instead of pasting it
+
+TERM_CLASS="nvim-wl-anywhere"
+TERM="kitty"
+TERM_OPTS="-o background_opacity=0.5 -o background=#000000 --class $TERM_CLASS -e"
+TMPFILE_DIR="/tmp/nvim-wl-anywhere"
+
+# check if wl-ime-type is installed
+if ! command -v wl-ime-type &>/dev/null; then
+  notify-send -i "$iDIR/error.png" "wl-ime-type missing" "Install package wl-ime-type first"
+  exit 1
+fi
+
+kill_existing_instance() {
+  local FOUND=false
+  while read -r pid cmd; do
+    if [[ "$cmd" == "$TERM"* ]]; then
+      kill -9 "$pid"
+      rm -rf $TMPFILE_DIR/*
+      FOUND=true
+    fi
+  done < <(pgrep -af "$TERM_CLASS")
+
+  if $FOUND; then
+    echo "An existing instance was found and terminated."
+    exit 1
+  fi
+}
+
+create_tmpfile() {
+  mkdir -p "$TMPFILE_DIR"
+  local filename="doc-$(date +"%y%m%d%H%M%S")"
+  if $ASK_EXT && [[ -n "${EXT:-}" ]]; then
+    filename="$filename.$EXT"
+  fi
+  TMPFILE="$TMPFILE_DIR/$filename"
+  touch "$TMPFILE"
+  chmod og-rwx "$TMPFILE"
+}
+
+# ------------
+
+kill_existing_instance
+create_tmpfile
+
+# save activewindow address before opening nvim
+address=$(hyprctl -j activewindow  | jq -r '.address')
+
+if [[ $1 == select ]]; then
+  # Save current clipboard state
+  LAST_CLIPBOARD=$(wl-paste --no-newline || true)
+
+  # Try to grab the primary selection
+  SELECTED_TEXT=$(wl-paste -p --no-newline || true)
+
+  if [[ "$SELECTED_TEXT" != "$LAST_CLIPBOARD" ]]; then
+    echo -n "$SELECTED_TEXT" | wl-copy -n
+    echo "$SELECTED_TEXT" >"$TMPFILE"
+  fi
+
+  # Restore the clipboard
+  echo -n "$LAST_CLIPBOARD" | wl-copy -n
+fi
+
+# Launch Neovim in insert mode, auto-quit on write
+$TERM $TERM_OPTS nvim +startinsert +'autocmd BufWritePost <buffer> quit' -c 'set wrap' -c 'set linebreak' -c 'nmap j gj' -c 'nmap k gk' "$TMPFILE"
+
+# Focus previous window before typing or pasting
+if [[ -n "$address" ]]; then
+  hyprctl dispatch focuswindow address:"$address"
+fi
+
+TEXT=$(<"$TMPFILE")
+
+# Paste or type the text if not empty
+if [ -n "$TEXT" ]; then
+
+  if $KEYSTROKE_MODE; then
+    wl-ime-type "$TEXT"
+
+  else
+    cat "$TMPFILE" | wl-copy -n
+    wtype -M Ctrl -k v -m Ctrl
+  fi
+
+else
+  :
+fi
+
+# Remove tmp file
+rm -rf "$TMPFILE"

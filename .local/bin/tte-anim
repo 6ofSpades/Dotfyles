@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [[ -z "$1" ]]; then
+  echo "Need a string as argument"
+  exit 1
+fi
+
+TEXT="$1"
+
+while true; do
+  figlet "$TEXT" | \
+    tte --reuse-canvas \
+    --random-effect \
+    --canvas-width 0 \
+    --canvas-height 0 \
+    --no-restore-cursor \
+    --no-eol \
+    --anchor-canvas c \
+    --anchor-text c \
+    --exclude-effects "matrix"
+done
