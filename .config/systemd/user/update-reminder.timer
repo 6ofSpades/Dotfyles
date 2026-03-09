@@ -1,5 +1,5 @@
 [Unit]
-Description=Runs update reminder every Saturday and hourly
+Description=Remind about Arch updates
 
 [Timer]
 # Every Saturday at every hour

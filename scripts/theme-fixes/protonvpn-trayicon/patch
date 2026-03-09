@@ -8,8 +8,8 @@ echo "Removing ProtonVPN's tray icons. Sudo is needed..."
 sudo rm -rf "$TRAY_PATH/state-connected.svg" "$TRAY_PATH/state-disconnected.svg" "$TRAY_PATH/state-error.svg"
 
 echo 'Copying new icons...'
-sudo cp state-connected.svg "$TRAY_PATH"
-sudo cp state-disconnected.svg "$TRAY_PATH"
-sudo cp state-error.svg "$TRAY_PATH"
+sudo cp state-connected.svg $TRAY_PATH
+sudo cp state-disconnected.svg $TRAY_PATH
+sudo cp state-error.svg $TRAY_PATH
 
 echo 'Done.'

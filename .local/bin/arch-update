@@ -18,7 +18,7 @@ if flatpak list; then
   gum confirm --timeout 10s --default "Update flatpak?" \
   --prompt.foreground="$PROMPT" \
   --selected.background="$SELECTION" \
-    && flatpak update
+    && flatpak update -y
 else
   gum style "No flatpak installed. Nice job  " --faint --padding "1 1"
 fi
