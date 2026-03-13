@@ -165,7 +165,16 @@ alias yayu='arch-update'
 
 alias journalctl='journalctl -S yesterday' # filter since yesterday by defautl
 
-alias history='history -i'  # add timestamp to history and show 100 lines by default
+alias history='history -i'  # add timestamp to history
+# fh - fzf command history
+fh() {
+  print -z $(
+    ([ -n "$ZSH_NAME" ] && fc -li 1 || history) |
+    fzf +s --tac |
+    sed -E 's/^[[:space:]]*[0-9]+[[:space:]]+[0-9-]+[[:space:]]+[0-9:]+[[:space:]]+//' |
+    sed -E 's/\\/\\\\/g'
+  )
+}
 
 alias hy='start-hyprland' ## To start Hyprland from the TTY easily
 alias hyconf='cd ~/.config/hypr && nvim' ## Just cause I need to access config all the time
