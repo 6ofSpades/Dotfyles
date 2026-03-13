@@ -22,7 +22,10 @@ def swap_rgba_argb(value: str) -> str:
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: script.py <hexcolor>")
+        print("Usage: rgba2argb <hexcolor>")
+        print()
+        print("Examples:")
+        print("  rgba2argb #FFAA00")
         sys.exit(1)
 
     print(swap_rgba_argb(sys.argv[1]))
