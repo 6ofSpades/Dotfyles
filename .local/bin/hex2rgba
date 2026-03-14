@@ -35,6 +35,23 @@ def convert(color):
         return rgb_to_hex(color)
 
 
+def extract_rgb(color):
+    if color.startswith("#"):
+        hex_code = color.lstrip("#")
+        if len(hex_code) >= 6:
+            return tuple(int(hex_code[i : i + 2], 16) for i in (0, 2, 4))
+    else:
+        match = re.match(r"rgba?\((\d+),\s*(\d+),\s*(\d+)", color)
+        if match:
+            return tuple(map(int, match.groups()))
+    return None
+
+
+def color_text(text, rgb):
+    r, g, b = rgb
+    return f"\033[38;2;{r};{g};{b}m{text}\033[0m"
+
+
 if __name__ == "__main__":
     import sys
 
@@ -47,4 +64,12 @@ if __name__ == "__main__":
         print('  hex2rgba "rgb(255,170,0)"')
         print('  hex2rgba "rgba(255,170,0,0.8)"')
     else:
-        print(convert(sys.argv[1]))
+        color = sys.argv[1]
+        result = convert(color)
+
+        rgb = extract_rgb(color)
+
+        if rgb:
+            print(color_text(result, rgb))
+        else:
+            print(result)
