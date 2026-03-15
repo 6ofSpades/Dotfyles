@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ICONS_DIR='/usr/share/icons/candy-icons'
-OVERRIDES='~/.local/share/icons/candy-icons'
+OVERRIDES="$HOME/.local/share/icons/candy-icons"
 
 # Check if candy icons is installed first
 [[ -d "$ICONS_DIR" ]] || ( echo "Candy-Icons not installed" && exit 0 )
