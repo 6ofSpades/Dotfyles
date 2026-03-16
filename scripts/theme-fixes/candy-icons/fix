@@ -4,7 +4,8 @@ ICONS_DIR='/usr/share/icons/candy-icons'
 OVERRIDES="$HOME/.local/share/icons/candy-icons"
 
 # Check if candy icons is installed first
-[[ -d "$ICONS_DIR" ]] || ( echo "Candy-Icons not installed" && exit 0 )
+[[ -d "$ICONS_DIR" ]] || { echo "Candy-Icons not installed" ; exit 0; }
+echo "Running candy-icons fix..."
 
 mkdir -p "$OVERRIDES/apps/scalable"
 
@@ -22,3 +23,5 @@ ln -s /usr/share/icons/al-beautyline/apps/scalable/audio-speakers.svg ${OVERRIDE
 ln -s /usr/share/icons/al-beautyline/apps/scalable/duckstation.svg ${OVERRIDES}/apps/scalable/yazi.svg
 ln -s /usr/share/icons/al-beautyline/apps/scalable/qasmixer.svg ${OVERRIDES}/apps/scalable/wiremix.svg
 ln -s /usr/share/icons/al-beautyline/apps/scalable/qtscrcpy.svg ${OVERRIDES}/apps/scalable/scrcpy.svg
+
+echo "Done."

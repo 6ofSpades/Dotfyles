@@ -1,8 +1,11 @@
 #!/bin/bash
 
-TRAY_PATH="/usr/lib/python*/site-packages/proton/vpn/app/gtk/assets/icons"
+for TRAY_PATH in /usr/lib/python*/site-packages/proton/vpn/app/gtk/assets/icons; do
+    [[ -d "$TRAY_PATH" ]] && break
+done
 
-[[ -d "$TRAY_PATH" ]] || ( echo "ProtonVPN not installed" && exit 0 )
+[[ -d "$TRAY_PATH" ]] || { echo "ProtonVPN not installed"; exit 0; }
+echo "Running proton-vpn tray-icon theme fix..."
 
 echo "Removing ProtonVPN's tray icons. Sudo is needed..."
 sudo rm -rf "$TRAY_PATH/state-connected.svg" "$TRAY_PATH/state-disconnected.svg" "$TRAY_PATH/state-error.svg"
