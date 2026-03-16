@@ -257,3 +257,33 @@ EOF"
 
   echo "ydotool service enabled."
 fi
+
+gum confirm --default "Run additional config and theme scripts?" && scripts="y" || scripts="n"
+if [[ "$scripts" == "y" ]]; then
+  # if flameshot was installed, auto configure the save path
+  if [[ $(yay -Qs flameshot) ]]; then
+    mkdir -p "$HOME/Pictures/flameshot"
+    sed -i "s/user/$USER/g" "$DOTFILES_DIR/.config/flameshot/flameshot.ini"
+  fi
+
+  if [[ $(yay -Qs candy-icons) ]]; then
+    cd "$DOTFILES_DIR/scripts/theme-fixes/candy-icons"
+    ./fix
+  fi
+  if [[ $(yay -Qs pear-desktop) ]]; then
+    cd "$DOTFILES_DIR/scripts/theme-fixes/pear-desktop"
+    ./patch
+  fi
+  if [[ $(yay -Qs proton-vpn) ]]; then
+    cd "$DOTFILES_DIR/scripts/theme-fixes/protonvpn-trayicon"
+    ./patch
+  fi
+  if [[ $(yay -Qs signal-desktop) ]]; then
+    cd "$DOTFILES_DIR/scripts/theme-fixes/signal-themer"
+    ./patch.sh
+  fi
+
+  cd
+fi
+
+gum style "Dotfyles installed." --foreground "#00ff00"  --bold --padding "1 1"
