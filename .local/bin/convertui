@@ -1,0 +1,182 @@
+#!/usr/bin/env bash
+
+# This script should be useful for converting file types
+# directly in the terminal by using some tools
+# goodbye convertio.co, no that I hate you, I just like
+# the terminal
+#
+
+DEPENDENCIES="
+  ### 🛠️ Required Dependencies Checklist:
+  Make sure you have the following CLI tools installed on your system:
+  * **Core TUI:** \`gum\`
+  * **Images:** \`imagemagick\` (provides \`magick\`)
+  * **Audio/Video:** \`ffmpeg\`
+  * **Documents:** \`pandoc-cli\`
+  * **PDF Output:** \`typst\` (required by pandoc to generate PDFs without LaTeX)
+  * **Font Utilities:** \`fontconfig\` (required to detect system fonts dynamically)
+  * **E-Books:** \`libmobi\` / \`libmobi\` (required for .mobi to .epub conversion)
+
+  ### 🌟 Optional Enhancements:
+  * **Office Layout Precision:** \`libreoffice-still\` (not required, but highly recommended if you want flawless \`.docx\` to \`.pdf\` conversion with accurate font substitution)
+  * **Fonts:** \`ttf-liberation\` (optional but good for converting to pdf when using typst instead of libreoffice)
+  "
+
+while [[ -z "$FILE" ]]; do
+
+  clear
+
+  # cool title
+  gum style \
+    --foreground 6 \
+    --border-foreground 5 \
+    --border double \
+    --padding "1 4" \
+    --margin "0 1" \
+    --align center \
+    " CONVERTUI " "bye bye convertio.co"
+  gum style \
+    --margin "1 0" \
+    "Not that I hate convertio, I just like using my own terminal"
+
+  # 1. Select the file
+  FILE=$(
+    gum input --placeholder "File path here" \
+      --header "
+     Select the file you want to convert
+    - Enter q to quit
+    - Enter f to use the file picker
+    - Enter d for dependencies checklist
+    " --placeholder.foreground 8 --header.foreground 8
+  )
+
+  [ -z "$FILE" ] && continue
+  [ "$FILE" == "q" ] && exit 0
+  [ "$FILE" == "f" ] && FILE=$(gum file)
+  [ "$FILE" == "d" ] && gum format "$DEPENDENCIES" --theme="pink" && FILE=
+done
+
+# Verify file exists
+if [ ! -f "$FILE" ]; then
+  gum format "❌ **Error:** File \`$FILE\` does not exist."
+  exit 1
+fi
+
+# Extract base name without extension
+FILENAME="${FILE%.*}"
+
+# 2. Detect the TRUE MIME type
+MIME_TYPE=$(file --mime-type -b "$FILE")
+msg1=$(gum style " Detected true file type: ")
+msg2=$(gum style " $MIME_TYPE " --foreground 6 --background 8)
+gum join "$msg1" "$msg2"
+
+# 3. Determine output options based on MIME type categories
+choose_color="--header.foreground 4 --cursor.foreground 5"
+if [[ "$MIME_TYPE" == image/* ]]; then
+  echo "󰓾 Select output image format:"
+  TARGET=$(gum choose "png" "jpg" "webp" "gif" "avif" $choose_color)
+  CMD_TYPE="image"
+elif [[ "$MIME_TYPE" == video/* ]]; then
+  echo "󰓾  Select output video or audio extraction format:"
+  TARGET=$(gum choose "mp4" "mkv" "mov" "mp3" "wav" $choose_color)
+  CMD_TYPE="video"
+elif [[ "$MIME_TYPE" == audio/* ]]; then
+  echo "󰓾  Select output audio format:"
+  TARGET=$(gum choose "mp3" "wav" "flac" "ogg" $choose_color)
+  CMD_TYPE="audio"
+# Detect mobipocket files
+elif [[ "$MIME_TYPE" == "application/x-mobipocket-ebook" ]]; then
+  echo "󰓾 Select output e-book format:"
+  TARGET=$(gum choose "epub" $choose_color)
+  CMD_TYPE="ebook"
+elif [[ "$MIME_TYPE" == text/* || "$MIME_TYPE" == "application/pdf" || "$MIME_TYPE" == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ]]; then
+  echo "󰓾 Select output document format:"
+  TARGET=$(gum choose "md" "pdf" "docx" "html" "txt" $choose_color)
+  CMD_TYPE="document"
+else
+  echo "󰓾 Unknown MIME type. Select any output format:"
+  TARGET=$(gum choose "png" "jpg" "pdf" "txt" "mp4" "mp3" "epub" $choose_color)
+  CMD_TYPE="fallback"
+fi
+
+[ -z "$TARGET" ] && echo "Cancelled." && exit 0
+OUTPUT_FILE="${FILENAME}.${TARGET}"
+
+# Setup a generic safe font for Pandoc fallbacks
+FONT="Liberation Sans"
+if ! fc-list : family | grep -qxi "Liberation Sans"; then
+  if fc-list : family | grep -qxi "Arial"; then
+    FONT="Arial"
+  else
+    FONT="sans-serif"
+  fi
+fi
+
+# 4. Perform conversion based on the logic category
+echo ""
+gum spin --spinner dot --title "Converting to $TARGET..." -- sleep 0.5
+
+case "$CMD_TYPE" in
+"image")
+  magick "$FILE" "$OUTPUT_FILE"
+  ;;
+"video")
+  if [[ "$TARGET" =~ ^(mp3|wav)$ ]]; then
+    ffmpeg -i "$FILE" -vn -acodec libmp3lame "$OUTPUT_FILE" -y -loglevel quiet
+  else
+    ffmpeg -i "$FILE" "$OUTPUT_FILE" -y -loglevel quiet
+  fi
+  ;;
+"audio")
+  ffmpeg -i "$FILE" "$OUTPUT_FILE" -y -loglevel quiet
+  ;;
+# Execution logic for .mobi conversion
+"ebook")
+  if [ "$TARGET" == "epub" ]; then
+    mobitool -e "$FILE"
+    # Note: mobitool automatically outputs file names as "${FILENAME}.epub"
+  fi
+  ;;
+"document")
+  if [ "$TARGET" == "pdf" ] && [[ "$MIME_TYPE" == *"officedocument"* ]] && command -v libreoffice &>/dev/null; then
+    # If it's a docx and LibreOffice exists, use it for perfect visual translation
+    libreoffice --headless --convert-to pdf "$FILE"
+  elif [ "$TARGET" == "pdf" ]; then
+    # Fallback to Pandoc + Typst if LibreOffice is missing or it's a text/md file
+    pandoc "$FILE" --pdf-engine=typst -V mainfont="$FONT" -o "$OUTPUT_FILE"
+  else
+    pandoc "$FILE" -o "$OUTPUT_FILE"
+  fi
+  ;;
+*)
+  if [[ "$TARGET" =~ ^(png|jpg|webp)$ ]]; then
+    magick "$FILE" "$OUTPUT_FILE"
+  elif [[ "$TARGET" == "epub" ]]; then
+    mobitool -e "$FILE"
+  elif [[ "$TARGET" =~ ^(md|pdf|docx|html)$ ]]; then
+    if [ "$TARGET" == "pdf" ]; then
+      if [[ "$MIME_TYPE" == *"officedocument"* ]] && command -v libreoffice &>/dev/null; then
+        libreoffice --headless --convert-to pdf "$FILE"
+      else
+        pandoc "$FILE" --pdf-engine=typst -V mainfont="$FONT" -o "$OUTPUT_FILE"
+      fi
+    else
+      pandoc "$FILE" -o "$OUTPUT_FILE"
+    fi
+  else
+    ffmpeg -i "$FILE" "$OUTPUT_FILE" -y -loglevel quiet
+  fi
+  ;;
+esac
+
+# 5. Success check
+if [ $? -eq 0 ]; then
+  msg1=$(gum style "✔ Success! Saved as " --foreground 2)
+  msg2=$(gum style " $OUTPUT_FILE " --foreground 6 --background 8)
+  gum join "$msg1" "$msg2"
+else
+  echo ""
+  gum format "❌ **Error:** Conversion failed."
+  gum format "$DEPENDENCIES"
+fi
