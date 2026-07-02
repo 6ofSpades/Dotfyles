@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# This script could be useful if you're dual booting windows
+# then you just wanna reboot the PC and start into windows
+# automatically only for the next reboot
+
+CONFIG_FILE="$HOME/.config/.reboot-windows-target"
+win_boot_num=""
+
+# Create config directory if it doesn't exist
+mkdir -p "$(dirname "$CONFIG_FILE")"
+
+# If the config file exists, read the stored boot number
+if [[ -f "$CONFIG_FILE" ]]; then
+  win_boot_num=$(cat "$CONFIG_FILE" | tr -d '[:space:]')
+fi
+
+# First-time setup: If no valid number is saved, ask the user
+if [[ -z "$win_boot_num" ]]; then
+  echo " First-time setup: Detecting available boot options..."
+  echo "--------------------------------------------------------"
+
+  # Display current efibootmgr entries
+  entries=$(efibootmgr)
+
+  if [[ -z "$entries" ]]; then
+    echo "❌ Something went wrong :(" >&2
+    exit 1
+  fi
+
+  echo "$entries"
+  echo "--------------------------------------------------------"
+
+  # Prompt the user to type the 4-digit hex number
+  echo -n "Type the 4-digit number for your Windows boot (e.g., 0002): "
+  read -r win_boot_num
+
+  # Basic validation: ensure it's exactly 4 alphanumeric/hex characters
+  if [[ ! "$win_boot_num" =~ ^[0-9A-Fa-f]{4}$ ]]; then
+    echo "❌ Invalid format. Expected a 4-digit hex number (e.g., 0002)." >&2
+    exit 1
+  fi
+
+  # Save it for next time
+  echo "$win_boot_num" >"$CONFIG_FILE"
+  echo " Saved Boot${win_boot_num} to $CONFIG_FILE"
+fi
+
+# Execute the reboot
+echo " Booting into Windows (Boot${win_boot_num})..."
+sudo efibootmgr -n "$win_boot_num" && sudo reboot
