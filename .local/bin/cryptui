@@ -1,0 +1,227 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+STATE_DIR="/tmp/cryptui"
+STATE_FILE="$STATE_DIR/vaults"
+
+mkdir -p "$STATE_DIR"
+touch "$STATE_FILE"
+
+# -----------------------------------
+# Helpers
+# -----------------------------------
+
+save_vault() {
+  echo "$1|$2|$3" >>"$STATE_FILE"
+}
+
+remove_vault() {
+  grep -v "^$1|" "$STATE_FILE" >"$STATE_FILE.tmp" || true
+  mv "$STATE_FILE.tmp" "$STATE_FILE"
+}
+
+vault_entries() {
+  while IFS="|" read -r vault mount pid; do
+    if kill -0 "$pid" 2>/dev/null; then
+      echo "$vault|$mount|$pid"
+    fi
+  done <"$STATE_FILE"
+}
+
+has_vaults() {
+  vault_entries | grep . >/dev/null 2>&1
+}
+
+select_vault() {
+
+  if ! has_vaults; then
+    gum style \
+      --foreground 1 \
+      "No vaults opened"
+
+    return 1
+  fi
+
+  vault_entries | while IFS="|" read -r vault mount pid; do
+    echo "$(basename "$vault") → $mount|$pid"
+  done | gum choose
+}
+
+# -----------------------------------
+# Main loop
+# -----------------------------------
+
+while true; do
+
+  clear
+
+  gum style \
+    --foreground 6 \
+    --border-foreground 5 \
+    --border double \
+    --padding "1 4" \
+    --margin "0 1" \
+    --align center \
+    "󰍁 CRYPTUI 󰍁" \
+    "CRYPTOMATOR-CLI FOR SHORT MEMORY ME"
+
+  gum style \
+    --margin "1 0" \
+    "It's not actually TUI, but it's useful"
+
+  ACTION=$(printf "%s\n" \
+    "Unlock vault" \
+    "Lock vault" \
+    "List vaults" \
+    "Open vault" \
+    "Quit" | gum choose)
+
+  case "$ACTION" in
+
+  # ===================================
+  # UNLOCK
+  # ===================================
+
+  "Unlock vault")
+
+    MOUNTER=$(cryptomator-cli list-mounters | gum choose \
+      --header "Choose mounter")
+
+    VAULT=$(gum input \
+      --header "Vault path")
+
+    [ -z "$VAULT" ] && continue
+
+    if [ ! -d "$VAULT" ]; then
+      gum style \
+        --foreground 1 \
+        "Vault folder does not exist"
+
+      sleep 1
+      continue
+    fi
+
+    DEFAULT_MOUNT="$HOME/.cryptui-mounts/$(basename "$VAULT")"
+
+    MOUNT_POINT=$(gum input \
+      --header "Mount point" \
+      --placeholder "$DEFAULT_MOUNT")
+
+    [ -z "$MOUNT_POINT" ] && MOUNT_POINT="$DEFAULT_MOUNT"
+
+    mkdir -p "$MOUNT_POINT"
+
+    PASSWORD=$(gum input \
+      --password \
+      --header "Vault password")
+
+    gum confirm "Unlock vault?" || continue
+
+    printf '%s' "$PASSWORD" | cryptomator-cli unlock \
+      --password:stdin \
+      --mounter="$MOUNTER" \
+      --mountPoint="$MOUNT_POINT" \
+      "$VAULT" >/dev/null 2>&1 &
+
+    PID=$!
+
+    save_vault "$VAULT" "$MOUNT_POINT" "$PID"
+
+    gum style \
+      --foreground 2 \
+      "✔ Vault unlocked"
+
+    sleep 1
+    ;;
+
+  # ===================================
+  # LOCK
+  # ===================================
+
+  "Lock vault")
+
+    CHOICE=$(select_vault) || {
+      sleep 1
+      continue
+    }
+
+    PID=$(echo "$CHOICE" | cut -d "|" -f2)
+
+    kill "$PID"
+
+    sleep 1
+
+    remove_vault "$(echo "$CHOICE" | cut -d "→" -f1 | xargs)"
+
+    gum style \
+      --foreground 2 \
+      "✔ Vault locked"
+
+    sleep 1
+    ;;
+
+  # ===================================
+  # LIST
+  # ===================================
+
+  "List vaults")
+
+    if ! has_vaults; then
+      gum style \
+        --foreground 1 \
+        "No vaults opened"
+
+      sleep 1
+      continue
+    fi
+
+    vault_entries | while IFS="|" read -r vault mount pid; do
+      echo "󰉋 $(basename "$vault")"
+      echo "   Mount: $mount"
+      echo "   PID:   $pid"
+      echo
+    done | gum format
+
+    gum confirm "Back?" >/dev/null
+    ;;
+
+  # ===================================
+  # OPEN
+  # ===================================
+
+  "Open vault")
+
+    CHOICE=$(select_vault) || {
+      sleep 1
+      continue
+    }
+
+    MOUNT=$(echo "$CHOICE" | cut -d "|" -f1 | cut -d "→" -f2 | xargs)
+
+    OPEN_ACTION=$(printf "%s\n" \
+      "Open shell here" \
+      "Open file manager" \
+      "Cancel" | gum choose)
+
+    case "$OPEN_ACTION" in
+
+    "Open shell here")
+      cd "$MOUNT"
+      exec "$SHELL"
+      ;;
+
+    "Open file manager")
+      xdg-open "$MOUNT" >/dev/null 2>&1 &
+      ;;
+
+    esac
+    ;;
+
+  "Quit")
+    exit 0
+    ;;
+
+  esac
+
+done
