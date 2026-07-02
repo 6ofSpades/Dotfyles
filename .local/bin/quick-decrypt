@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+[[ -z "$1" ]] && string=$(gum write --placeholder "Type text to decrypt here") || string="$1"
+pass=$(gum input --password --placeholder "Type your password")
+
+echo "$string" | openssl aes-256-cbc -d -a -pbkdf2 -pass pass:"$pass" | nvim -i NONE -n -c 'set wrap' -c 'set linebreak' -c 'nmap j gj' -c 'nmap k gk' -c "nnoremap q :qa!<CR>"
