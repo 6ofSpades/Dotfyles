@@ -68,7 +68,7 @@ case "$TYPE" in
       "Auto Best" \
       "1080p" \
       "720p" \
-      "480p"
+      "480p" \
       "360p"
     )
 
