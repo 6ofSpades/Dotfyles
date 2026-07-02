@@ -23,4 +23,23 @@ else
   gum style "No flatpak installed. Nice job  " --faint --padding "1 1"
 fi
 
+# update yazi plugins
+gum spin --title "Updating yazi plugins..." ya pkg upgrade
+
+# update locate database
+echo "Updating plocate database..."
+sudo updatedb
+
+# update tldr
+echo "Updating tldr local cache..."
+tldr --update
+
+# clean cache
+echo "Cleaning cache..."
+(
+  echo n
+  echo y
+  echo y
+) | yay -Scc
+
 gum style "Done" --foreground "$PROMPT" --bold --padding "1 1"
