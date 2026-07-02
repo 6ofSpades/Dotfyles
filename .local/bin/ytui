@@ -6,31 +6,22 @@
 # set -e
 set -o pipefail
 
-# Colors
-RED=$(kitty @ get-colors | awk '$1 == "color1" {print $2}')
-GREEN=$(kitty @ get-colors | awk '$1 == "color2" {print $2}')
-CYAN=$(kitty @ get-colors | awk '$1 == "color6" {print $2}')
-MAGENTA=$(kitty @ get-colors | awk '$1 == "color5" {print $2}')
-
-TITLE_COLOR="$CYAN"
-ACCENT_COLOR="$MAGENTA"
-
-clear
-
-gum style \
-  --foreground "$TITLE_COLOR" \
-  --border-foreground "$ACCENT_COLOR" \
-  --border double \
-  --padding "1 4" \
-  --margin "0 1" \
-  --align center \
-  "󰿏 YTUI 󰿏" "YT-DLP FOR SHORT MEMORY PEOPLE"
-gum style \
-  --foreground "#fff" \
-  --margin "1 0" \
-  "P.S.: Not truly TUI, but definitely useful if you can't remember yt-dlp commands 😅"
-
 while true; do
+
+  clear
+
+  gum style \
+    --foreground 6 \
+    --border-foreground 5 \
+    --border double \
+    --padding "1 4" \
+    --margin "0 1" \
+    --align center \
+    "󰿏 YTUI 󰿏" "YT-DLP FOR SHORT MEMORY PEOPLE"
+  gum style \
+    --margin "1 0" \
+    "P.S.: Not truly TUI, but definitely useful if you can't remember yt-dlp commands 😅"
+
   URL=$(
     gum input --placeholder "Paste URL here" \
       --header "
@@ -41,7 +32,7 @@ while true; do
 
   [ -z "$URL" ] && exit 1
   [ "$URL" == "q" ] && exit 0
-  [ "$URL" == "?" ] && curl https://raw.githubusercontent.com/yt-dlp/yt-dlp/refs/heads/master/supportedsites.md | gum format | gum pager --match.foreground="$MAGENTA" && continue
+  [ "$URL" == "?" ] && curl https://raw.githubusercontent.com/yt-dlp/yt-dlp/refs/heads/master/supportedsites.md | gum format | gum pager --match.foreground=5 && continue
   break
 done
 
@@ -227,7 +218,7 @@ EXIT_CODE=$?
 
 if [ $EXIT_CODE -ne 0 ]; then
   gum style \
-    --foreground "$RED" \
+    --foreground 1 \
     --bold \
     --padding "1 1" \
     "❌ Download Failed"
@@ -235,6 +226,6 @@ if [ $EXIT_CODE -ne 0 ]; then
 fi
 
 gum style \
-  --foreground "$GREEN" \
+  --foreground 2 \
   --bold \
   "✔ Download Complete!"

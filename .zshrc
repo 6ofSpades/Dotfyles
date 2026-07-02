@@ -42,6 +42,65 @@ fastfetch -s none | lolcat --force -F 0.1 -S 21 -p 20| fastfetch --raw - --logo-
 # 35 will make directories purple instead of blue, etc.
 LS_COLORS=$LS_COLORS:'di=1;34:' ; export LS_COLORS
 
+# fzf colors
+export FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS} \
+  --color=bg:-1 \
+  --color=bg+:#690086 \
+  --color=border:8 \
+  --color=fg:-1 \
+  --color=gutter:8 \
+  --color=header:5 \
+  --color=hl+:4 \
+  --color=hl:4\
+  --color=info:8 \
+  --color=marker:8 \
+  --color=pointer:6 \
+  --color=prompt:2 \
+  --color=scrollbar:5 \
+  --color=separator:8 \
+  --color=spinner:6 \
+"
+
+# gum colors
+export GUM_INPUT_CURSOR_FOREGROUND=1
+export GUM_INPUT_PROMPT_FOREGROUND=6
+export GUM_INPUT_HEADER_FOREGROUND=8
+export GUM_INPUT_PLACEHOLDER_FOREGROUND=8
+
+export GUM_CHOOSE_HEADER_FOREGROUND=4
+export GUM_CHOOSE_CURSOR_FOREGROUND=5
+
+export GUM_CONFIRM_PROMPT_FOREGROUND=6
+export GUM_CONFIRM_SELECTED_BACKGROUND=5
+
+export GUM_FILE_CURSOR_FOREGROUND=5
+export GUM_FILE_SYMLINK_FOREGROUND=6
+export GUM_FILE_DIRECTORY_FOREGROUND=4
+export GUM_FILE_PERMISSIONS_FOREGROUND=8
+export GUM_FILE_SELECTED_FOREGROUND=5
+export GUM_FILE_FILE_SIZE_FOREGROUND=8
+
+export GUM_FILTER_INDICATOR_FOREGROUND=6
+export GUM_FILTER_SELECTED_PREFIX_FOREGROUND=5
+export GUM_FILTER_HEADER_FOREGROUND=5
+export GUM_FILTER_MATCH_FOREGROUND=4
+export GUM_FILTER_PLACEHOLDER_FOREGROUND=8
+export GUM_FILTER_PROMPT_FOREGROUND=8
+
+export GUM_PAGER_MATCH_FOREGROUND=5
+export GUM_PAGER_LINE_NUMBER_FOREGROUND=8
+export GUM_PAGER_HELP_FOREGROUND=8
+export GUM_PAGER_MATCH_HIGH_BACKGROUND=5
+export GUM_PAGER_MATCH_HIGH_FOREGROUND=5
+
+export GUM_SPIN_SPINNER_FOREGROUND=3
+
+export GUM_WRITE_CURSOR_LINE_NUMBER_FOREGROUND=8
+export GUM_WRITE_CURSOR_FOREGROUND=1
+export GUM_WRITE_HEADER_FOREGROUND=5
+export GUM_WRITE_PLACEHOLDER_FOREGROUND=8
+export GUM_WRITE_PROMPT_FOREGROUND=8
+
 #---
 
 
