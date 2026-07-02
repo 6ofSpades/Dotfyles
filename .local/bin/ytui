@@ -36,12 +36,13 @@ while true; do
   break
 done
 
-TYPE=$(gum choose \
-  --header "Choose type" \
-  "  Video (mp4)" \
-  "  Video (mkv)" \
-  "  Audio (mp3)" \
-  "  Audio (flac)"
+TYPE=$(
+  gum choose \
+    --header "Choose type" \
+    "  Video (mp4)" \
+    "  Video (mkv)" \
+    "  Audio (mp3)" \
+    "  Audio (flac)"
 )
 
 # -------------------------
@@ -49,58 +50,63 @@ TYPE=$(gum choose \
 # -------------------------
 
 case "$TYPE" in
-  "  Video (mp4)"|"  Video (mkv)")
+"  Video (mp4)" | "  Video (mkv)")
 
-    RESOLUTION=$(gum choose \
-      --header "
-      Choose desired resolution.
-      Will fall back to lower if selected resolution is not available
-      " \
+  RESOLUTION=$(
+    gum choose \
+      --header \
+      "Choose desired resolution. 
+Will fall back to lower if selected resolution is not available
+" \
       "Auto Best" \
       "1080p" \
       "720p" \
       "480p" \
       "360p"
-    )
+  )
 
-    AUDIO_QUALITY=$(gum choose \
+  AUDIO_QUALITY=$(
+    gum choose \
       --header "Choose audio quality" \
       "Auto Best" \
       "≤320k" \
       "≤192k" \
       "≤128k"
-    )
-    ;;
+  )
+  ;;
 
-  "  Audio (mp3)"|"  Audio (flac)")
+"  Audio (mp3)" | "  Audio (flac)")
 
-    AUDIO_QUALITY=$(gum choose \
+  AUDIO_QUALITY=$(
+    gum choose \
       --header "Choose audio quality" \
       "Auto Best" \
       "≤320k" \
       "≤192k" \
       "≤128k"
-    )
-    ;;
+  )
+  ;;
 esac
 
 # -------------------------
 
-COOKIE_CHOICE=$(gum choose \
-  --header " Cookies" \
-  "No Cookies" \
-  "Firefox" \
-  "Chromium" \
-  "Brave" \
-  "Custom Browser"
+COOKIE_CHOICE=$(
+  gum choose \
+    --header " Cookies" \
+    "No Cookies" \
+    "Firefox" \
+    "Chromium" \
+    "Brave" \
+    "Custom Browser"
 )
 
-EXTRA_OPTIONS=$(gum choose --no-limit \
-  --header "Extras" \
-  "Embed Metadata" \
-  "Embed Thumbnail" \
-  "Download Subtitles" \
-  "Download Playlist"
+EXTRA_OPTIONS=$(
+  gum choose --no-limit \
+    --header "Extras" \
+    "Embed Metadata" \
+    "Embed Thumbnail" \
+    "Download Subtitles" \
+    "Download Playlist"
 )
 
 FOLDER=$(gum input --placeholder "Download folder (default: ~/Videos)")
@@ -117,23 +123,23 @@ CMD="yt-dlp"
 
 # Cookies
 case "$COOKIE_CHOICE" in
-  "Firefox")
-    CMD="$CMD --cookies-from-browser firefox"
-    ;;
-  "Chromium")
-    CMD="$CMD --cookies-from-browser chromium"
-    ;;
-  "Brave")
-    CMD="$CMD --cookies-from-browser brave"
-    ;;
-  "Custom Browser")
-    CUSTOM_HEADER="
+"Firefox")
+  CMD="$CMD --cookies-from-browser firefox"
+  ;;
+"Chromium")
+  CMD="$CMD --cookies-from-browser chromium"
+  ;;
+"Brave")
+  CMD="$CMD --cookies-from-browser brave"
+  ;;
+"Custom Browser")
+  CUSTOM_HEADER="
     E.g. For Zen-Browser: firefox:~/.zen/
     Works cause Zen is a fork of Firefox and that's the path to Zen's folder
     "
-    BROWSER=$(gum input --header "$CUSTOM_HEADER" --placeholder "Enter <browser_name:path to folder>")
-    CMD="$CMD --cookies-from-browser $BROWSER"
-    ;;
+  BROWSER=$(gum input --header "$CUSTOM_HEADER" --placeholder "Enter <browser_name:path to folder>")
+  CMD="$CMD --cookies-from-browser $BROWSER"
+  ;;
 esac
 
 # Output organization
@@ -145,61 +151,60 @@ CMD="$CMD -P \"$FOLDER\" -o \"%(title)s.%(ext)s\""
 [[ "$EXTRA_OPTIONS" == *"Download Subtitles"* ]] && CMD="$CMD --write-auto-subs --sub-lang en --embed-subs"
 [[ "$EXTRA_OPTIONS" != *"Download Playlist"* ]] && CMD="$CMD --no-playlist"
 
-
 case "$AUDIO_QUALITY" in
-  "Auto Best")
-    AUDIO_FORMAT="bestaudio"
-    ;;
-  "≤320k")
-    AUDIO_FORMAT="bestaudio[abr<=320]"
-    ;;
-  "≤192k")
-    AUDIO_FORMAT="bestaudio[abr<=192]"
-    ;;
-  "≤128k")
-    AUDIO_FORMAT="bestaudio[abr<=128]"
-    ;;
+"Auto Best")
+  AUDIO_FORMAT="bestaudio"
+  ;;
+"≤320k")
+  AUDIO_FORMAT="bestaudio[abr<=320]"
+  ;;
+"≤192k")
+  AUDIO_FORMAT="bestaudio[abr<=192]"
+  ;;
+"≤128k")
+  AUDIO_FORMAT="bestaudio[abr<=128]"
+  ;;
 esac
 
 # Type handling
 case "$TYPE" in
 
-  "  Audio (mp3)")
-    CMD="$CMD -f \"$AUDIO_FORMAT\" -x --audio-format mp3"
+"  Audio (mp3)")
+  CMD="$CMD -f \"$AUDIO_FORMAT\" -x --audio-format mp3"
+  ;;
+
+"  Audio (flac)")
+  CMD="$CMD -f \"$AUDIO_FORMAT\" -x --audio-format flac"
+  ;;
+
+*)
+
+  case "$TYPE" in
+  "  Video (mp4)")
+    MERGE="--merge-output-format mp4"
     ;;
-
-  "  Audio (flac)")
-    CMD="$CMD -f \"$AUDIO_FORMAT\" -x --audio-format flac"
+  "  Video (mkv)")
+    MERGE="--merge-output-format mkv"
     ;;
+  esac
 
-  *)
-
-    case "$TYPE" in
-      "  Video (mp4)")
-        MERGE="--merge-output-format mp4"
-        ;;
-      "  Video (mkv)")
-        MERGE="--merge-output-format mkv"
-        ;;
-    esac
-
-    case "$RESOLUTION" in
-      "Auto Best")
-        FORMAT="bv*+ba/b"
-        ;;
-      "1080p")
-        FORMAT="bestvideo[height<=1080]+$AUDIO_FORMAT/best[height<=1080]"
-        ;;
-      "720p")
-        FORMAT="bestvideo[height<=720]+$AUDIO_FORMAT/best[height<=720]"
-        ;;
-      "480p")
-        FORMAT="bestvideo[height<=480]+$AUDIO_FORMAT/best[height<=480]"
-        ;;
-    esac
-
-    CMD="$CMD -f \"$FORMAT\" $MERGE"
+  case "$RESOLUTION" in
+  "Auto Best")
+    FORMAT="bv*+ba/b"
     ;;
+  "1080p")
+    FORMAT="bestvideo[height<=1080]+$AUDIO_FORMAT/best[height<=1080]"
+    ;;
+  "720p")
+    FORMAT="bestvideo[height<=720]+$AUDIO_FORMAT/best[height<=720]"
+    ;;
+  "480p")
+    FORMAT="bestvideo[height<=480]+$AUDIO_FORMAT/best[height<=480]"
+    ;;
+  esac
+
+  CMD="$CMD -f \"$FORMAT\" $MERGE"
+  ;;
 esac
 
 CMD="$CMD \"$URL\""
