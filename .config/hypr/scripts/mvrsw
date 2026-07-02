@@ -24,3 +24,20 @@ if [[ "$1" == blur ]]; then
   fi
   exit 0
 fi
+
+if [[ "$1" == blur-all ]]; then
+  # Get the specific line containing 'int:' and extract the number
+  blur_status=$(hyprctl getoption decoration:blur:enabled | awk '/int:/ {print $2}')
+
+  # Check the value and run the commands
+  if [ "$blur_status" -eq 1 ]; then
+    # Blur for all windows is currently ENABLED. Disabling...
+    hyprctl keyword decoration:blur:enabled false
+  elif [ "$blur_status" -eq 0 ]; then
+    # Blur for all windows is currently DISABLED. Enabling...
+    hyprctl keyword decoration:blur:enabled true
+  else
+    echo "Something went wrong! Unexpected output: $blur_status"
+  fi
+  exit 0
+fi
