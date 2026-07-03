@@ -193,6 +193,7 @@ noto-fonts-emoji
 ttf-jetbrains-mono-nerd
 grim
 flameshot
+swayimg
 clipvault
 wl-clipboard
 mpv
