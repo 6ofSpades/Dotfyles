@@ -147,6 +147,7 @@ kitty
 xdg-desktop-portal
 xdg-desktop-portal-gtk
 xdg-desktop-portal-hyprland
+xdg-desktop-portal-termfilechooser-hunkyburrito-git
 polkit
 hyprpolkitagent
 swww
