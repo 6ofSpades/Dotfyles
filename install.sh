@@ -265,7 +265,7 @@ if [[ "$scripts" == "y" ]]; then
   # if flameshot was installed, auto configure the save path
   if [[ $(yay -Qs flameshot) ]]; then
     mkdir -p "$HOME/Pictures/flameshot"
-    sed -i "s/user/$USER/g" "$DOTFILES_DIR/.config/flameshot/flameshot.ini"
+    sed -i "s/user/$USER/g" "$HOME/.config/flameshot/flameshot.ini"
   fi
 
   if [[ $(yay -Qs candy-icons) ]]; then
