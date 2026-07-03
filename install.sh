@@ -225,9 +225,11 @@ mapfile -t OPTIONAL_PKGS < <(
 
 if (( ${#OPTIONAL_PKGS[@]} > 0 )); then
   echo "Installing the things you selected..."
-  yay -S --needed "${OPTIONAL_PKGS[@]}"
+  yay -S --needed "${OPTIONAL_PKGS[@]}" --makepkgconf="$HOME/.config/pacman/makepkg.conf" --config="$HOME/.config/pacman/pacman.conf" --devel --cleanafter --save
 else
   echo "Nothing to install."
+  echo "We'll still run yay just to save to the config file."
+  yay --makepkgconf="$HOME/.config/pacman/makepkg.conf" --config="$HOME/.config/pacman/pacman.conf" --devel --cleanafter --save
 fi
 
 gum confirm --default "Install and enable ydotool service?" && ydot_serv="y" || ydot_serv="n"
