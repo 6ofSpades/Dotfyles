@@ -198,6 +198,9 @@ wl-clipboard
 mpv
 resvg
 poppler
+zathura
+zathura-pdf-mupdf
+zathura-cb
 ffmpeg
 imagemagick
 autotrash
