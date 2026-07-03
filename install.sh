@@ -1,18 +1,17 @@
 #!/bin/bash
 
-
 INSTALL_MODE=""
 NONINTERACTIVE=false
 
 case "$1" in
-  --link)
-    INSTALL_MODE="link"
-    NONINTERACTIVE=true
-    ;;
-  --copy)
-    INSTALL_MODE="copy"
-    NONINTERACTIVE=true
-    ;;
+--link)
+  INSTALL_MODE="link"
+  NONINTERACTIVE=true
+  ;;
+--copy)
+  INSTALL_MODE="copy"
+  NONINTERACTIVE=true
+  ;;
 esac
 
 # Check if gum is installed
@@ -75,7 +74,7 @@ backup() {
   sleep 1
 }
 
-export -f backup  # need these exports to make gum spin work with functions
+export -f backup # need these exports to make gum spin work with functions
 export DOTFILES_DIR
 gum spin -s line --show-error --title "Making backup..." -- bash -c backup
 echo "Backup done B)"
@@ -126,14 +125,13 @@ for item in "$DOTFILES_DIR"/.*; do
   name="$(basename "$item")"
 
   case "$name" in
-    .|..|.git|.gitignore|.config|.local|scripts|install.sh)
-      continue
-      ;;
+  . | .. | .git | .gitignore | .config | .local | scripts | install.sh)
+    continue
+    ;;
   esac
 
   install_item "$item" "$HOME/$name"
 done
-
 
 #### install packages
 OPTIONAL_PKGS="
@@ -220,10 +218,10 @@ fi
 # Convert to sanitized array
 mapfile -t OPTIONAL_PKGS < <(
   printf '%s\n' "$SELECTED" |
-  grep -vE '^[[:space:]]*(#|$)'
+    grep -vE '^[[:space:]]*(#|$)'
 )
 
-if (( ${#OPTIONAL_PKGS[@]} > 0 )); then
+if ((${#OPTIONAL_PKGS[@]} > 0)); then
   echo "Installing the things you selected..."
   yay -S --needed "${OPTIONAL_PKGS[@]}" --makepkgconf="$HOME/.config/pacman/makepkg.conf" --config="$HOME/.config/pacman/pacman.conf" --devel --cleanafter --save
 else
@@ -288,4 +286,4 @@ if [[ "$scripts" == "y" ]]; then
   cd
 fi
 
-gum style "Dotfyles installed." --foreground "#00ff00"  --bold --padding "1 1"
+gum style "Dotfyles installed." --foreground "#00ff00" --bold --padding "1 1"
