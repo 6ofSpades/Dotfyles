@@ -116,6 +116,7 @@ HISTFILE=~/.zsh_histfile
 HISTSIZE=100000 # number of lines of history kept in memory
 SAVEHIST=100000 # number of lines of history saved to the histfile
 setopt EXTENDED_HISTORY # Make the history actually work
+setopt HIST_IGNORE_SPACE # don't save to history if command starts with a space
 
 # Simple config
 zstyle :compinstall filename '~/.zshrc'
@@ -134,6 +135,10 @@ export SYSTEMD_EDITOR=nvim
 
 zstyle ':completion:*' menu select
 zstyle ':completion::complete:*' gain-privileges 1
+
+# stop the "go" folder from being created in home
+# I guess
+export GOPATH="$HOME/.cache/go"
 # ---
 
 #  _  __          _     _           _     
@@ -204,6 +209,11 @@ if (( ${+terminfo[smkx]} && ${+terminfo[rmkx]} )); then
 	add-zle-hook-widget -Uz zle-line-finish zle_application_mode_stop
 fi
 
+# Bind Ctrl+Backspace to delete the word behind the cursor
+bindkey '^H' backward-kill-word      # Works in many local terminals / GUI apps
+bindkey '^?' backward-kill-word      # Alternative sequence for some terminal setups
+bindkey '^[[3;5~' backward-kill-word # For some specific emulator environments
+
 # Yank to the system clipboard
 # function vi-yank-xclip {
 #     zle vi-yank
@@ -224,16 +234,19 @@ alias yayu='arch-update'
 
 alias journalctl='journalctl -S yesterday' # filter since yesterday by defautl
 
-alias history='history -i'  # add timestamp to history
+alias locate='locate -i' # ignore case in locate by default
+
 # fh - fzf command history
-fh() {
+history() {
   print -z $(
     ([ -n "$ZSH_NAME" ] && fc -li 1 || history) |
-    fzf +s --tac |
+    fzf --style full +s --tac |
     sed -E 's/^[[:space:]]*[0-9]+[[:space:]]+[0-9-]+[[:space:]]+[0-9:]+[[:space:]]+//' |
     sed -E 's/\\/\\\\/g'
   )
 }
+alias fh='history'
+alias hist='history'
 
 alias hy='start-hyprland' ## To start Hyprland from the TTY easily
 alias hyconf='cd ~/.config/hypr && nvim' ## Just cause I need to access config all the time
@@ -242,6 +255,8 @@ alias ip='ip -color'
 alias ls='ls --color'
 alias grep='grep --color=auto'
 
+alias ping='ping -c 4'
+
 alias pubip='curl https://ipinfo.io/ip' # useful to get your public ip from the terminal
 
 alias cat='bat'
@@ -249,6 +264,10 @@ alias -g -- -h='-h 2>&1 | bat --language=help --style=plain --paging=never'
 alias -g -- --help='--help 2>&1 | bat --language=help --style=plain --paging=never'
 
 alias takesnap='sudo snapper -c root create -c number --description'  # For manually taking snapshots easily. Have to put description
+alias snaplist='sudo snapper list | bat -l sql --paging never'  # easily list snapshots
+alias snaproll='sudo snapper-rollback'  # rollback. less things to type
+
+alias cd='z'
 # ---
 
 # __   __        _ 
