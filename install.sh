@@ -197,6 +197,7 @@ swayimg
 clipvault
 wl-clipboard
 mpv
+mpv-modernz
 resvg
 poppler
 zathura
