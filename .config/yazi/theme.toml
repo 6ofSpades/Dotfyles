@@ -3,7 +3,7 @@
 
 # If you want to dynamically override their content based on dark/light mode, you can specify two different flavors
 # for dark and light modes under `[flavor]`, and do so in those flavors instead.
-"$schema" = "https://yazi-rs.github.io/schemas/theme.json"
+#:schema = "https://yazi-rs.github.io/schemas/theme.json"
 
 # vim:fileencoding=utf-8:foldmethod=marker
 
@@ -27,10 +27,10 @@ overall = {}
 # : Manager {{{
 
 [mgr]
-cwd = { fg = "cyan", hidden = true }
+cwd = { fg = "#00ffff", hidden = true }
 
 # Find
-find_keyword  = { fg = "yellow", bold = true, italic = true, underline = true }
+find_keyword  = { fg = "#00ffff", bold = true, italic = true, underline = true }
 find_position = { fg = "magenta", bg = "reset", bold = true, italic = true }
 
 # Symlink
@@ -49,7 +49,7 @@ count_selected = { fg = "black", bg = "yellow" }
 
 # Border
 border_symbol = ""
-border_style  = { fg = "#434968" }
+border_style  = { fg = "#414a74" }
 
 # Highlighting
 syntect_theme = ""
@@ -60,8 +60,8 @@ syntect_theme = ""
 # : Tabs {{{
 
 [tabs]
-active   = { fg = "white", bg = "#56007b", bold = true, italic = true }
-inactive = { fg = "#a8a8a8",  bg = "#2d2d2d" }
+active   = { fg = "#dddddd", bg = "#6910a5", bold = true, italic = true }
+inactive = { fg = "#616789",  bg = "#202331" }
 
 # Separator
 sep_inner = { open = "", close = "" }
@@ -73,16 +73,16 @@ sep_outer = { open = "", close = "" }
 # : Mode {{{
 
 [mode]
-normal_main = { bg = "blue", bold = true, italic = true }
-normal_alt  = { fg = "blue", bg = "#2d2d2d" }
+normal_main = { bg = "#335aff", fg = "#000000", bold = true, italic = true }
+normal_alt  = { fg = "#335aff", bg = "#202331" }
 
 # Select mode
-select_main = { bg = "magenta", bold = true, italic = true }
-select_alt  = { fg = "magenta", bg = "gray" }
+select_main = { bg = "#8500bc", fg = "#000000",  bold = true, italic = true }
+select_alt  = { fg = "#8500bc", bg = "#202331" }
 
 # Unset mode
-unset_main = { bg = "red", bold = true, italic = true }
-unset_alt  = { fg = "red", bg = "gray" }
+unset_main = { bg = "#cc00fc", fg = "#000000", bold = true, italic = true }
+unset_alt  = { fg = "#cc00fc", bg = "#202331" }
 
 # : }}}
 
@@ -92,8 +92,8 @@ unset_alt  = { fg = "red", bg = "gray" }
 [indicator]
 # parent  = { reversed = true }
 # current = { reversed = true }
-parent  = { bg = "#490066" }
-current = { bg = "#490066" }
+parent  = { bg = "#490085" }
+current = { bg = "#490085" }
 preview = { underline = true }
 padding = { open = "◤◢", close = "▓▒░" }
 
@@ -283,6 +283,7 @@ dirs  = [
 	{ name = "Public", text = " " },
 	{ name = "Videos", text = " " },
 	{ name = "Games", text = "󰺷 " },
+	{ name = "Books", text = " " },
 ]
 files = [
 	{ name = ".babelrc", text = " ", fg = "#cbcb41" },

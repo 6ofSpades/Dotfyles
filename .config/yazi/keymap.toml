@@ -1,6 +1,6 @@
 # A TOML linter such as https://taplo.tamasfe.dev/ can use this schema to validate your config.
 # If you encounter any issues, please make an issue at https://github.com/yazi-rs/schemas.
-"$schema" = "https://yazi-rs.github.io/schemas/keymap.json"
+#:schema = "https://yazi-rs.github.io/schemas/keymap.json"
 
 [mgr]
 
@@ -17,47 +17,16 @@ keymap = [
   { on = [ "M", "m" ], run = "plugin mount",  desc = "Mount plugin" },
 
   { on = "<C-y>", run = [ "yank", 'plugin clipboard -- --action=copy --notify-unknown-display-server' ],  desc = "Copy to system clipboard" },
+  { on = "<C-p>", run = [ 'plugin clipboard -- --action=paste --notify-unknown-display-server' ],  desc = "Paste from system clipboard" },
 
   # Projects
-  { on = [ "P", "s" ], run = "plugin projects save",  desc = "Save current project" },
-  { on = [ "P", "P" ], run = "plugin projects load_last",  desc = "Load last project" },
+  # { on = [ "P", "s" ], run = "plugin projects save",  desc = "Save current project" },
+  # { on = [ "P", "P" ], run = "plugin projects load_last",  desc = "Load last project" },
 
-  # xcur2png
-  { on = [ "i", "p" ], run = '''shell --
-  if [ -d .previews ]; then
-    echo ".previews already exists — skipping preview generation"
-    exit 0
-  fi
-
-  mkdir -p .previews
-
-  for f in *; do
-    # skip non-files and symlinks
-    [ -f "$f" ] || continue
-    [ -L "$f" ] && continue
-
-    # create a temporary sandbox
-    tmp=$(mktemp -d)
-
-    # try extracting cursor images
-    xcur2png --directory "$tmp" "$f" 2>/dev/null
-
-    # check if extraction succeeded
-    png=$(ls "$tmp"/*.png 2>/dev/null | head -n 1)
-
-    # if yes, keep one preview
-    [ -n "$png" ] && cp "$png" ".previews/$f.png"
-
-    # clean up sandbox
-    rm -rf "$tmp"
-  done
-  ''',  desc = "Generate xcursor previews in current directory" },
-
-  # Relative motions
-  { on = [ "m" ], run = "plugin relative-motions", desc = "Trigger a new relative motion" },
-
-  # Jump to char
-  { on = [ "f" ], run = "plugin jump-to-char", desc = "Jump to char" },
+  # Jump to file with easyjump
+  { on = [ "f" ], run = "plugin easyjump", desc = "Easyjump/Hop to file" },
+  # Jump to file with jump-to-char
+  { on = [ "F" ], run = "plugin jump-to-char", desc = "Jump to char" },
 
   # Trash manager
   { on = ["R"], run = "plugin recycle-bin",              desc = "Open Recycle Bin menu" },
@@ -132,8 +101,8 @@ keymap = [
 	{ on = "s",         run = "search --via=fd",             desc = "Search files by name via fd" },
 	{ on = "S",         run = "search --via=rg",             desc = "Search files by content via ripgrep" },
 	{ on = "<C-s>",     run = "escape --search",             desc = "Cancel the ongoing search" },
-	{ on = "z",         run = "plugin fzf",                  desc = "Jump to a file/directory via fzf" },
-	{ on = "Z",         run = "plugin zoxide",               desc = "Jump to a directory via zoxide" },
+	{ on = "z",         run = "plugin zoxide",               desc = "Jump to a file/directory via fzf" },
+	{ on = "Z",         run = "plugin fzf",                  desc = "Jump to a directory via zoxide" },
 
 	# Linemode
 	{ on = [ "m", "s" ], run = "linemode size",        desc = "Linemode: size" },
@@ -150,7 +119,7 @@ keymap = [
 	{ on = [ "c", "n" ], run = "copy name_without_ext", desc = "Copy the filename without extension" },
 
 	# Filter
-	{ on = "F", run = "filter --smart", desc = "Filter files" },
+	# { on = "F", run = "filter --smart", desc = "Filter files" },
 
 	# Find
 	{ on = "/", run = "find --smart",            desc = "Find next file" },
@@ -203,11 +172,47 @@ keymap = [
 	{ on = ">", run = "tab_swap 1",  desc = "Swap current tab with next tab" },
 
 	# Tasks
-	{ on = "w", run = "tasks:show", desc = "Show task manager" },
+	{ on = [ "w", "w" ], run = "tasks:show", desc = "Show task manager" },
 
 	# Help
 	{ on = "~",    run = "help", desc = "Open help" },
 	{ on = "<F1>", run = "help", desc = "Open help" },
+
+  # Plugin time-travel
+	{ on = [ "w", "h" ], run = "plugin time-travel prev", desc = "Go to previous snapshot" },
+	{ on = [ "w", "l" ], run = "plugin time-travel next", desc = "Go to next snapshot" },
+	{ on = [ "w", "e" ], run = "plugin time-travel exit", desc = "Exit browsing snapshots" },
+
+  # xcur2png
+  { on = [ "i", "p" ], run = '''shell --
+  if [ -d .previews ]; then
+    echo ".previews already exists — skipping preview generation"
+    exit 0
+  fi
+
+  mkdir -p .previews
+
+  for f in *; do
+    # skip non-files and symlinks
+    [ -f "$f" ] || continue
+    [ -L "$f" ] && continue
+
+    # create a temporary sandbox
+    tmp=$(mktemp -d)
+
+    # try extracting cursor images
+    xcur2png --directory "$tmp" "$f" 2>/dev/null
+
+    # check if extraction succeeded
+    png=$(ls "$tmp"/*.png 2>/dev/null | head -n 1)
+
+    # if yes, keep one preview
+    [ -n "$png" ] && cp "$png" ".previews/$f.png"
+
+    # clean up sandbox
+    rm -rf "$tmp"
+  done
+  ''',  desc = "Generate xcursor previews in current directory" },
 
   # GVFS plugin
   # Mount
@@ -372,6 +377,8 @@ keymap = [
 	{ on = "<Right>", run = "move 1",  desc = "Move forward a character" },
 	{ on = "<C-b>",   run = "move -1", desc = "Move back a character" },
 	{ on = "<C-f>",   run = "move 1",  desc = "Move forward a character" },
+	{ on = "<A-h>",   run = "move -1", desc = "Move back a character" },
+	{ on = "<A-l>",   run = "move 1",  desc = "Move forward a character" },
 
 	# Word-wise movement
 	{ on = "b",     run = "backward",                    desc = "Move back to the start of the current or previous word" },
@@ -381,7 +388,8 @@ keymap = [
 	{ on = "e",     run = "forward --end-of-word",       desc = "Move forward to the end of the current or next word" },
 	{ on = "E",     run = "forward --far --end-of-word", desc = "Move forward to the end of the current or next WORD" },
 	{ on = "<A-b>", run = "backward",                    desc = "Move back to the start of the current or previous word" },
-	{ on = "<A-f>", run = "forward --end-of-word",       desc = "Move forward to the end of the current or next word" },
+	{ on = "<A-w>", run = "forward",                     desc = "Move forward to the start of the next word" },
+	{ on = "<A-e>", run = "forward --end-of-word",       desc = "Move forward to the end of the current or next word" },
 
 	# Line-wise movement
 	{ on = "0",      run = "move bol",        desc = "Move to the BOL" },
@@ -392,6 +400,8 @@ keymap = [
 	{ on = "<C-e>",  run = "move eol",        desc = "Move to the EOL" },
 	{ on = "<Home>", run = "move bol",        desc = "Move to the BOL" },
 	{ on = "<End>",  run = "move eol",        desc = "Move to the EOL" },
+	{ on = "<A-0>",  run = "move bol",        desc = "Move to the BOL" },
+	{ on = "<A-a>",  run = "move eol",        desc = "Move to the EOL" },
 
 	# Delete
 	{ on = "<Backspace>", run = "backspace",         desc = "Delete the character before the cursor" },
@@ -404,6 +414,7 @@ keymap = [
 	{ on = "<C-k>", run = "kill eol",      desc = "Kill forwards to the EOL" },
 	{ on = "<C-w>", run = "kill backward", desc = "Kill backwards to the start of the current word" },
 	{ on = "<A-d>", run = "kill forward",  desc = "Kill forwards to the end of the current word" },
+	{ on = "<C-Backspace>",run = "kill backward", desc = "Kill backwards to the start of the current word" },
 
 	# Cut/Yank/Paste
 	{ on = "d", run = "delete --cut",                                      desc = "Cut selected characters" },

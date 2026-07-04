@@ -1,110 +1,19 @@
+-- full border plugin
 require("full-border"):setup({
 	-- Available values: ui.Border.PLAIN, ui.Border.ROUNDED
 	type = ui.Border.ROUNDED,
 })
 
-require("relative-motions"):setup({
-	show_numbers = "relative",
-	show_motion = true,
-	enter_mode = "first",
-})
-
+-- recycle-bin plugin
 require("recycle-bin"):setup()
 
--- require("autosession"):setup()
-
-require("yatline"):setup({
-	--theme = my_theme,
-	section_separator = { open = "", close = "" },
-	part_separator = { open = "", close = "" },
-	inverse_separator = { open = "", close = "" },
-
-	style_a = {
-		fg = "black",
-		bold = true,
-		italic = true,
-		bg_mode = {
-			normal = "blue",
-			select = "magenta",
-			un_set = "brightred",
-		},
-	},
-	style_b = { bg = "#313131", fg = "brightwhite" },
-	style_c = { bg = "black", fg = "brightwhite" },
-
-	permissions_t_fg = "magenta",
-	permissions_r_fg = "blue",
-	permissions_w_fg = "cyan",
-	permissions_x_fg = "green",
-	permissions_s_fg = "white",
-
-	tab_width = 20,
-	tab_use_inverse = false,
-
-	selected = { icon = " 󰻭", fg = "yellow" },
-	copied = { icon = "", fg = "green" },
-	cut = { icon = "", fg = "red" },
-
-	total = { icon = "󰮍", fg = "yellow" },
-	succ = { icon = "", fg = "green" },
-	fail = { icon = "", fg = "red" },
-	found = { icon = "󰮕", fg = "blue" },
-	processed = { icon = "󰐍", fg = "green" },
-
-	show_background = true,
-
-	display_header_line = true,
-	display_status_line = true,
-
-	component_positions = { "header", "tab", "status" },
-
-	header_line = {
-		left = {
-			section_a = {
-				{ type = "line", custom = false, name = "tabs", params = { "left" } },
-			},
-			section_b = {},
-			section_c = {},
-		},
-		right = {
-			section_a = {
-				{ type = "string", custom = false, name = "date", params = { "%A, %d %B %Y" } },
-			},
-			section_b = {
-				{ type = "string", custom = false, name = "date", params = { "%X" } },
-			},
-			section_c = {},
-		},
-	},
-
-	status_line = {
-		left = {
-			section_a = {
-				{ type = "string", custom = false, name = "tab_mode" },
-			},
-			section_b = {
-				{ type = "string", custom = false, name = "hovered_size" },
-			},
-			section_c = {
-				{ type = "string", custom = false, name = "hovered_path" },
-				{ type = "coloreds", custom = false, name = "count" },
-			},
-		},
-		right = {
-			section_a = {
-				{ type = "string", custom = false, name = "cursor_position" },
-			},
-			section_b = {
-				{ type = "string", custom = false, name = "cursor_percentage" },
-			},
-			section_c = {
-				{ type = "string", custom = false, name = "hovered_file_extension", params = { true } },
-				{ type = "coloreds", custom = false, name = "permissions" },
-			},
-		},
-	},
+-- git.yazi
+require("git"):setup({
+	-- Order of status signs showing in the linemode
+	order = 1500,
 })
 
+-- gvfs plugin
 require("gvfs"):setup({
 	-- (Optional) Allowed keys to select device.
 	which_keys = "1234567890qwertyuiopasdfghjklzxcvbnm-=[]\\;',./!@#$%^&*()_+{}|:\"<>?",
@@ -153,6 +62,7 @@ require("gvfs"):setup({
 	-- root_mountpoint = (os.getenv("XDG_RUNTIME_DIR") or ("/run/user/" .. ya.uid())) .. "/gvfs"
 })
 
+-- projects plugin
 require("projects"):setup({
 	event = {
 		save = {
@@ -200,4 +110,10 @@ require("projects"):setup({
 		timeout = 3,
 		level = "info",
 	},
+})
+
+-- easy jump plugin
+require("easyjump"):setup({
+	icon_fg = "#ff00ff", -- color for hint labels
+	first_key_fg = "#45475a", -- color for first char of double-key hints
 })

@@ -1,27 +1,22 @@
 [[plugin.deps]]
 use = "yazi-rs/plugins:chmod"
-rev = "88990a6"
-hash = "8da0b15a97b5dfd13941d1ecc617ac7c"
+rev = "5d461d8"
+hash = "5b1c276b75cae91cbbdbe7863f39a540"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:full-border"
-rev = "88990a6"
-hash = "3996fc74044bc44144b323686f887e1"
+rev = "5d461d8"
+hash = "7b625412411be411153886894d9acaf"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:mount"
-rev = "88990a6"
-hash = "9ad20d763df07ce40fd09de549d914b0"
+rev = "5d461d8"
+hash = "e3260d0b1feded8c8e3ae3afa1169e30"
 
 [[plugin.deps]]
 use = "XYenon/clipboard"
-rev = "9089f90"
-hash = "e6efc609de1b617c7e8e98efd5286221"
-
-[[plugin.deps]]
-use = "dedukun/relative-motions"
-rev = "a603d9e"
-hash = "e02a788e5b8ae0fb47fd0193dda589cc"
+rev = "0ac0320"
+hash = "f80172438b4b5c31e94d6c891f734445"
 
 [[plugin.deps]]
 use = "uhs-robert/recycle-bin"
@@ -29,14 +24,9 @@ rev = "fa68711"
 hash = "8714306b5cac6359edbacbf545fbd691"
 
 [[plugin.deps]]
-use = "yazi-rs/plugins:jump-to-char"
-rev = "88990a6"
-hash = "ce67445ebb1bf3d97b8e44f50904b2c5"
-
-[[plugin.deps]]
 use = "boydaihungst/gvfs"
-rev = "30440c7"
-hash = "211b7d22478b907e5f6fd4fe27a923e"
+rev = "3abc0a2"
+hash = "eed89e75671723c8f9390a2862af0e4e"
 
 [[plugin.deps]]
 use = "imsi32/yatline"
@@ -45,13 +35,33 @@ hash = "e6e98d12b1648d1894c2b560d85eeaa7"
 
 [[plugin.deps]]
 use = "MasouShizuka/projects"
-rev = "eed0657"
-hash = "ca79de2b3bb2247906e01b2261e5d2bb"
+rev = "112a270"
+hash = "5a4e61f8cae42be53844acaa6c447d96"
 
 [[plugin.deps]]
 use = "boydaihungst/mediainfo"
-rev = "dc61636"
-hash = "2fa34959353b6f1a1c33659f50e098fd"
+rev = "a6d30a1"
+hash = "579fe44e64b655ce46eeb526e3332f55"
+
+[[plugin.deps]]
+use = "mikavilpas/easyjump.yazi:easyjump"
+rev = "6c6b0a2"
+hash = "b976709df0f6d3341736f053e87b2b8"
+
+[[plugin.deps]]
+use = "iynaix/time-travel"
+rev = "aaec6e2"
+hash = "3d52b2b88c91a4ece2f7ed68ff39bb7b"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:git"
+rev = "5d461d8"
+hash = "88e56a64b7ce7c4314427452343fef17"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:jump-to-char"
+rev = "5d461d8"
+hash = "7a4b4237223aaa94e589d1c01a23542a"
 
 [flavor]
 deps = []
