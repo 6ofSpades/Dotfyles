@@ -190,6 +190,8 @@ neo-matrix
 terminaltexteffects-git
 noto-fonts
 noto-fonts-emoji
+noto-fonts-cjk
+ttf-liberation
 ttf-jetbrains-mono-nerd
 grim
 flameshot
