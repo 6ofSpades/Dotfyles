@@ -2,14 +2,17 @@
 
 TRAY_PATH="/opt/YouTube Music/resources/app.asar.unpacked/assets"
 
-[[ -d "$TRAY_PATH" ]] || { echo "Pear desktop prob not installed" ; exit 0; }
+[[ -d "$TRAY_PATH" ]] || {
+  echo "Pear desktop prob not installed"
+  exit 0
+}
 echo "Running pear-desktop theme fix..."
 
 echo 'Removing default tray icon, sudo is needed...'
 sudo rm -rf "$TRAY_PATH/youtube-music-tray.png" "$TRAY_PATH/youtube-music-tray-paused.png"
 
 echo 'Replacing with custom icon...'
-sudo cp youtube-music-tray.png "$TRAY_PATH/youtube-music-tray.png"
-sudo cp youtube-music-tray.png "$TRAY_PATH/youtube-music-tray-paused.png"
+sudo cp youtube-music-tray.png "$TRAY_PATH/tray.png"
+sudo cp youtube-music-tray.png "$TRAY_PATH/tray-paused.png"
 
 echo 'Done.'
