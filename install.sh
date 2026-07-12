@@ -144,6 +144,9 @@ hyprsunset
 qt5-wayland
 qt6-wayland
 kitty
+neovim
+tree-sitter
+tree-sitter-cli
 xdg-desktop-portal
 xdg-desktop-portal-gtk
 xdg-desktop-portal-hyprland
@@ -207,6 +210,7 @@ zathura-pdf-mupdf
 zathura-cb
 ffmpeg
 imagemagick
+mediainfo
 autotrash
 "
 # Prompt selection

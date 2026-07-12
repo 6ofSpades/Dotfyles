@@ -1,6 +1,6 @@
 return {
 	"mikesmithgh/borderline.nvim",
-	enabled = true,
+	enabled = false,
 	lazy = true,
 	event = "VeryLazy",
 	config = function()

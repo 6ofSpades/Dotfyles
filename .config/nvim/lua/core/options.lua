@@ -2,6 +2,9 @@
 vim.cmd("let g:netrw_liststyle = 3") -- make nvim's file explorer show in list tree mode
 vim.opt.mouse = "a" -- enable mouse support
 
+-- don't show mode, since it's already on the status bar
+vim.opt.showmode = false
+
 vim.opt.cursorline = true -- highlights the current line you're in
 vim.opt.scrolloff = 5 -- keep X lines visible when scrolling
 vim.opt.sidescrolloff = 5 -- keep X columns visible when side-scrolling
@@ -38,8 +41,6 @@ vim.api.nvim_create_autocmd("UIEnter", {
 vim.opt.splitright = true -- if you split vertically, window will go to the right
 vim.opt.splitbelow = true -- if you split horizontally, window will go to the bottom
 
--- vim.opt.termguicolors = true
--- vim.opt.background = "dark" -- colorschemes that can be light or dark will be made dark
 vim.opt.signcolumn = "yes" -- show sign column so that text doesn't shift
 
 vim.opt.laststatus = 3
@@ -49,12 +50,16 @@ vim.opt.fillchars = {
 	-- horiz = "𜸍",
 	eob = " ", -- remove the tildas that appear at the end of file or on empty lines
 }
--- vim.opt.winbar = "%=%{repeat('‾', 10)}%="
-vim.api.nvim_set_hl(0, "WinBar", { link = "WinSeparator" })
-vim.api.nvim_set_hl(0, "WinBarNC", { link = "WinSeparator" })
 
--- Transparency
--- vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
--- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
--- vim.api.nvim_set_hl(0, "LineNr", { bg = "none" })
--- vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
+-- Automatically enable English spellcheck for text and markdown files
+-- English is by default, you can change language with Telescope
+-- Also wrap and linebreak
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = { "markdown", "text" },
+	callback = function()
+		vim.opt_local.spell = true
+		vim.opt_local.spelllang = "en"
+		vim.opt.wrap = true
+		vim.opt.linebreak = true
+	end,
+})

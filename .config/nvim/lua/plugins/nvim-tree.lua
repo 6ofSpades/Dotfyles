@@ -10,21 +10,6 @@ return {
 		vim.g.loaded_netrw = 1
 		vim.g.loaded_netrwPlugin = 1
 
-		-- highlight overrides
-		-- you can do :NvimTreeHiTest to see all highlights
-		vim.cmd([[
-
-      :hi NvimTreeWinSeparator        guifg=#690085
-
-      :hi NvimTreeExecFile            guifg=#00bfa7
-
-      :hi NvimTreeSymlink             guifg=#00ffff
-
-      :hi NvimTreeFolderArrowClosed   guifg=#616a94
-      :hi NvimTreeFolderArrowOpen     guifg=#616a94
-      :hi NvimTreeIndentMarker        guifg=#616a94
-    ]])
-
 		nvimtree.setup({
 			view = {
 				width = 35,
@@ -64,7 +49,6 @@ return {
 			"<cmd>NvimTreeFindFileToggle<CR>",
 			{ desc = "Toggle file explorer on current file" }
 		) -- toggle file explorer on current file
-		keymap.set("n", "<leader>ec", "<cmd>NvimTreeCollapse<CR>", { desc = "Collapse file explorer" }) -- collapse file explorer
 		keymap.set("n", "<leader>er", "<cmd>NvimTreeRefresh<CR>", { desc = "Refresh file explorer" }) -- refresh file explorer
 	end,
 }
