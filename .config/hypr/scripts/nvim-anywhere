@@ -2,95 +2,72 @@
 
 set -eo pipefail
 
-ASK_EXT=false
-KEYSTROKE_MODE=true # will type the text instead of pasting it
+# ==========================================
+# CONFIGURATION
+# ==========================================
+TERM_CLASS="nvim-anywhere"
+TERM_EXEC="kitty"
+TMPFILE_DIR="/tmp/nvim-anywhere"
+NVIM_CONFIG_DIR="$HOME/.config/nvim-anywhere"
 
-TERM_CLASS="nvim-wl-anywhere"
-TERM="kitty"
-TERM_OPTS="-o background_opacity=0.5 -o background=#000000 --class $TERM_CLASS -e"
-TMPFILE_DIR="/tmp/nvim-wl-anywhere"
+TERM_OPTS=(
+  -o "confirm_os_window_close=0"
+  -o "background_opacity=0.5"
+  -o "background=#000000"
+  --class "$TERM_CLASS"
+  -e
+)
 
-# check if wl-ime-type is installed
-if ! command -v wl-ime-type &>/dev/null; then
-  notify-send -i "$iDIR/error.png" "wl-ime-type missing" "Install package wl-ime-type first"
-  exit 1
-fi
+# ==========================================
+# FUNCTIONS
+# ==========================================
 
 kill_existing_instance() {
-  local FOUND=false
-  while read -r pid cmd; do
-    if [[ "$cmd" == "$TERM"* ]]; then
-      kill -9 "$pid"
-      rm -rf $TMPFILE_DIR/*
-      FOUND=true
-    fi
-  done < <(pgrep -af "$TERM_CLASS")
+  local address
+  address=$(hyprctl -j clients | jq -r ".[] | select(.class == \"$TERM_CLASS\") | .address" | head -n1)
 
-  if $FOUND; then
-    echo "An existing instance was found and terminated."
-    exit 1
+  if [[ -n "$address" ]]; then
+    hyprctl dispatch closewindow address:"$address"
+    rm -rf "$TMPFILE_DIR"/*
+    echo "Existing instance closed."
+    exit 0
   fi
 }
 
-create_tmpfile() {
-  mkdir -p "$TMPFILE_DIR"
-  local filename="doc-$(date +"%y%m%d%H%M%S")"
-  if $ASK_EXT && [[ -n "${EXT:-}" ]]; then
-    filename="$filename.$EXT"
-  fi
-  TMPFILE="$TMPFILE_DIR/$filename"
-  touch "$TMPFILE"
-  chmod og-rwx "$TMPFILE"
-}
-
-# ------------
+# ==========================================
+# MAIN EXECUTION
+# ==========================================
 
 kill_existing_instance
-create_tmpfile
 
-# save activewindow address before opening nvim
-address=$(hyprctl -j activewindow  | jq -r '.address')
+# Create temp file
+mkdir -p "$TMPFILE_DIR"
+TMPFILE="$TMPFILE_DIR/doc-$(date +"%y%m%d%H%M%S")"
+touch "$TMPFILE"
+chmod og-rwx "$TMPFILE"
 
-if [[ $1 == select ]]; then
-  # Save current clipboard state
-  LAST_CLIPBOARD=$(wl-paste --no-newline || true)
+# Save active window address before opening nvim
+PREV_WINDOW=$(hyprctl -j activewindow | jq -r '.address')
 
-  # Try to grab the primary selection
-  SELECTED_TEXT=$(wl-paste -p --no-newline || true)
+# Launch Neovim
+$TERM_EXEC "${TERM_OPTS[@]}" env NVIM_APPNAME=nvim-anywhere nvim \
+  +startinsert \
+  -i NONE -n \
+  -c 'set wrap' \
+  -c 'set linebreak' \
+  -c 'nmap j gj' \
+  -c 'nmap k gk' \
+  "$TMPFILE" \
+  -u "$NVIM_CONFIG_DIR/init.lua" 63<&0 0</dev/null
 
-  if [[ "$SELECTED_TEXT" != "$LAST_CLIPBOARD" ]]; then
-    echo -n "$SELECTED_TEXT" | wl-copy -n
-    echo "$SELECTED_TEXT" >"$TMPFILE"
+# ONLY refocus and paste if the file actually has content
+if [[ -s "$TMPFILE" ]]; then
+  if [[ -n "$PREV_WINDOW" ]]; then
+    hyprctl dispatch focuswindow address:"$PREV_WINDOW"
   fi
-
-  # Restore the clipboard
-  echo -n "$LAST_CLIPBOARD" | wl-copy -n
+  wl-copy -n <"$TMPFILE"
+  wtype -M Ctrl -k v -m Ctrl
 fi
 
-# Launch Neovim in insert mode, auto-quit on write
-$TERM $TERM_OPTS nvim +startinsert +'autocmd BufWritePost <buffer> quit' -c 'set wrap' -c 'set linebreak' -c 'nmap j gj' -c 'nmap k gk' "$TMPFILE"
-
-# Focus previous window before typing or pasting
-if [[ -n "$address" ]]; then
-  hyprctl dispatch focuswindow address:"$address"
-fi
-
-TEXT=$(<"$TMPFILE")
-
-# Paste or type the text if not empty
-if [ -n "$TEXT" ]; then
-
-  if $KEYSTROKE_MODE; then
-    wl-ime-type "$TEXT"
-
-  else
-    cat "$TMPFILE" | wl-copy -n
-    wtype -M Ctrl -k v -m Ctrl
-  fi
-
-else
-  :
-fi
-
-# Remove tmp file
-rm -rf "$TMPFILE"
+# Cleanup
+rm -f "$TMPFILE"
