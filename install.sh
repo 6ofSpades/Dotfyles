@@ -215,6 +215,10 @@ autotrash
 "
 # Prompt selection
 if ! $NONINTERACTIVE; then
+
+  echo "Syncing repos and updating system first..."
+  yay -Syu
+
   SELECTED=$(echo "$OPTIONAL_PKGS" | gum choose \
     --selected "*" \
     --no-limit \
@@ -224,6 +228,7 @@ if ! $NONINTERACTIVE; then
     What's already installed will be auto skipped.
       ")
 else
+  yay -Syu --noconfirm
   SELECTED="$OPTIONAL_PKGS"
 fi
 
@@ -235,11 +240,39 @@ mapfile -t OPTIONAL_PKGS < <(
 
 if ((${#OPTIONAL_PKGS[@]} > 0)); then
   echo "Installing the things you selected..."
-  yay -Sy --needed "${OPTIONAL_PKGS[@]}" --makepkgconf="$HOME/.config/pacman/makepkg.conf" --config="$HOME/.config/pacman/pacman.conf" --devel --cleanafter --save
+
+  FAILED_PKGS=()
+
+  # Loop through each package individually
+  for pkg in "${OPTIONAL_PKGS[@]}"; do
+    echo "--------------------------------------------------"
+    echo "📦 Installing: $pkg"
+    echo "--------------------------------------------------"
+
+    if ! yay -S --needed "$pkg" \
+      --makepkgconf="$HOME/.config/pacman/makepkg.conf" \
+      --config="$HOME/.config/pacman/pacman.conf" \
+      --answerclean "a" \
+      --devel --cleanafter --noconfirm --save; then
+
+      echo "❌ ERROR: Failed to install $pkg"
+      FAILED_PKGS+=("$pkg")
+    fi
+  done
+
+  # Final report
+  echo "--------------------------------------------------"
+  if ((${#FAILED_PKGS[@]} > 0)); then
+    echo "⚠️  The following packages failed to install:"
+    printf ' - %s\n' "${FAILED_PKGS[@]}"
+  else
+    echo "✅ All packages installed successfully!"
+  fi
+
 else
   echo "Nothing to install."
-  echo "We'll still run yay just to save to the config file."
-  yay --makepkgconf="$HOME/.config/pacman/makepkg.conf" --config="$HOME/.config/pacman/pacman.conf" --devel --cleanafter --save
+  # We'll still run yay just to save to the config file.
+  yay -S --makepkgconf="$HOME/.config/pacman/makepkg.conf" --config="$HOME/.config/pacman/pacman.conf" --devel --cleanafter --answerclean "a" --save
 fi
 
 gum confirm --default "Install and enable ydotool service?" && ydot_serv="y" || ydot_serv="n"
@@ -278,10 +311,6 @@ if [[ "$scripts" == "y" ]]; then
     sed -i "s/user/$USER/g" "$HOME/.config/flameshot/flameshot.ini"
   fi
 
-  if [[ $(yay -Qs candy-icons) ]]; then
-    cd "$DOTFILES_DIR/scripts/theme-fixes/candy-icons"
-    ./fix
-  fi
   if [[ $(yay -Qs pear-desktop) ]]; then
     cd "$DOTFILES_DIR/scripts/theme-fixes/pear-desktop"
     ./patch
