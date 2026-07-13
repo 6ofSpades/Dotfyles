@@ -144,6 +144,7 @@ hyprsunset
 qt5-wayland
 qt6-wayland
 kitty
+foot
 neovim
 tree-sitter
 tree-sitter-cli
