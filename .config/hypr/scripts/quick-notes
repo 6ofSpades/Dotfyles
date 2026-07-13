@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+
+CACHE_DIR="$HOME/.cache/quick-notes"
+CONFIG_FILE="$CACHE_DIR/notes_dir"
+WINDOW_CLASS="quick-notes"
+SPECIAL_WORKSPACE="special:quicknotes"
+
+mkdir -p "$CACHE_DIR"
+
+# --- Setup Routine ---
+# If this script is called with the "--run-setup-internal" flag, it runs the Gum UI
+if [ "$1" = "--run-setup-internal" ]; then
+  clear
+  echo "--- Quick Notes Setup ---"
+  INPUT=$(
+    gum input --placeholder "Paste directory path here" \
+      --header "
+    Quick notes first time setup
+    Choose a directory for your quick-notes, ideally an Obsidian vault
+    Enter f for file picker
+    "
+  )
+
+  if [ $? -ne 0 ] || [ -z "$INPUT" ]; then
+    exit 1
+  fi
+
+  if [ "$INPUT" = "f" ]; then
+    NOTES_DIR=$(gum file --directory)
+  else
+    NOTES_DIR="${INPUT/#\~/$HOME}"
+  fi
+
+  if [ -d "$NOTES_DIR" ] || mkdir -p "$NOTES_DIR" 2>/dev/null; then
+    echo "$NOTES_DIR" >"$CONFIG_FILE"
+    exit 0
+  else
+    gum log --level error "Invalid directory path. Setup failed."
+    exit 1
+  fi
+fi
+
+# 1. First-time setup check
+if [ ! -f "$CONFIG_FILE" ]; then
+  # Spawn Kitty, telling it to run *this exact script* with the setup flag
+  kitty --class "quick-notes" bash "$0" --run-setup-internal
+
+  # Wait briefly for the setup window to close and check if the config file was created
+  sleep 0.5
+  [ ! -f "$CONFIG_FILE" ] && exit 1
+fi
+
+NOTES_DIR=$(cat "$CONFIG_FILE")
+
+# 2. Check the current state of the quick-notes window using hyprctl
+WINDOW_INFO=$(hyprctl clients -j | jq -r ".[] | select(.class == \"$WINDOW_CLASS\")")
+
+# If the window doesn't exist, launch it
+if [ -z "$WINDOW_INFO" ]; then
+  kitty --class "$WINDOW_CLASS" -d "$NOTES_DIR" nvim -i NONE -n &
+  exit 0
+fi
+
+WORKSPACE_NAME=$(echo "$WINDOW_INFO" | jq -r '.workspace.name')
+IS_FOCUSED=$(echo "$WINDOW_INFO" | jq -r '.focusHistoryID == 0')
+
+# 3. Toggle window state based on visibility
+# Quoting the dispatcher targets protects the parenthesis from Bash syntax parsing
+if [ "$WORKSPACE_NAME" = "$SPECIAL_WORKSPACE" ]; then
+  hyprctl dispatch movetoworkspace "e+0,class:^(${WINDOW_CLASS})$"
+  hyprctl dispatch focuswindow "class:^(${WINDOW_CLASS})$"
+elif [ "$IS_FOCUSED" = "true" ]; then
+  hyprctl dispatch movetoworkspacesilent "${SPECIAL_WORKSPACE},class:^(${WINDOW_CLASS})$"
+else
+  hyprctl dispatch focuswindow "class:^(${WINDOW_CLASS})$"
+fi
