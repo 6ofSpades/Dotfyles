@@ -1,1 +1,1 @@
-/home/six/.config/nvim/lua/plugins/noice.lua
+../../../nvim/lua/plugins/noice.lua

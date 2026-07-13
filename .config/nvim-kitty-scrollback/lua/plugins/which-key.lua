@@ -1,1 +1,1 @@
-/home/six/.config/nvim/lua/plugins/which-key.lua
+../../../nvim/lua/plugins/which-key.lua

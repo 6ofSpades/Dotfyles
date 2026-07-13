@@ -1,1 +1,1 @@
-/home/six/.config/nvim/lua/plugins/nvim-notify.lua
+../../../nvim/lua/plugins/nvim-notify.lua

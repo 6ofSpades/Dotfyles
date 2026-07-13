@@ -1,1 +1,1 @@
-/home/six/.config/nvim/lua/plugins/marks.lua
+../../../nvim/lua/plugins/marks.lua

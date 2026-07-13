@@ -1,1 +1,1 @@
-/home/six/.config/nvim/lua/plugins/colorscheme.lua
+../../../nvim/lua/plugins/colorscheme.lua

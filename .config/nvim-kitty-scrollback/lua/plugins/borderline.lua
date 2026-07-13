@@ -1,1 +1,1 @@
-/home/six/.config/nvim/lua/plugins/borderline.lua
+../../../nvim/lua/plugins/borderline.lua

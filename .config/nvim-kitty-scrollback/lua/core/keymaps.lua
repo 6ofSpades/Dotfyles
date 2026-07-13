@@ -101,3 +101,9 @@ vim.keymap.set("n", "<leader>nn", "<cmd>:Notifications<CR>", { desc = "See notif
 vim.keymap.set("n", "<leader>nx", function()
 	require("notify").dismiss()
 end, { desc = "Dismiss all notifications" })
+
+-- Select all with Ctrl-a
+vim.keymap.set("n", "<C-a>", "ggVG", { desc = "Select all" })
+
+-- Keep cursor in place after yanking in visual mode
+vim.keymap.set("v", "y", "ygv<Esc>")
