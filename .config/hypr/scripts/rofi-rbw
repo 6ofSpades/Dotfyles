@@ -1,0 +1,5 @@
+#!/bin/bash
+
+rofi-rbw --typer ydotool --prompt "RBW " --clear-after 10 \
+  --selector-args="-theme ~/.config/rofi/rbw.rasi" \
+  --keybindings "Alt+1:type:delay:username:tab:password:enter,Alt+2:type:delay:username:enter,Alt+3:type:delay:password:enter,Ctrl+1:type:delay:username:tab:password,Ctrl+2:type:delay:username,Ctrl+3:type:delay:password,Alt+m:type:delay:menu,Alt+c:copy:password,Alt+u:copy:username"
