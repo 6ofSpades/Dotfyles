@@ -1,0 +1,46 @@
+#!/bin/bash
+
+## an attempt to force focus to a window that just opened
+## and should auto focus but doesn't for some reason
+
+# --- Configuration ---
+# The command to launch the program
+PROGRAM_CMD="$1"
+# The window class or title to look for (use 'hyprctl clients' to find this)
+WINDOW_CLASS="$2"
+
+# Timeout settings
+MAX_ATTEMPTS=20    # Maximum number of times to try focusing
+SLEEP_INTERVAL=0.2 # Time to wait between attempts (in seconds)
+# Total maximum wait time = 20 * 0.2 = 4 seconds
+
+# --- Main Logic ---
+
+# 1. Launch the program in the background
+$PROGRAM_CMD &
+
+# 2. Loop to continuously check and focus
+ATTEMPT=0
+while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+
+  # Check if the window currently exists in hyprland's client list
+  if hyprctl clients | grep -q "class: $WINDOW_CLASS"; then
+
+    # Try to focus the window
+    hyprctl dispatch focuswindow "class:$WINDOW_CLASS"
+
+    # Check if the active window is now the one we want
+    ACTIVE_CLASS=$(hyprctl activewindow -j | jq -r '.class')
+    if [ "$ACTIVE_CLASS" = "$WINDOW_CLASS" ]; then
+      echo "Successfully focused $WINDOW_CLASS after $ATTEMPT attempts."
+      exit 0
+    fi
+  fi
+
+  # Increment counter and wait before trying again
+  ATTEMPT=$((ATTEMPT + 1))
+  sleep $SLEEP_INTERVAL
+done
+
+echo "Warning: Timed out trying to focus $WINDOW_CLASS."
+exit 1
