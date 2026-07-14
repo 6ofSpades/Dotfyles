@@ -1,15 +1,17 @@
 #!/bin/bash
 
 TEMP="/tmp/mark-cursor"
+POP="$HOME/.config/hypr/scripts/.pop-alert.mp3"
+SWOOSH="$HOME/.config/hypr/scripts/.operagx-swoosh.mp3"
 
 # Create temporary file if it doesn't exist
-if [[ ! -e $TEMP ]]; then 
+if [[ ! -e $TEMP ]]; then
   touch $TEMP
 fi
 
-
 function mark {
-  echo $(hyprctl cursorpos) > $TEMP
+  echo $(hyprctl cursorpos) >$TEMP
+  paplay $POP
 }
 
 function move {
@@ -20,10 +22,11 @@ function move {
   pos=$(echo $pos | tr -d ',')
 
   ydotool mousemove -a $pos
+
+  paplay $SWOOSH
 }
 
-
 case $1 in
-  mark) mark ;;
-  move) move ;;
+mark) mark ;;
+move) move ;;
 esac
