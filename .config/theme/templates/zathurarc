@@ -1,0 +1,53 @@
+# --- Zathura Minimalist Dark Mode Config ---
+
+# Tell Zathura to use custom colors by default
+set recolor "true"
+
+set recolor-keephue "true"
+
+# This option is very important
+# It makes the pages have inverted colors for dark mode
+# While still keeping the images with normal colors 
+set recolor-reverse-video "true"
+
+# Define your Theme Colors
+# Transparent background cause it makes stuff pretty
+set default-bg                  "rgba(0,0,0,0.6)"
+set default-fg                  "#CDD6F4" # Light gray text
+
+# Make pages actually dark mode
+set recolor-darkcolor           "#CDD6F4" # Text color in recolor mode
+set recolor-lightcolor          "rgba(0, 0, 0, 0.50)" # Page color in recolor mode
+
+# Optional UI tweaks to match the clean aesthetic
+set statusbar-bg                "#11111B"
+set statusbar-fg                "#CDD6F4"
+set inputbar-bg                 "#11111B"
+set inputbar-fg                 "#A6E3A1" # Green accent for commands
+
+# Link highlights
+set highlight-color             "rgba(105, 0, 134, 0.50)" #0A
+set highlight-fg                "#00ffff" #0D
+
+# completion highlights
+set completion-highlight-fg "#151515" #02
+set completion-highlight-bg "#90A959" #0C
+
+set completion-bg "#303030" #02
+set completion-fg "#E0E0E0" #0C
+
+#stop at page boundries
+set scroll-page-aware "true"
+set scroll-full-overlap 0.01
+set scroll-step 50
+
+# copy selection to system clipboard
+set selection-clipboard clipboard
+
+# SMOOTH SCROLLING
+# IT TOOK ME EVERYTHING TO FIND OUT ABOUT THIS
+map j scroll smooth-down
+map k scroll smooth-up
+
+map = zoom in
+map - zoom out

@@ -1,0 +1,19 @@
+
+@import "~/.config/rofi/config.rasi"
+
+window {
+    location:       center;
+    width:          400;
+    border-radius:  10px;
+
+    background-color: @bg1;
+    border: 2px;
+    border-color: @bg3;
+}
+
+entry {
+    // placeholder:        "Search";
+    placeholder-color:  @fg3;
+    horizontal-align: 0.40;
+    cursor: text;
+}

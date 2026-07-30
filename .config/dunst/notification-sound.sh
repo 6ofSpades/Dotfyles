@@ -1,3 +1,3 @@
 #!/bin/bash
 
-paplay ~/.config/dunst/hacker-notify-sound.mp3
+paplay ~/.config/dunst/scifi-click.mp3

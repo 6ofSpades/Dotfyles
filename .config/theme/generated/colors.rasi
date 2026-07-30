@@ -1,0 +1,36 @@
+* {
+    bg: rgb(0, 0, 0);
+    fg: rgb(192, 202, 245);
+    black: rgb(0, 0, 0);
+    red: rgb(204, 0, 252);
+    green: rgb(0, 191, 167);
+    yellow: rgb(224, 175, 104);
+    blue: rgb(51, 90, 255);
+    magenta: rgb(133, 0, 188);
+    cyan: rgb(0, 255, 255);
+    white: rgb(221, 221, 221);
+    black-bright: rgb(65, 74, 116);
+    red-bright: rgb(204, 0, 252);
+    green-bright: rgb(0, 191, 167);
+    yellow-bright: rgb(224, 175, 104);
+    blue-bright: rgb(51, 90, 255);
+    magenta-bright: rgb(133, 0, 188);
+    cyan-bright: rgb(0, 255, 255);
+    white-bright: rgb(255, 255, 255);
+    gray1: rgb(32, 35, 49);
+    gray2: rgb(97, 103, 137);
+    magenta2: rgb(154, 40, 227);
+    magenta3: rgb(95, 0, 247);
+    accent: rgb(105, 16, 165);
+    cursor: rgb(133, 0, 188);
+    cursor-text-color: rgb(0, 0, 0);
+    cursor-line: rgb(32, 35, 49);
+    cursor-line-number: rgb(0, 255, 255);
+    line-number: rgb(65, 74, 116);
+    selection-bg: rgb(73, 0, 133);
+    rofi-bg: rgba(0,0,0,0.5);
+    frecency-bg: rgba(0,0,0,0.3);
+    rofi-border: rgb(105,16,165);
+    selected-bg: rgba(105,16,165,0.5);
+    active-fg: rgb(204,0,252);
+}

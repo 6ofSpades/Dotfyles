@@ -54,7 +54,7 @@ element-icon {
 }
 
 element selected.normal {
-  background-color:   @bg3;
+  background-color:   @selected-bg;
   border-radius:      10px;
 }
 

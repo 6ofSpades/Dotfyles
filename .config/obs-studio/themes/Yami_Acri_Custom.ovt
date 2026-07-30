@@ -7,13 +7,13 @@
 }
 
 @OBSThemeVars {
-    --grey1: rgb(97,97,97);
-    --grey2: rgb(87,87,87);
-    --grey3: rgb(61,61,63);
-    --grey4: rgb(50,50,58);
+    --grey1: rgb(40,40,40);
+    --grey2: rgb(35,35,35);
+    --grey3: rgb(30,30,30);
+    --grey4: rgb(25,25,25);
     --grey5: rgb(0,0,0);   /* this is the background of the preview */
-    --grey6: rgb(24,24,25);
-    --grey7: rgb(16,16,16);
+    --grey6: rgb(20,20,20);
+    --grey7: rgb(0,0,0);
     --grey8: rgb(9,9,9);
 
     /* change these to change theme colors */

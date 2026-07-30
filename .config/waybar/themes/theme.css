@@ -1,25 +1,19 @@
-/* Glass-purple */
+/* Blur-Glass */
+@import "../../theme/generated/colors-gtk.css";
 
-@define-color text			  rgba(255, 255, 255, 0.9);
-@define-color subtext		  rgba(255, 255, 255, 0.85);
+@define-color text			  @fg;
+@define-color subtext			alpha(@fg, 0.9);
 
-@define-color overlay5    rgba(0, 0, 0, 0.4);
-@define-color overlay4    rgba(0, 0, 0, 0.3);
-@define-color overlay3		rgba(0, 0, 0, 0.25);
-@define-color overlay2		rgba(0, 0, 0, 0.15);
-@define-color overlay17		rgba(0, 0, 0, 0.13);
+@define-color overlay5    rgba(0, 0, 0, 0.70);
+@define-color overlay4    rgba(0, 0, 0, 0.38);
+@define-color overlay3		rgba(0, 0, 0, 0.30);
+@define-color overlay2		rgba(0, 0, 0, 0.20);
+@define-color overlay17		rgba(0, 0, 0, 0.15);
 @define-color overlay15		rgba(0, 0, 0, 0.10);
-@define-color overlay1		rgba(0, 0, 0, 0.05);
-
-@define-color yellow  #e0af68;
-@define-color red     #de646e;
-@define-color green   #00bfb7;
-@define-color cyan    #00ffff;
-@define-color blue    #1A75CF;
+@define-color overlay1		rgba(0, 0, 0, 0.10);
 
 /* main colors */
-@define-color accent		  #8325af;
-@define-color clock       #c9c0f5;
+@define-color clock       shade(@accent, 3);
 
 @define-color hover-bg		alpha(@accent, 0.5);
 

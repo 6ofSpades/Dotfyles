@@ -8,6 +8,7 @@
   padding: 6px;
   font-weight: bold;
   text-decoration: underline;
+  background-color: @overlay3;
 }
 #submap.MAIN {
   color: @blue;
@@ -29,13 +30,16 @@
 }
 
 /* workspaces */
-#custom-left_div.5,
+#custom-left_div.5 {
+  color: @overlay17;
+  background-color: @overlay3;
+}
 #custom-right_div.5 {
-  color: @overlay3;
+  color: @overlay4;
 }
 #workspaces {
   padding: 0 1px;
-  background-color: @overlay3;
+  background-color: @overlay4;
 }
 #workspaces .active label {
   font-size: 23px;

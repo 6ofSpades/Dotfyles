@@ -1,0 +1,266 @@
+colors:
+  bg: "#000000"
+  fg: "#c0caf5"
+
+  black: "#000000"
+  red: "#cc00fc"
+  green: "#00bfa7"
+  yellow: "#e0af68"
+  blue: "#335aff"
+  magenta: "#8500bc"
+  cyan: "#00ffff"
+  white: "#dddddd"
+
+  black_bright: "#414a74"
+  red_bright: red
+  green_bright: green
+  yellow_bright: yellow
+  blue_bright: blue
+  magenta_bright: magenta
+  cyan_bright: cyan
+  white_bright: "#ffffff"
+
+  gray1: "#202331"
+  gray2: "#616789"
+
+  magenta2: "#9A28e3"
+  magenta3: "#5F00f7"
+
+ui:
+  accent: "#6910a5"
+
+  cursor: magenta
+  cursor_text_color: black
+  cursor_line: gray1
+  cursor_line_number: cyan
+  line_number: black_bright
+
+  selection_fg:
+  selection_bg: "#490085"
+
+kitty:
+  kitty_transparent: "#490085@0.75 #202331@0.75"
+
+  active_tab_fg: white
+  active_tab_bg: accent
+  inactive_tab_fg: gray2
+  inactive_tab_bg: gray1
+
+hyprland:
+  border: red
+  border_pin: yellow
+  border_maximized: cyan
+
+rofi:
+  rofi-bg: rgba(bg,0.5)
+  frecency-bg: rgba(bg,0.3)
+  rofi-border: rgb(accent)
+
+  selected-bg: rgba(accent,0.5)
+  active-fg: rgb(red)
+
+mpv:
+  # accent color of the OSC and title bar
+  osc_color: bg
+  # color of the title in borderless/fullscreen mode
+  window_title_color: fg
+  # color of the window controls (close, minimize, maximize) in borderless/fullscreen mode
+  window_controls_color: fg
+
+  # color of the title
+  title_color: white
+  # color of the cache information
+  cache_info_color: fg
+  # color of the cache ranges on the seekbar
+  seekbar_cache_color: black_bright
+  # color of the seekbar progress
+  seekbarfg_color: accent
+  # color of the remaining seekbar
+  seekbarbg_color: gray2
+  # color of the seekbar handle
+  seek_handle_color: accent
+  # inner border color drawn inside the seekbar handle (set to disable to disable)
+  seek_handle_border_color: accent
+  # color of the timestamps (below seekbar)
+  time_color: fg
+  # color of the chapter title
+  chapter_title_color: fg
+  # color of the side buttons (audio, subtitles, playlist, etc.)
+  side_buttons_color: fg
+  # color of the middle buttons (skip, jump, chapter, etc.)
+  middle_buttons_color: fg
+  # color of the play/pause button
+  playpause_color: fg
+  # color of the element when held down (pressed)
+  held_element_color: gray1
+  # color of a hovered button when hover_effect includes "color"
+  hover_effect_color: accent
+  # color of the background for thumbnail box
+  thumbnail_box_color: bg
+  # color of the border outline for thumbnail box
+  thumbnail_box_outline: accent
+  # color of chapter nibbles on the seekbar
+  nibble_color: accent
+  # color of the current chapter nibble on the seekbar
+  nibble_current_color: fg
+  # color of the A/B loop range on the seekbar
+  ab_loop_color: "#2596be"
+
+zathura:
+  default-fg: rgb(fg)
+  default-bg: rgba(bg,0.6)
+
+  recolor-darkcolor: rgb(white)
+  recolor-lightcolor: rgba(bg,0.5)
+
+  statusbar-bg: rgb(black)
+  statusbar-fg: rgb(blue)
+  inputbar-bg: rgb(black)
+  inputbar-fg: rgb(yellow)
+
+  highlight-color: rgba(selection_bg,0.5)
+  highlight-fg: rgb(cyan)
+
+  completion-highlight-fg: rgb(blue)
+  completion-highlight-bg: rgba(selection_bg,0.5)
+
+  completion-bg: rgba(black,0.5)
+  completion-fg: rgb(fg)
+
+dunst:
+  frame_color: accent
+
+  urgency_low.background: "#00000080"
+  urgency_low.foreground: fg
+  urgency_low.highlight: "#8500bc, #1a75cf"
+
+  urgency_normal.background: "#00000080"
+  urgency_normal.foreground: fg
+  urgency_normal.highlight: "#8500bc, #1a75cf"
+
+  urgency_critical.background: "#90000066"
+  urgency_critical.foreground: fg
+  urgency_critical.highlight: "#d54e53, #f0f0f0"
+  urgency_critical.frame_color: red
+
+flameshot:
+  uiColor: accent
+  drawColor: "#ff0000"
+
+btop:
+  # Main text color
+  theme[main_fg]: fg
+  # Title color for boxes
+  theme[title]: white
+  # Color of inactive/disabled text
+  theme[inactive_fg]: gray1
+
+  # Process box color gradients for threads, men, and cpu usage
+  theme[process_start]: green
+
+  # boder color for both cpu and gpu box
+  theme[cpu_box]: accent
+  # border color for the other boxes
+  theme[mem_box]: blue
+  theme[net_box]: blue
+  theme[proc_box]: blue
+
+  # Highlight color for keyboard shortcuts
+  theme[hi_fg]: cyan
+
+  # Background color of selected item in processes box
+  theme[selected_bg]: selection_bg
+  # Foreground color of selected item in processes box
+  theme[selected_fg]: white
+
+  # Box divider line and small boxes line color
+  theme[div_line]: black_bright
+
+  # Misc colors for processes box including mini cpu graphs, details memory graph and details status text
+  theme[proc_misc]: accent
+  # Color of text appearing on top of graphs, i.e uptime and current network graph scaling
+  theme[graph_text]: fg
+
+  # graphs
+  # Temperature graph colors
+  theme[temp_start]: blue
+  theme[temp_mid]: yellow
+  theme[temp_end]: red
+
+  # CPU graph colors
+  theme[cpu_start]: magenta
+  theme[cpu_mid]: blue
+  theme[cpu_end]: red
+
+  # Mem/Disk used meter
+  theme[used_start]: blue
+  theme[used_mid]: magenta
+  theme[used_end]: red
+
+  # Mem/Disk available meter
+  theme[available_start]: cyan
+  theme[available_mid]: blue
+  theme[available_end]: green
+
+  # Mem/Disk cached meter
+  theme[cached_start]: magenta
+  theme[cached_mid]: blue
+  theme[cached_end]: magenta
+
+  # Mem/Disk free meter
+  theme[free_start]: green
+  theme[free_mid]: cyan
+  theme[free_end]: blue
+
+  # Download graph colors
+  theme[download_start]: blue
+  theme[download_mid]: magenta
+  theme[download_end]: red
+
+  # Upload graph colors
+  theme[upload_start]: blue
+  theme[upload_mid]: magenta
+  theme[upload_end]: red
+
+yazi:
+  mgr.cwd.fg: cyan
+
+  mgr.find_keyword.fg: cyan
+
+  mgr.find_keyword.fg: cyan
+
+  mgr.border_style.fg: black_bright
+
+  tabs.active.fg: white
+  tabs.active.bg: accent
+  tabs.inactive.fg: gray2
+  tabs.inactive.bg: gray1
+
+  mode.normal_main.bg: blue
+  mode.normal_main.fg: bg
+  mode.normal_alt.bg: gray1
+  mode.normal_alt.fg: blue
+  mode.select_main.bg: magenta
+  mode.select_main.fg: bg
+  mode.select_alt.bg: gray1
+  mode.select_alt.fg: magenta
+  mode.unset_main.bg: red
+  mode.unset_main.fg: bg
+  mode.unset_alt.bg: gray1
+  mode.unset_alt.fg: red
+
+  indicator.parent.bg: selection_bg
+  indicator.current.bg: selection_bg
+
+traytui:
+  colors.bg: bg
+  colors.bg_focused: bg
+
+  colors.fg: fg
+  colors.fg_focused: white
+
+  colors.border_fg: black_bright
+  colors.border_fg_focused: accent
+
+  colors.bg_highlighted: selection_bg
+  colors.fg_highlighted: white_bright

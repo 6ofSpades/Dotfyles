@@ -6,53 +6,43 @@ return {
 		local lualine = require("lualine")
 		local lazy_status = require("lazy.status") -- to configure lazy pending updates count
 
-		local colors = {
-			blue = "#1a75cf",
-			green = "#00bfa7",
-			violet = "#8500bc",
-			yellow = "#e0af68",
-			-- red = "#FF4A4A",
-			red = "#de646e",
-			fg = "#ffffff",
-			dark_fg = "#000001",
-			bg = "#000000",
-		}
+		local theme = dofile(vim.fn.expand("~/.config/theme/generated/theme.lua"))
 
 		local my_lualine_theme = {
 			normal = {
-				a = { bg = colors.blue, fg = colors.dark_fg, gui = "italic,bold" },
-				b = { bg = colors.bg, fg = colors.fg },
-				c = { bg = colors.bg, fg = colors.fg },
-				y = { fg = colors.blue, gui = "italic,bold" },
+				a = { bg = theme.colors.blue, fg = theme.colors.bg, gui = "italic,bold" },
+				b = { bg = theme.colors.bg, fg = theme.colors.fg },
+				c = { bg = theme.colors.bg, fg = theme.colors.fg },
+				y = { fg = theme.colors.blue, gui = "italic,bold" },
 			},
 			insert = {
-				a = { bg = colors.green, fg = colors.dark_fg, gui = "italic,bold" },
-				b = { bg = colors.bg, fg = colors.fg },
-				c = { bg = colors.bg, fg = colors.fg },
-				y = { fg = colors.green, gui = "italic,bold" },
+				a = { bg = theme.colors.green, fg = theme.colors.bg, gui = "italic,bold" },
+				b = { bg = theme.colors.bg, fg = theme.colors.fg },
+				c = { bg = theme.colors.bg, fg = theme.colors.fg },
+				y = { fg = theme.colors.green, gui = "italic,bold" },
 			},
 			visual = {
-				a = { bg = colors.violet, fg = colors.dark_fg, gui = "italic,bold" },
-				b = { bg = colors.bg, fg = colors.fg },
-				c = { bg = colors.bg, fg = colors.fg },
-				y = { fg = colors.violet, gui = "italic,bold" },
+				a = { bg = theme.colors.magenta, fg = theme.colors.bg, gui = "italic,bold" },
+				b = { bg = theme.colors.bg, fg = theme.colors.fg },
+				c = { bg = theme.colors.bg, fg = theme.colors.fg },
+				y = { fg = theme.colors.magenta, gui = "italic,bold" },
 			},
 			command = {
-				a = { bg = colors.yellow, fg = colors.dark_fg, gui = "italic,bold" },
-				b = { bg = colors.bg, fg = colors.fg },
-				c = { bg = colors.bg, fg = colors.fg },
-				y = { fg = colors.yellow, gui = "italic,bold" },
+				a = { bg = theme.colors.yellow, fg = theme.colors.bg, gui = "italic,bold" },
+				b = { bg = theme.colors.bg, fg = theme.colors.fg },
+				c = { bg = theme.colors.bg, fg = theme.colors.fg },
+				y = { fg = theme.colors.yellow, gui = "italic,bold" },
 			},
 			replace = {
-				a = { bg = colors.red, fg = colors.dark_fg, gui = "italic,bold" },
-				b = { bg = colors.bg, fg = colors.fg },
-				c = { bg = colors.bg, fg = colors.fg },
-				y = { fg = colors.red, gui = "italic,bold" },
+				a = { bg = theme.colors.red, fg = theme.colors.bg, gui = "italic,bold" },
+				b = { bg = theme.colors.bg, fg = theme.colors.fg },
+				c = { bg = theme.colors.bg, fg = theme.colors.fg },
+				y = { fg = theme.colors.red, gui = "italic,bold" },
 			},
 			inactive = {
-				a = { bg = colors.inactive_bg, fg = colors.inactive_fg },
-				b = { bg = colors.inactive_bg, fg = colors.inactive_fg },
-				c = { bg = colors.inactive_bg, fg = colors.inactive_fg },
+				a = { bg = theme.colors.gray1, fg = theme.colors.black_bright },
+				b = { bg = theme.colors.gray1, fg = theme.colors.black_bright },
+				c = { bg = theme.colors.gray1, fg = theme.colors.black_bright },
 			},
 		}
 
@@ -60,8 +50,6 @@ return {
 		lualine.setup({
 			options = {
 				theme = my_lualine_theme,
-				-- component_separators = { left = '', right = ''},
-				-- section_separators = { left = '', right = ''},
 				component_separators = { left = "", right = "" },
 				section_separators = { left = "", right = "" },
 			},
@@ -70,18 +58,13 @@ return {
 					{
 						lazy_status.updates,
 						cond = lazy_status.has_updates,
-						color = { fg = "#ff9e64" },
+						color = { fg = theme.colors.red },
 					},
 					{ "encoding" },
 					{ "filetype" },
 				},
 				lualine_y = {
-					{
-						require("noice").api.statusline.mode.get,
-						cond = require("noice").api.statusline.mode.has,
-						color = { bg = "#313131", fg = "#ff00ff" },
-					},
-					{ "progress", color = { bg = "#313131" } },
+					{ "progress", color = { bg = theme.colors.gray1 } },
 				},
 			},
 		})
