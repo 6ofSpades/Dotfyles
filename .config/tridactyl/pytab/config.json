@@ -1,0 +1,24 @@
+{
+  "colors": {
+    "normal": "normal",
+    "active": "blue",
+    "discarded": "bright_black",
+    "cursor_bg": "#390065",
+    "border": "#6910a5",
+    "footer": "bright_black",
+    "prompt": "cyan",
+    "pin_marker": "red"
+  },
+  "symbols": {
+    "pinned": " "
+  },
+  "keybinds": {
+    "down": "C-j",
+    "up": "C-k",
+    "close": "C-d",
+    "discard": "C-u",
+    "pin": "C-p",
+    "sort": "C-s",
+    "center": "C-z"
+  }
+}

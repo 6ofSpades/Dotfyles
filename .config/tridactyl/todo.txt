@@ -1,0 +1,4 @@
+Maybe important things to do:
+
+- Make the fuzzy search still keep the most recent tabs on top, keep the sorting by recent.
+

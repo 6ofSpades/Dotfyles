@@ -1,0 +1,392 @@
+" ==============================================================================
+" General Settings
+" ==============================================================================
+set configversion 2.0
+set theme lunara
+set smoothscroll true
+set scrollduration 100
+
+" Update Settings
+set update.lastchecktime 1783293436121
+set update.nag true
+set update.nagwait 7
+set update.lastnaggedversion 1.14.0
+set update.checkintervalsecs 86400
+
+" External Editor Configuration
+" Press <C-i> on the browser when in an input text to fire this.
+set editorcmd kitty --class nvim-anywhere -o background_opacity=0.5 env NVIM_APPNAME=nvim-anywhere nvim 63<&0 0</dev/null +startinsert -c 'set wrap' -c 'set linebreak' -c 'nmap j gj' -c 'nmap k gk' -u "~/.config/nvim-anywhere/init.lua"
+
+
+" ==============================================================================
+" Core Navigation & Scrolling Binds
+" ==============================================================================
+bind j scrollline +5
+bind k scrollline -5
+bind <C-d> scrollline 100
+bind <C-u> scrollline -100
+bind h scrollpx -50
+bind l scrollpx 50
+bind G scrollto 100
+bind gg scrollto 0
+bind $ scrollto 100 x
+bind ^ scrollto 0 x
+
+" History Navigation
+bind H back
+bind L forward
+bind <C-o> jumpprev
+bind <C-i> jumpnext
+
+" Miscellaneous Global Binds
+bind \ nmode ignore 1 mode normal
+bind . repeat
+bind <S-Insert> mode ignore
+bind <Escape> composite mode normal ; hidecmdline
+bind <C-[> composite mode normal ; hidecmdline
+bind <F1> help
+
+
+" ==============================================================================
+" Tab Management
+" ==============================================================================
+bind K tabprev
+bind J tabnext
+bind gt tabnext_gt
+bind g0 tabfirst
+bind g$ tablast
+bind tp tab #
+bind tx fillcmdline tabclose
+bind ta tabaudio
+bind tu fillcmdline tabdiscard
+bind ty tabduplicate
+bind tr fillcmdline tabrename %
+bind td tabdetach
+bind tm fillcmdline tabmove
+bind tk tabclose
+bind to tabopen
+bind < tabmove -1
+bind > tabmove +1
+
+" Closing Multiple Tabs
+bind gx0 tabclosealltoleft
+bind gx$ tabclosealltoright
+bind u undo
+bind U undo window
+
+" Pinned & Muted States
+bind <A-p> pin
+bind tP pin
+bind <A-m> mute toggle
+bind tM mute toggle
+
+
+" ==============================================================================
+" Page & URL Actions
+" ==============================================================================
+bind o fillcmdline open
+bind O fillcmdline tabopen
+bind w fillcmdline winopen
+bind W current_url winopen
+bind : fillcmdline_notrail
+bind s fillcmdline open search
+bind S fillcmdline tabopen search
+
+" Page Control
+bind r reload
+bind R reloadhard
+bind x stop
+bind gh home
+bind gH home true
+bind gi focusinput
+bind ]] followpage next
+bind [[ followpage prev
+bind [c urlincrement -1
+bind ]c urlincrement 1
+bind gr reader --old
+bind gu urlparent
+bind gU urlroot
+bind gf viewsource
+bind ge current_url open
+
+
+" ==============================================================================
+" Clipboard & Yanking
+" ==============================================================================
+bind p clipboard open
+bind P clipboard tabopen
+bind yy clipboard yank
+bind ys clipboard yankshort
+bind yq text2qr --timeout 5
+bind yc clipboard yankcanon
+bind ym clipboard yankmd
+bind yo clipboard yankorg
+bind yt clipboard yanktitle
+
+
+" ==============================================================================
+" Zoom Controls
+" ==============================================================================
+bind zi zoom 0.1 true
+bind zo zoom -0.1 true
+bind zm zoom 0.5 true
+bind zr zoom -0.5 true
+bind zM zoom 0.5 true
+bind zR zoom -0.5 true
+bind zz zoom 1
+bind zI zoom 3
+bind zO zoom 0.3
+
+
+" ==============================================================================
+" Marks & Bookmarks
+" ==============================================================================
+bind a current_url bmark
+bind A bmark
+bind M gobble 1 quickmark
+bind m gobble 1 markadd
+bind ' gobble 1 markjump
+bind '' markjumpbefore
+
+
+" ==============================================================================
+" Hint Mode Keybindings (f/F/;)
+" ==============================================================================
+hintstylesnohighlights
+bind f hint
+bind F hint -b
+bind <C-f> hint -t
+bind yf hint -y
+bind gF hint -qb
+bind v hint -h
+
+" Standard Hints (;)
+bind ;o hint
+bind ;i hint -i
+bind ;I hint -I
+bind ;k hint -k
+bind ;K hint -K
+bind ;p hint -p
+bind ;h hint -h
+bind ;P hint -P
+bind ;r hint -r
+bind ;s hint -s
+bind ;S hint -S
+bind ;a hint -a
+bind ;A hint -A
+bind ;; hint -; *
+bind ;# hint -#
+bind ;v hint -W mpvsafe
+bind ;V hint -V
+bind ;w hint -w
+bind ;t hint -W tabopen
+bind ;O hint -W fillcmdline_notrail open 
+bind ;W hint -W fillcmdline_notrail winopen 
+bind ;T hint -W fillcmdline_notrail tabopen 
+bind ;d hint -W tabopen --discard
+bind ;z hint -z
+
+" Quick Hints (;g)
+bind ;gf hint -q
+bind ;gi hint -qi
+bind ;gI hint -qI
+bind ;gk hint -qk
+bind ;gy hint -qy
+bind ;gp hint -qp
+bind ;gP hint -qP
+bind ;gr hint -qr
+bind ;gs hint -qs
+bind ;gS hint -qS
+bind ;ga hint -qa
+bind ;gA hint -qA
+bind ;g; hint -q;
+bind ;g# hint -q#
+bind ;gv hint -qW mpvsafe
+bind ;gw hint -qw
+bind ;gb hint -qb
+bind ;gF hint -qb
+bind ;gd hint -qW tabopen --discard
+
+" Image/Yank Specific Hints
+bind if hint -cF img i => tri.excmds.yankimage(tri.urlutils.getAbsoluteURL(i.src))
+bind ;Y hint -cF img i => tri.excmds.yankimage(tri.urlutils.getAbsoluteURL(i.src))
+bind ;m hint -JFc img i => tri.excmds.open('https://lens.google.com/uploadbyurl?url='+i.src)
+bind ;M hint -JFc img i => tri.excmds.tabopen('https://lens.google.com/uploadbyurl?url='+i.src)
+
+" Custom Scripted Mouse/Click Hints via ydotool
+bind ;x hint -F e => { const pos = tri.dom.getAbsoluteCentre(e); tri.excmds.exclaim_quiet("ydotool mousemove --sync " + window.devicePixelRatio * pos.x + " " + window.devicePixelRatio * pos.y + "; ydotool click 1")}
+bind ;c hint -F e => { const pos = tri.dom.getAbsoluteCentre(e); tri.excmds.exclaim_quiet("ydotool mousemove --sync " + window.devicePixelRatio * pos.x + " " + window.devicePixelRatio * pos.y + "; ydotool click 3")}
+bind ;: hint -F e => { const pos = tri.dom.getAbsoluteCentre(e); tri.excmds.exclaim_quiet("ydotool mousemove --sync " + window.devicePixelRatio * pos.x + " " + window.devicePixelRatio * pos.y)}
+bind ;X hint -F e => { const pos = tri.dom.getAbsoluteCentre(e); tri.excmds.exclaim_quiet("ydotool mousemove --sync " + window.devicePixelRatio * pos.x + " " + window.devicePixelRatio * pos.y + "; ydotool keydown ctrl+shift; ydotool click 1; ydotool keyup ctrl+shift")}
+
+
+" ==============================================================================
+" Ex-Mode / Command Line Binds (--mode=ex)
+" ==============================================================================
+bind --mode=ex <C-j> ex.next_completion
+bind --mode=ex <C-k> ex.prev_completion
+bind --mode=ex <Tab> ex.next_completion
+bind --mode=ex <S-Tab> ex.prev_completion
+bind --mode=ex <C-f> ex.complete
+bind --mode=ex <Space> ex.insert_space_or_completion
+bind --mode=ex <C-Space> ex.insert_space
+
+" Execution Controls
+bind --mode=ex <C-m> ex_execute; fillcmdline tabclose
+bind --mode=ex <Enter> ex.accept_line
+bind --mode=ex <C-Enter> ex.execute_ex_on_completion
+bind --mode=ex <S-Delete> ex.execute_ex_on_completion_args tabclose
+bind --mode=ex <C-x> ex.execute_ex_on_completion_args tabclose
+bind --mode=ex <C-p> ex.execute_ex_on_completion_args pin
+bind --mode=ex <C-u> ex.execute_ex_on_completion_args tabdiscard
+bind --mode=ex <C-c> ex.execute_ex_on_completion_args clipboard yank
+bind --mode=ex <Escape> ex.hide_and_clear
+bind --mode=ex <C-[> ex.hide_and_clear
+
+" History Navigation
+bind --mode=ex <ArrowUp> ex.prev_history
+bind --mode=ex <ArrowDown> ex.next_history
+
+" Text Editing inside Command Line
+bind --mode=ex <A-b> text.backward_word
+bind --mode=ex <A-f> text.forward_word
+bind --mode=ex <C-e> text.end_of_line
+bind --mode=ex <A-d> text.kill_word
+bind --mode=ex <S-Backspace> text.backward_kill_word
+
+" Complex Ex Executions
+bind --mode=ex <C-o>yy ex.execute_ex_on_completion_args clipboard yank
+bind --mode=ex <C-o>t ex.execute_ex_on_completion_args tabopen -b
+bind --mode=ex <C-o>w ex.execute_ex_on_completion_args winopen
+
+
+" ==============================================================================
+" Background Processes, Custom Commands & Autocmds
+" ==============================================================================
+" The permanent background engine loop
+command run_browser_server_loop jsb (async () => { while (true) { let res = await tri.native.run("~/.config/tridactyl/browser_server.sh"); let output = res.content.trim().split(" "); if (output.length < 2) continue; let action = output[0]; let id = parseInt(output[1]); if (action === "switch") { browser.tabs.update(id, {active: true}); } else if (action === "close") { browser.tabs.remove(id); } else if (action === "discard") { browser.tabs.discard(id); } else if (action === "toggle-pin") { browser.tabs.get(id).then(t => browser.tabs.update(id, {pinned: !t.pinned})); } } })()
+
+" Boot the server as soon as Tridactyl starts
+autocmd TriStart .* run_browser_server_loop
+
+" Custom Python / TUI Integrations (Pytab)
+bind T jsb browser.tabs.query({currentWindow:true}).then(tabs => { const data = JSON.stringify(tabs.map(t => ({id: t.id, index: t.index, title: t.title, url: t.url, pinned: t.pinned, discarded: t.discarded, lastAccessed: t.lastAccessed, active: t.active}))); tri.native.run("footclient -a pytab -e python3 ~/.config/tridactyl/pytab.py '" + data.replace(/'/g, "'\\''") + "' recent"); })
+bind tt jsb browser.tabs.query({currentWindow:true}).then(tabs => { const data = JSON.stringify(tabs.map(t => ({id: t.id, index: t.index, title: t.title, url: t.url, pinned: t.pinned, discarded: t.discarded, lastAccessed: t.lastAccessed, active: t.active}))); tri.native.run("footclient -a pytab -e python3 ~/.config/tridactyl/pytab.py '" + data.replace(/'/g, "'\\''") + "' index"); })
+
+
+" ==============================================================================
+" Easter Eggs / Text Fun
+" ==============================================================================
+bind g? rot13
+bind g! jumble
+bind g; changelistjump -1
+bind <AS-ArrowUp><AS-ArrowUp><AS-ArrowDown><AS-ArrowDown><AS-ArrowLeft><AS-ArrowRight><AS-ArrowLeft><AS-ArrowRight>ba open https://www.youtube.com/watch?v=M3iOROuTuMA
+
+
+" ==============================================================================
+" Aliases
+" ==============================================================================
+command alias command
+alias au autocmd
+alias aucon autocontain
+alias audel autocmddelete
+alias audelete autocmddelete
+alias blacklistremove autocmddelete DocStart
+
+" Navigation and Tab Aliases
+alias b tab
+alias tNext tabnext_gt
+alias bnext tabnext_gt
+alias tn tabnext_gt
+alias bn tabnext_gt
+alias tp tabprev
+alias tN tabprev
+alias bp tabprev
+alias bN tabprev
+alias tprev tabprev
+alias bprev tabprev
+alias tabfirst tab 1
+alias tablast tab 0
+alias bfirst tabfirst
+alias blast tablast
+alias tfirst tabfirst
+alias tlast tablast
+alias buffer tab
+alias bufferall taball
+alias tabm tabmove
+
+" Tab Closing Aliases
+alias bd tabclose
+alias bdelete tabclose
+alias quit tabclose
+alias q tabclose
+alias qa qall
+alias bclose fillcmdline tabclose
+alias tclose fillcmdline tabclose
+alias tabclosealltoright tabcloseallto right
+alias tabclosealltoleft tabcloseallto left
+alias tabo fillcmdline_tmp 3000 The :tabo alias has been removed. You can add it back with :command tabo tabonly
+
+" Tab Group Aliases
+alias tabgroupabort tgroupabort
+alias tabgroupclose tgroupclose
+alias tabgroupcreate tgroupcreate
+alias tabgrouplast tgrouplast
+alias tabgroupmove tgroupmove
+alias tabgrouprename tgrouprename
+alias tabgroupswitch tgroupswitch
+alias tabnew tabopen
+
+" Window & Search Aliases
+alias o open
+alias w winopen
+alias t tabopen
+alias clsh clearsearchhighlight
+alias nohlsearch clearsearchhighlight
+alias noh clearsearchhighlight
+
+" System & UI Customization Aliases
+alias sanitize sanitise
+alias saveas! saveas --cleanup --overwrite
+alias tutorial tutor
+alias h help
+alias man help
+alias unmute mute unmute
+alias authors credits
+alias openwith hint -W
+alias ! exclaim
+alias !s exclaim_quiet
+alias containerremove containerdelete
+alias colours colourscheme
+alias colorscheme colourscheme
+alias colors colourscheme
+alias zo zoom
+
+" Deprecated & Legacy Fixes
+alias !js fillcmdline_tmp 3000 !js is deprecated. Please use js instead
+alias !jsb fillcmdline_tmp 3000 !jsb is deprecated. Please use jsb instead
+
+" Complex Command & Javascript Aliases
+alias sortbyloaded jsb let tabs = await browser.tabs.query({currentWindow: true}); tabs.sort((a, b) => (a.discarded === b.discarded) ? 0 : a.discarded ? 1 : -1); browser.tabs.move(tabs.map(t => t.id), {index: 0});
+alias get_current_url js document.location.href
+alias current_url composite get_current_url | fillcmdline_notrail 
+alias stop js window.stop()
+alias installnative nativeinstall
+alias nativeupdate updatenative
+alias mkt mktridactylrc
+alias mkt! mktridactylrc -f
+alias mktridactylrc! mktridactylrc -f
+alias mpvsafe js -p tri.excmds.shellescape(JS_ARG).then(url => tri.excmds.exclaim_quiet('mpv --no-terminal ' + url))
+alias drawingstop mouse_mode
+alias exto extoptions
+alias extpreferences extoptions
+alias extp extpreferences
+alias prefset setpref
+alias prefremove removepref
+alias reibadailty jumble
+
+" ==============================================================================
+" Vim Meta
+" ==============================================================================
+" For syntax highlighting see https://github.com/tridactyl/vim-tridactyl
+" vim: set filetype=tridactyl

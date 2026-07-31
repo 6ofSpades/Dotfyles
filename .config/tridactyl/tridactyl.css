@@ -1,0 +1,19 @@
+/* this is the css configuration for tridactyl hints */
+/* you can import this into your browser's userContent.css */
+
+span.TridactylHint {
+  position: absolute !important;
+  font-family: JetBrainsMono Nerd Font !important;
+  font-size: var(--tridactyl-hintspan-font-size) !important;
+  font-weight: var(--tridactyl-hintspan-font-weight) !important;
+  color: var(--tridactyl-hintspan-fg) !important;
+  background: black !important;
+  border-color: var(--zen-primary-color) !important;
+  border-width: 1px !important;
+  border-radius: 5px !important;
+  min-width: 0.75em !important;
+  border-style: var(--tridactyl-hintspan-border-style) !important;
+  padding: 2pt !important;
+  text-align: center !important;
+  z-index: 2147483646 !important;
+}
