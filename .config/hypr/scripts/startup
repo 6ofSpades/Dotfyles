@@ -1,7 +1,6 @@
 #!/bin/bash
 
-terminal=kitty
-
+terminal="kitty"
 
 hyprctl dispatch exec "[workspace 1 silent]" "$terminal" &
 # wait for kitty to open
@@ -20,4 +19,4 @@ until hyprctl clients | grep 'tte-anim'; do
   sleep 0.1
 done
 
-hyprctl dispatch exec "[workspace 1 silent]" "$terminal genact -m cryptomining -m mkinitcpio" &
+hyprctl dispatch exec "[workspace 1 silent]" "$terminal surge" &
