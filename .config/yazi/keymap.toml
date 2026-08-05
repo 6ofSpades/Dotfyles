@@ -183,6 +183,11 @@ keymap = [
 	{ on = [ "w", "l" ], run = "plugin time-travel next", desc = "Go to next snapshot" },
 	{ on = [ "w", "e" ], run = "plugin time-travel exit", desc = "Exit browsing snapshots" },
 
+  # swayimg 
+	{ on = [ "i", "i" ], run = "shell 'swayimg'", desc = "Swayimg" },
+	{ on = [ "i", "g" ], run = "shell 'swayimg -g'", desc = "Swayimg in gallery mode" },
+	{ on = [ "i", "r" ], run = "shell 'swayimg -g -e swayimg.imagelist.recursive=true'", desc = "Swayimg in recursive mode" },
+
   # xcur2png
   { on = [ "i", "p" ], run = '''shell --
   if [ -d .previews ]; then

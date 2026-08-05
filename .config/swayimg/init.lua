@@ -6,61 +6,61 @@
 -- General
 --------------------------------------------------------------------------------
 
-swayimg.set_mode("viewer")
-swayimg.enable_decoration(false)
-swayimg.enable_overlay(false)
-swayimg.enable_antialiasing(true)
+swayimg.mode = "viewer"
+swayimg.decoration = true
+swayimg.overlay = false
+swayimg.antialiasing = true
 
 -- EXIF orientation enabled by default usually
-swayimg.enable_exif_orientation(true)
+swayimg.exif_orientation = true
 
 --------------------------------------------------------------------------------
 -- Image list
 --------------------------------------------------------------------------------
 
-swayimg.imagelist.set_order("alpha")
-swayimg.imagelist.enable_reverse(false)
-swayimg.imagelist.enable_recursive(false)
-swayimg.imagelist.enable_adjacent(false)
-swayimg.imagelist.enable_fsmon(true)
+swayimg.imagelist.order = "alpha"
+swayimg.imagelist.reverse = false
+swayimg.imagelist.recursive = false
+swayimg.imagelist.adjacent = false
+swayimg.imagelist.fsmon = true
 
 --------------------------------------------------------------------------------
 -- Text / Font
 --------------------------------------------------------------------------------
 
-swayimg.text.set_font("JetBrainsMono Nerd Font")
-swayimg.text.set_size(14)
+swayimg.text.font = "JetBrainsMono Nerd Font"
+swayimg.text.size = 14
 
 -- old RGBA -> new ARGB format
-swayimg.text.set_foreground(0xffcccccc)
-swayimg.text.set_shadow(0xd0000000)
-swayimg.text.set_background(0x00000000)
+swayimg.text.color = 0xffcccccc
+swayimg.text.shadow = 0x80000000
+swayimg.text.background = 0x00000000
 
-swayimg.text.set_padding(10)
+swayimg.text.padding = 10
 
 -- old:
 -- info_timeout = 0
 -- status_timeout = 0
 
-swayimg.text.set_timeout(0)
-swayimg.text.set_status_timeout(0)
+swayimg.text.timeout = 0
+swayimg.text.status_timeout = 0
 
 --------------------------------------------------------------------------------
 -- Viewer mode
 --------------------------------------------------------------------------------
 
-swayimg.viewer.set_default_scale("optimal")
-swayimg.viewer.set_default_position("center")
+swayimg.viewer.default_scale = "optimal"
+swayimg.viewer.default_position = "center"
 
 swayimg.viewer.set_window_background(0x80000000)
 
 -- transparency = grid
-swayimg.viewer.set_image_chessboard(20, 0xff333333, 0xff4c4c4c)
+swayimg.viewer.set_image_chessboard(20, 0x99333333, 0x994c4c4c)
 
-swayimg.viewer.enable_loop(true)
+swayimg.viewer.loop = true
 
-swayimg.viewer.limit_history(1)
-swayimg.viewer.limit_preload(1)
+swayimg.viewer.history = 1
+swayimg.viewer.preload = 1
 
 -- Info overlays
 swayimg.viewer.set_text("topleft", {
@@ -88,10 +88,10 @@ swayimg.viewer.set_text("bottomright", {
 -- Slideshow mode
 --------------------------------------------------------------------------------
 
-swayimg.slideshow.set_timeout(3)
+swayimg.slideshow.timeout = 3
 
-swayimg.slideshow.set_default_scale("fit")
-swayimg.slideshow.set_default_position("center")
+swayimg.slideshow.default_scale = "fit"
+swayimg.slideshow.default_position = "center"
 
 swayimg.slideshow.set_window_background("auto")
 
@@ -104,21 +104,23 @@ swayimg.slideshow.set_text("bottomright", {
 -- Gallery mode
 --------------------------------------------------------------------------------
 
-swayimg.gallery.set_thumb_size(200)
+swayimg.gallery.thumb_size = 200
 
-swayimg.gallery.limit_cache(100)
-swayimg.gallery.enable_preload(false)
-swayimg.gallery.enable_pstore(false)
+swayimg.gallery.cache = 100
+swayimg.gallery.preload = false
+swayimg.gallery.pstore = false
 
 -- fill = yes
-swayimg.gallery.set_aspect("fill")
+swayimg.gallery.aspect = "fill"
 
-swayimg.gallery.set_window_color(0x80000000)
+swayimg.gallery.window_color = 0x80000000
 
-swayimg.gallery.set_unselected_color(0xff202020)
-swayimg.gallery.set_selected_color(0xff404040)
+-- background color of images with transparent background
+-- on gallery mode
+swayimg.gallery.unselected_color = 0x99000000
+swayimg.gallery.selected_color = 0xb2000000
 
-swayimg.gallery.set_border_color(0xff000000)
+swayimg.gallery.border_color = 0xffffffff
 
 -- Gallery text
 swayimg.gallery.set_text("topright", {
@@ -135,23 +137,27 @@ swayimg.gallery.set_text("bottomleft", {
 --------------------------------------------------------------------------------
 
 swayimg.viewer.on_key("h", function()
-	swayimg.viewer.switch_image("prev")
+	swayimg.viewer.open("prev")
 end)
 
 swayimg.viewer.on_key("l", function()
-	swayimg.viewer.switch_image("next")
+	swayimg.viewer.open("next")
 end)
 
 swayimg.viewer.on_key("Space", function()
-	swayimg.viewer.switch_image("next")
+	swayimg.viewer.open("next")
 end)
 
 swayimg.viewer.on_key("f", function()
-	swayimg.toggle_fullscreen()
+	swayimg.fullscreen = not swayimg.fullscreen
+end)
+
+swayimg.viewer.on_key("i", function()
+	swayimg.text.visible = not swayimg.text.visible
 end)
 
 swayimg.viewer.on_key("Return", function()
-	swayimg.set_mode("gallery")
+	swayimg.mode = "gallery"
 end)
 
 swayimg.viewer.on_key("Escape", function()
@@ -214,27 +220,31 @@ end)
 --------------------------------------------------------------------------------
 
 swayimg.gallery.on_key("h", function()
-	swayimg.gallery.switch_image("left")
+	swayimg.gallery.select("left")
 end)
 
 swayimg.gallery.on_key("l", function()
-	swayimg.gallery.switch_image("right")
+	swayimg.gallery.select("right")
 end)
 
 swayimg.gallery.on_key("k", function()
-	swayimg.gallery.switch_image("up")
+	swayimg.gallery.select("up")
 end)
 
 swayimg.gallery.on_key("j", function()
-	swayimg.gallery.switch_image("down")
+	swayimg.gallery.select("down")
 end)
 
 swayimg.gallery.on_key("Return", function()
-	swayimg.set_mode("viewer")
+	swayimg.mode = "viewer"
 end)
 
 swayimg.gallery.on_key("f", function()
-	swayimg.toggle_fullscreen()
+	swayimg.fullscreen = not swayimg.fullscreen
+end)
+
+swayimg.gallery.on_key("i", function()
+	swayimg.text.visible = not swayimg.text.visible
 end)
 
 swayimg.gallery.on_key("Escape", function()
@@ -256,7 +266,7 @@ swayimg.viewer.on_key("Shift+Delete", function()
 
 	swayimg.text.set_status("File removed: " .. image.path)
 
-	swayimg.viewer.switch_image("next")
+	swayimg.viewer.open("next")
 end)
 
 swayimg.gallery.on_key("Shift+Delete", function()
@@ -266,5 +276,5 @@ swayimg.gallery.on_key("Shift+Delete", function()
 
 	swayimg.text.set_status("File removed: " .. image.path)
 
-	swayimg.gallery.switch_image("right")
+	swayimg.gallery.select("right")
 end)
