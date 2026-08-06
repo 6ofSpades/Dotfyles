@@ -281,8 +281,8 @@ command run_browser_server_loop jsb (async () => { while (true) { let res = awai
 autocmd TriStart .* run_browser_server_loop
 
 " Custom Python / TUI Integrations (Pytab)
-bind T jsb browser.tabs.query({currentWindow:true}).then(tabs => { const data = JSON.stringify(tabs.map(t => ({id: t.id, index: t.index, title: t.title, url: t.url, pinned: t.pinned, discarded: t.discarded, lastAccessed: t.lastAccessed, active: t.active}))); tri.native.run("footclient -a pytab -e python3 ~/.config/tridactyl/pytab.py '" + data.replace(/'/g, "'\\''") + "' recent"); })
-bind tt jsb browser.tabs.query({currentWindow:true}).then(tabs => { const data = JSON.stringify(tabs.map(t => ({id: t.id, index: t.index, title: t.title, url: t.url, pinned: t.pinned, discarded: t.discarded, lastAccessed: t.lastAccessed, active: t.active}))); tri.native.run("footclient -a pytab -e python3 ~/.config/tridactyl/pytab.py '" + data.replace(/'/g, "'\\''") + "' index"); })
+bind T jsb browser.tabs.query({currentWindow:true}).then(tabs => { const data = JSON.stringify(tabs.map(t => ({id: t.id, index: t.index, title: t.title, url: t.url, pinned: t.pinned, discarded: t.discarded, lastAccessed: t.lastAccessed, active: t.active}))); tri.native.run("kitty -1 --instance-group=pytab --class=pytab -e python3 ~/.config/tridactyl/pytab.py '" + data.replace(/'/g, "'\\''") + "' recent"); })
+bind tt jsb browser.tabs.query({currentWindow:true}).then(tabs => { const data = JSON.stringify(tabs.map(t => ({id: t.id, index: t.index, title: t.title, url: t.url, pinned: t.pinned, discarded: t.discarded, lastAccessed: t.lastAccessed, active: t.active}))); tri.native.run("kitty -1 --instance-group=pytab --class=pytab -e python3 ~/.config/tridactyl/pytab.py '" + data.replace(/'/g, "'\\''") + "' index"); })
 
 
 " ==============================================================================

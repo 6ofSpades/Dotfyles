@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+# start kitty server so pytab opens faster
+if ! pgrep -f "kitty.*--instance-group=pytab" >/dev/null; then
+  kitty --start-as=hidden -1 --instance-group=pytab &
+  # else
+  # can't actually echo otherwise browser receives as stdout and exits the script
+  # echo "Instance already running"
+fi
+
 # Check if port 9999 is already listening (works using standard ss or netstat)
 if ss -tuln | grep -q ":9999 "; then
   # Server is already running somewhere else, exit immediately and do nothing!
