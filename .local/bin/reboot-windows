@@ -20,7 +20,7 @@ if [[ -z "$win_boot_num" ]]; then
   echo " First-time setup: Detecting available boot options..."
   echo "--------------------------------------------------------"
 
-  # Display current efibootmgr entries
+  # Display current efibootmgr entries filtered for Windows
   entries=$(efibootmgr)
 
   if [[ -z "$entries" ]]; then
