@@ -1,9 +1,9 @@
 {
   "colors": {
     "normal": "normal",
-    "active": "blue",
+    "active": "green",
     "discarded": "bright_black",
-    "cursor_bg": "#390065",
+    "cursor_bg": "#490085",
     "border": "#6910a5",
     "footer": "bright_black",
     "prompt": "cyan",
@@ -19,6 +19,7 @@
     "discard": "C-u",
     "pin": "C-p",
     "sort": "C-s",
-    "center": "C-z"
+    "center": "C-z",
+    "copy": "C-y"
   }
 }

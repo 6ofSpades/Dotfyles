@@ -17,6 +17,15 @@ set update.checkintervalsecs 86400
 " Press <C-i> on the browser when in an input text to fire this.
 set editorcmd kitty --class nvim-anywhere -o background_opacity=0.5 env NVIM_APPNAME=nvim-anywhere nvim 63<&0 0</dev/null +startinsert -c 'set wrap' -c 'set linebreak' -c 'nmap j gj' -c 'nmap k gk' -u "~/.config/nvim-anywhere/init.lua"
 
+" Container config
+" Look at what container current tab is using and inherit it when opening a new tab
+set tabopencontaineraware true
+
+" Search engine shortcuts
+set searchurls.y https://www.youtube.com/results?search_query=%s
+set searchurls.g https://www.google.com/search?q=%s
+set searchurls.w https://en.wikipedia.org/wiki/Special:Search?search=%s
+
 
 " ==============================================================================
 " Core Navigation & Scrolling Binds
@@ -64,7 +73,7 @@ bind tr fillcmdline tabrename %
 bind td tabdetach
 bind tm fillcmdline tabmove
 bind tk tabclose
-bind to tabopen
+bind tn tabopen
 bind < tabmove -1
 bind > tabmove +1
 
@@ -106,7 +115,7 @@ bind ]c urlincrement 1
 bind gr reader --old
 bind gu urlparent
 bind gU urlroot
-bind gf viewsource
+bind gs viewsource
 bind ge current_url open
 
 
@@ -146,7 +155,6 @@ bind A bmark
 bind M gobble 1 quickmark
 bind m gobble 1 markadd
 bind ' gobble 1 markjump
-bind '' markjumpbefore
 
 
 " ==============================================================================
@@ -157,7 +165,7 @@ bind f hint
 bind F hint -b
 bind <C-f> hint -t
 bind yf hint -y
-bind gF hint -qb
+bind gf hint -qb
 bind v hint -h
 
 " Standard Hints (;)
@@ -208,7 +216,10 @@ bind ;gF hint -qb
 bind ;gd hint -qW tabopen --discard
 
 " Image/Yank Specific Hints
-bind if hint -cF img i => tri.excmds.yankimage(tri.urlutils.getAbsoluteURL(i.src))
+bind iy hint -cF img i => tri.excmds.yankimage(tri.urlutils.getAbsoluteURL(i.src))
+bind is hint -JS
+bind ii hint -JI
+bind ig hint -JFc img i => tri.excmds.tabopen('https://lens.google.com/uploadbyurl?url='+i.src)
 bind ;Y hint -cF img i => tri.excmds.yankimage(tri.urlutils.getAbsoluteURL(i.src))
 bind ;m hint -JFc img i => tri.excmds.open('https://lens.google.com/uploadbyurl?url='+i.src)
 bind ;M hint -JFc img i => tri.excmds.tabopen('https://lens.google.com/uploadbyurl?url='+i.src)

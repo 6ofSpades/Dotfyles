@@ -31,6 +31,7 @@
 
   --tridactyl-fg: var(--fg);
   --tridactyl-bg: var(--bg);
+  --tridactyl-cmdl-bg: var(--tridactyl-bg);
   --tridactyl-url-fg: var(--cyan);
   --tridactyl-url-bg: var(--bg);
   --tridactyl-highlight-box-bg: var(--base0B);
