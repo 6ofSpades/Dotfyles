@@ -4,8 +4,8 @@
 # focused window on that workspace, so you don't need to
 # focus manually after switching
 
-hyprctl dispatch workspace "$1"
+hyprctl dispatch "hl.dsp.focus({ workspace = $1 })"
 lastwindow=$(hyprctl activeworkspace -j | jq -r '.lastwindow')
-if [[ -n $lastwindow ]];then
-  hyprctl dispatch focuswindow address:$lastwindow
+if [[ -n $lastwindow ]]; then
+  hyprctl dispatch "hl.dsp.focus({ window = \"address:$lastwindow\" })"
 fi

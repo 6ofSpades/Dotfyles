@@ -64,13 +64,12 @@ fi
 WORKSPACE_NAME=$(echo "$WINDOW_INFO" | jq -r '.workspace.name')
 IS_FOCUSED=$(echo "$WINDOW_INFO" | jq -r '.focusHistoryID == 0')
 
-# 3. Toggle window state based on visibility
-# Quoting the dispatcher targets protects the parenthesis from Bash syntax parsing
+# 3. Toggle window state based on visibility using hyprctl eval + Lua dispatchers
 if [ "$WORKSPACE_NAME" = "$SPECIAL_WORKSPACE" ]; then
-  hyprctl dispatch movetoworkspace "e+0,class:^(${WINDOW_CLASS})$"
-  hyprctl dispatch focuswindow "class:^(${WINDOW_CLASS})$"
+  hyprctl eval 'hl.dispatch(hl.dsp.window.move({ workspace = "e+0", window = "class:^('"$WINDOW_CLASS"')$", follow = false }))'
+  hyprctl eval 'hl.dispatch(hl.dsp.focus({ window = "class:^('"$WINDOW_CLASS"')$" }))'
 elif [ "$IS_FOCUSED" = "true" ]; then
-  hyprctl dispatch movetoworkspacesilent "${SPECIAL_WORKSPACE},class:^(${WINDOW_CLASS})$"
+  hyprctl eval 'hl.dispatch(hl.dsp.window.move({ workspace = "'"$SPECIAL_WORKSPACE"'", window = "class:^('"$WINDOW_CLASS"')$", follow = false }))'
 else
-  hyprctl dispatch focuswindow "class:^(${WINDOW_CLASS})$"
+  hyprctl eval 'hl.dispatch(hl.dsp.focus({ window = "class:^('"$WINDOW_CLASS"')$" }))'
 fi

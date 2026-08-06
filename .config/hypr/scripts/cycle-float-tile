@@ -8,13 +8,13 @@
 TEMP="/tmp/cycle-float-tile"
 
 # Create temporary file if it doesn't exist
-if [[ ! -e $TEMP ]]; then 
+if [[ ! -e $TEMP ]]; then
   touch $TEMP
 fi
 
 # make sure it has 2 empty lines first
-while [[ $(wc -l < "$TEMP") -lt 2 ]]; do
-    echo "" >> "$TEMP"
+while [[ $(wc -l <"$TEMP") -lt 2 ]]; do
+  echo "" >>"$TEMP"
 done
 
 # check if floating or tiled
@@ -22,7 +22,7 @@ floating=$(hyprctl -j activewindow | jq -r '.floating')
 
 # if its tiled:
 if [[ "$floating" == "false" ]]; then
-  echo 'Saving active window address'
+  echo 'Saving active tiled window address'
   activeaddress=$(hyprctl -j activewindow | jq -r '.address')
 
   # write tiled address to first line
@@ -32,25 +32,36 @@ if [[ "$floating" == "false" ]]; then
   prevaddress=$(sed -n '2p' "$TEMP")
   # if window address exists
   if [[ -n "$prevaddress" ]]; then # trim whitespace
+
+    # if both adresses are equal for some reason jsut cycle normally
+    if [[ "$activeaddress" == "$prevaddress" ]]; then
+      hyprctl dispatch "hl.dsp.window.cycle_next({ floating = true })"
+      exit 0
+    fi
+
     # only change to window address if on the same workspace
     activeworkspace=$(hyprctl -j activeworkspace | jq -r '.id')
     addressworkspace=$(hyprctl -j clients | jq -r ".[] | select(.address == \"$prevaddress\") | .workspace.id")
     if [[ "$activeworkspace" == "$addressworkspace" ]]; then
       # if window is not found exit code is still 0 for some reason, so we have to read output manually
-      output=$(hyprctl dispatch focuswindow address:"$prevaddress" 2>&1)
+      output=$(hyprctl dispatch "hl.dsp.focus({ window = \"address:$prevaddress\" })" 2>&1)
+      echo "$output"
     else
-      hyprctl dispatch cyclenext floating
+      echo 'Not on same workspace, cycling normally'
+      hyprctl dispatch "hl.dsp.window.cycle_next({ floating = true })"
     fi
-    if [[ "$output" == *"No such window found"* ]]; then
-      hyprctl dispatch cyclenext floating
+    if [[ "$output" == *"window not found"* ]] || [[ "$output" == *"error"* ]]; then
+      echo 'Window not found, cycling normally'
+      hyprctl dispatch "hl.dsp.window.cycle_next({ floating = true })"
     fi
   else
-    hyprctl dispatch cyclenext floating
+    echo 'No window address, cycling normally'
+    hyprctl dispatch "hl.dsp.window.cycle_next({ floating = true })"
   fi
 
 # if its floating:
 elif [[ "$floating" == "true" ]]; then
-  echo 'Saving active window address'
+  echo 'Saving active float window address'
   activeaddress=$(hyprctl -j activewindow | jq -r '.address')
 
   # write float address to second line
@@ -60,19 +71,30 @@ elif [[ "$floating" == "true" ]]; then
   prevaddress=$(sed -n '1p' "$TEMP")
   # if window address exists
   if [[ -n "$prevaddress" ]]; then # trim whitespace
+
+    # if both adresses are equal for some reason jsut cycle normally
+    if [[ "$activeaddress" == "$prevaddress" ]]; then
+      hyprctl dispatch "hl.dsp.window.cycle_next({ tiled = true })"
+      exit 0
+    fi
+
     # only change to window address if on the same workspace
     activeworkspace=$(hyprctl -j activeworkspace | jq -r '.id')
     addressworkspace=$(hyprctl -j clients | jq -r ".[] | select(.address == \"$prevaddress\") | .workspace.id")
     if [[ "$activeworkspace" == "$addressworkspace" ]]; then
       # if window is not found exit code is still 0 for some reason, so we have to read output manually
-      output=$(hyprctl dispatch focuswindow address:"$prevaddress" 2>&1)
+      output=$(hyprctl dispatch "hl.dsp.focus({ window = \"address:$prevaddress\" })" 2>&1)
+      echo "$output"
     else
-      hyprctl dispatch cyclenext tiled
+      echo 'Not on same workspace, cycling normally'
+      hyprctl dispatch "hl.dsp.window.cycle_next({ tiled = true })"
     fi
-    if [[ "$output" == *"No such window found"* ]]; then
-      hyprctl dispatch cyclenext tiled
+    if [[ "$output" == *"window not found"* ]] || [[ "$output" == *"error"* ]]; then
+      echo 'Window not found, cycling normally'
+      hyprctl dispatch "hl.dsp.window.cycle_next({ tiled = true })"
     fi
   else
-    hyprctl dispatch cyclenext tiled
+    echo 'No window address, cycling normally'
+    hyprctl dispatch "hl.dsp.window.cycle_next({ tiled = true })"
   fi
 fi

@@ -2,42 +2,48 @@
 
 if [[ "$1" == opacityp ]]; then
   opacity=$(hyprctl getprop active opacity)
-  if [[ "$opacity" < 1 ]]; then
-    hyprctl dispatch setprop active opacity $(echo "$opacity" + 0.1 | bc) $(echo "$opacity" + 0.1 | bc)
+  if [[ $(echo "$opacity < 1" | bc -l) -eq 1 ]]; then
+    new_op=$(echo "$opacity + 0.1" | bc)
+    hyprctl dispatch "hl.dsp.window.set_prop({ prop = 'opacity', value = '$new_op' })"
+    hyprctl dispatch "hl.dsp.window.set_prop({ prop = 'opacity_inactive', value = '$new_op' })"
     exit 0
   fi
 fi
 
 if [[ "$1" == opacitym ]]; then
   opacity=$(hyprctl getprop active opacity)
-  if [[ "$opacity" > 0 ]]; then
-    hyprctl dispatch setprop active opacity $(echo "$opacity" - 0.1 | bc) $(echo "$opacity" - 0.1 | bc)
+  if [[ $(echo "$opacity > 0" | bc -l) -eq 1 ]]; then
+    new_op=$(echo "$opacity - 0.1" | bc)
+    hyprctl dispatch "hl.dsp.window.set_prop({ prop = 'opacity', value = '$new_op' })"
+    hyprctl dispatch "hl.dsp.window.set_prop({ prop = 'opacity_inactive', value = '$new_op' })"
     exit 0
   fi
 fi
 
 if [[ "$1" == blur ]]; then
   if $(hyprctl getprop active no_blur); then
-    hyprctl dispatch setprop active no_blur 0
+    hyprctl dispatch "hl.dsp.window.set_prop({ prop = 'no_blur', value = 0 })"
   else
-    hyprctl dispatch setprop active no_blur 1
+    hyprctl dispatch "hl.dsp.window.set_prop({ prop = 'no_blur', value = 1 })"
   fi
   exit 0
 fi
 
 if [[ "$1" == blur-all ]]; then
-  # Get the specific line containing 'int:' and extract the number
-  blur_status=$(hyprctl getoption decoration:blur:enabled | awk '/int:/ {print $2}')
+  # Safely extract option value, defaulting to an empty string if it fails
+  blur_status=$(hyprctl getoption decoration:blur:enabled |
+    awk '/^bool:/ {print $2}')
 
-  # Check the value and run the commands
-  if [ "$blur_status" -eq 1 ]; then
-    # Blur for all windows is currently ENABLED. Disabling...
-    hyprctl keyword decoration:blur:enabled false
-  elif [ "$blur_status" -eq 0 ]; then
-    # Blur for all windows is currently DISABLED. Enabling...
-    hyprctl keyword decoration:blur:enabled true
-  else
-    echo "Something went wrong! Unexpected output: $blur_status"
-  fi
+  case "$blur_status" in
+  true)
+    hyprctl eval 'hl.config({ decoration = { blur = { enabled = false } } })'
+    ;;
+  false)
+    hyprctl eval 'hl.config({ decoration = { blur = { enabled = true } } })'
+    ;;
+  *)
+    echo "Unexpected output: $blur_status"
+    ;;
+  esac
   exit 0
 fi

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eo pipefail
+# set -eo pipefail
 
 # ==========================================
 # CONFIGURATION
@@ -27,7 +27,7 @@ kill_existing_instance() {
   address=$(hyprctl -j clients | jq -r ".[] | select(.class == \"$TERM_CLASS\") | .address" | head -n1)
 
   if [[ -n "$address" ]]; then
-    hyprctl dispatch closewindow address:"$address"
+    hyprctl dispatch "hl.dsp.window.close({ window = 'address:$address' })"
     rm -rf "$TMPFILE_DIR"/*
     echo "Existing instance closed."
     exit 0
@@ -63,7 +63,7 @@ $TERM_EXEC "${TERM_OPTS[@]}" env NVIM_APPNAME=nvim-anywhere nvim \
 # ONLY refocus and paste if the file actually has content
 if [[ -s "$TMPFILE" ]]; then
   if [[ -n "$PREV_WINDOW" ]]; then
-    hyprctl dispatch focuswindow address:"$PREV_WINDOW"
+    hyprctl dispatch "hl.dsp.focus({ window = 'address:$PREV_WINDOW' })"
   fi
   wl-copy -n <"$TMPFILE"
   wtype -M Ctrl -k v -m Ctrl

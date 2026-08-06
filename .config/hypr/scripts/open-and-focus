@@ -11,7 +11,7 @@ WINDOW_CLASS="$2"
 
 # Timeout settings
 MAX_ATTEMPTS=20    # Maximum number of times to try focusing
-SLEEP_INTERVAL=0.2 # Time to wait between attempts (in seconds)
+SLEEP_INTERVAL=0.1 # Time to wait between attempts (in seconds)
 # Total maximum wait time = 20 * 0.2 = 4 seconds
 
 # --- Main Logic ---
@@ -26,8 +26,8 @@ while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
   # Check if the window currently exists in hyprland's client list
   if hyprctl clients | grep -q "class: $WINDOW_CLASS"; then
 
-    # Try to focus the window
-    hyprctl dispatch focuswindow "class:$WINDOW_CLASS"
+    # Try to focus the window using the new Lua dispatcher syntax
+    hyprctl dispatch 'hl.dsp.focus({ window = "class:'"$WINDOW_CLASS"'" })'
 
     # Check if the active window is now the one we want
     ACTIVE_CLASS=$(hyprctl activewindow -j | jq -r '.class')
