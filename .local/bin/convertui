@@ -10,7 +10,7 @@ DEPENDENCIES="
   ### 🛠️ Required Dependencies Checklist:
   Make sure you have the following CLI tools installed on your system:
   * **Core TUI:** \`gum\`
-  * **Images:** \`imagemagick\` (provides \`magick\`)
+  * **Images:** \`imagemagick\` (provides \`magick\`), \`inkscape\` (SVG -> PNG conversion)
   * **Audio/Video:** \`ffmpeg\`
   * **Documents:** \`pandoc-cli\`
   * **PDF Output:** \`typst\` (required by pandoc to generate PDFs without LaTeX)
@@ -113,13 +113,64 @@ if ! fc-list : family | grep -qxi "Liberation Sans"; then
   fi
 fi
 
+# Ask whether to resize output if it's image
+RESIZE_ARGS=""
+if [[ "$CMD_TYPE" == "image" ]]; then
+  echo ""
+  RESIZE=$(
+    gum choose "No" "Yes" \
+      --header "󰩨 Resize output?"
+  )
+
+  if [[ "$RESIZE" == "Yes" ]]; then
+    SIZE=$(gum input \
+      --header "
+    󰩨 Enter output size 
+    # Basic
+    1920x1080
+    100x100
+
+    # Advanced - Doesn't work when converting from SVG to PNG
+    1920x1080! -> force exactly 1920x1080 (may distort)
+    500x500> -> only shrink if larger
+    500x500< -> only enlarge if smaller
+    50% -> scale to half size
+    2000x -> set width only
+    x1200 -> set height only
+    100 -> 100x100
+    " \
+      --placeholder "100x100")
+
+    if [[ -n "$SIZE" ]]; then
+      RESIZE_ARGS="-resize $SIZE"
+    fi
+  fi
+fi
+
 # 4. Perform conversion based on the logic category
 echo ""
 gum spin --spinner dot --title "Converting to $TARGET..." -- sleep 0.5
 
 case "$CMD_TYPE" in
 "image")
-  magick "$FILE" "$OUTPUT_FILE"
+  if [[ "$MIME_TYPE" == "image/svg+xml" ]] && [[ "$TARGET" == "png" ]]; then
+    if [[ "$SIZE" =~ ^([0-9]+)x([0-9]+)$ ]]; then
+      WIDTH="${BASH_REMATCH[1]}"
+      HEIGHT="${BASH_REMATCH[2]}"
+
+      inkscape "$FILE" \
+        --export-type=png \
+        --export-width="$WIDTH" \
+        --export-height="$HEIGHT" \
+        --export-filename="$OUTPUT_FILE"
+    else
+      inkscape "$FILE" \
+        --export-type=png \
+        --export-filename="$OUTPUT_FILE"
+    fi
+  else
+    magick "$FILE" $RESIZE_ARGS "$OUTPUT_FILE"
+  fi
   ;;
 "video")
   if [[ "$TARGET" =~ ^(mp3|wav)$ ]]; then
@@ -151,7 +202,7 @@ case "$CMD_TYPE" in
   ;;
 *)
   if [[ "$TARGET" =~ ^(png|jpg|webp)$ ]]; then
-    magick "$FILE" "$OUTPUT_FILE"
+    magick "$FILE" $RESIZE_ARGS "$OUTPUT_FILE"
   elif [[ "$TARGET" == "epub" ]]; then
     mobitool -e "$FILE"
   elif [[ "$TARGET" =~ ^(md|pdf|docx|html)$ ]]; then
