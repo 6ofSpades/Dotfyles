@@ -10,13 +10,15 @@
 /* IMPORT CSS */
 @import url("https://clearvision.github.io/ClearVision-v7/main.css");
 @import url("https://clearvision.github.io/ClearVision-v7/betterdiscord.css");
+
+@import "colors-web.css";
 /* SETTINGS */
 :root {
   /* ACCENT COLORS */
-  --main-color: #690085; /* #55007C #8325AF */
-  --hover-color: #7400aa;
-  --success-color: #00d787;
-  --danger-color: #ff0000;
+  --main-color: rgb(from var(--accent) r g b / 0.9); /* #55007C #8325AF */
+  --hover-color: rgb(from var(--accent) r g b / 0.5);
+  --success-color: var(--green);
+  --danger-color: var(--red);
   /* STATUS COLORS */
   --online-color: #00d787;
   --idle-color: #faa61a;
@@ -24,7 +26,7 @@
   --streaming-color: #593695;
   --offline-color: #808080;
   /* APP BACKGROUND */
-  --background-shading-percent: 50%;
+  --background-shading-percent: 99%;
   --background-image: url("");
   --background-attachment: fixed;
   --background-filter: saturate(calc(var(--saturation-factor, 1) * 1));
@@ -42,8 +44,7 @@
   --main-font:
     "gg sans", Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif;
   --code-font:
-    Consolas, "JetBrainsMono Nerd Font", "Liberation Mono", Menlo, Courier,
-    monospace;
+    "JetBrainsMono Nerd Font", "Liberation Mono", Menlo, Courier, monospace;
 }
 
 /* THEME SPECIFIC SHADING */
@@ -95,8 +96,8 @@
 
 /* selection of text */
 ::selection {
-  background-color: rgba(89, 0, 141, 0.7);
-  color: white;
+  background-color: rgb(from var(--selection_bg) r g b / 0.6);
+  color: var(--white);
 }
 
 /*profiles popups*/
@@ -112,4 +113,14 @@
 }
 .visual-refresh {
   --brand-500: var(--main-color);
+}
+
+/* color of links */
+:is(.theme-light, .theme-dark, .theme-darker, .theme-midnight),
+:is(.theme-light, .theme-dark, .theme-darker, .theme-midnight):is(
+  .theme-light,
+  .theme-dark
+) {
+  /* Mix 85% of accent with 25% white to make it brighter */
+  --text-link: color-mix(in srgb, var(--accent) 75%, white);
 }
