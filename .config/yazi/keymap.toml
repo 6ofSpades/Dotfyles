@@ -29,7 +29,9 @@ keymap = [
   { on = [ "F" ], run = "plugin jump-to-char", desc = "Jump to char" },
 
   # Trash manager
-  { on = ["R"], run = "plugin recycle-bin",              desc = "Open Recycle Bin menu" },
+  { on = ["R"], run = "plugin recycle-bin", desc = "Open Recycle Bin menu" },
+  # Restore plugin
+  { on = "u", run = "plugin restore",       desc = "Restore last deleted files/folders" },
 
 	# Hopping
 	{ on = "k", run = "arrow prev", desc = "Previous file" },

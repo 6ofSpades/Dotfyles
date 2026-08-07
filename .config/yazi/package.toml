@@ -1,52 +1,47 @@
 [[plugin.deps]]
 use = "yazi-rs/plugins:chmod"
-rev = "5d461d8"
+rev = "b9598e6"
 hash = "5b1c276b75cae91cbbdbe7863f39a540"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:full-border"
-rev = "5d461d8"
+rev = "b9598e6"
 hash = "7b625412411be411153886894d9acaf"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:mount"
-rev = "5d461d8"
-hash = "e3260d0b1feded8c8e3ae3afa1169e30"
+rev = "b9598e6"
+hash = "46cbdc05596a3ecd730b288e28c7079d"
 
 [[plugin.deps]]
 use = "XYenon/clipboard"
-rev = "0ac0320"
-hash = "f80172438b4b5c31e94d6c891f734445"
+rev = "0f4982a"
+hash = "dcda5f179482ee8cc191ad679c9d72e0"
 
 [[plugin.deps]]
 use = "uhs-robert/recycle-bin"
-rev = "fa68711"
-hash = "8714306b5cac6359edbacbf545fbd691"
+rev = "82da16a"
+hash = "7383d80862d3cdcc85f8658dac7b90c2"
 
 [[plugin.deps]]
 use = "boydaihungst/gvfs"
-rev = "3abc0a2"
-hash = "eed89e75671723c8f9390a2862af0e4e"
-
-[[plugin.deps]]
-use = "imsi32/yatline"
-rev = "c5d4b48"
-hash = "e6e98d12b1648d1894c2b560d85eeaa7"
+rev = "cb7084d"
+hash = "364c5771e5c9f7c057916129d156913c"
 
 [[plugin.deps]]
 use = "MasouShizuka/projects"
-rev = "112a270"
-hash = "5a4e61f8cae42be53844acaa6c447d96"
+rev = "22a4006"
+hash = "195d1b8c8fc1a944883b5ce3d92d7ca7"
 
 [[plugin.deps]]
 use = "boydaihungst/mediainfo"
-rev = "a6d30a1"
-hash = "579fe44e64b655ce46eeb526e3332f55"
+rev = "e079a00"
+hash = "f9ae479bdbce6d35ec7176ee2869808d"
 
 [[plugin.deps]]
 use = "mikavilpas/easyjump.yazi:easyjump"
-rev = "6c6b0a2"
-hash = "b976709df0f6d3341736f053e87b2b8"
+rev = "ca01cf6"
+hash = "6f8b9e41dde4ae29d958d4cdc829c121"
 
 [[plugin.deps]]
 use = "iynaix/time-travel"
@@ -55,13 +50,18 @@ hash = "3d52b2b88c91a4ece2f7ed68ff39bb7b"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:git"
-rev = "5d461d8"
-hash = "88e56a64b7ce7c4314427452343fef17"
+rev = "b9598e6"
+hash = "ce259b12c503a33a18a861052fa582b7"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:jump-to-char"
-rev = "5d461d8"
+rev = "b9598e6"
 hash = "7a4b4237223aaa94e589d1c01a23542a"
+
+[[plugin.deps]]
+use = "boydaihungst/restore"
+rev = "7bfcfcb"
+hash = "bbb1569978e6d2b3e8343c6ca08a4ea6"
 
 [flavor]
 deps = []

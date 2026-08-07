@@ -15,7 +15,7 @@ else
 fi
 
 # update yazi plugins
-gum spin --title "Updating yazi plugins..." ya pkg upgrade
+# gum spin --title "Updating yazi plugins..." ya pkg upgrade
 
 # update locate database
 echo "Updating plocate database..."

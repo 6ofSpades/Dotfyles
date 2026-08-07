@@ -185,12 +185,15 @@ prepend_keymap = [
     #   -> remount this DEVIEC_1 if needed
     { on = [ "M", "R" ], run = "plugin gvfs -- remount-current-cwd-device", desc = "Remount device under cwd" },
 
+    # Unmount device.
+    #   -> Unmounted device can safely be removed, if it's not hard drive (usb drive, hdd, ssd, etc). e.g. mtp, etc.
     { on = [ "M", "u" ], run = "plugin gvfs -- select-then-unmount", desc = "Select device then unmount" },
-    # Or this if you want to unmount and eject device.
+    # Eject hard device (including both mounted or not mounted devices, and only show hard drives).
     #   -> Ejected device can safely be removed.
     #   -> Ejecting a device will unmount all paritions/volumes under it.
+    #   -> Ejected device CAN'T be mounted again. Re-plug the device to show it again.
     #   -> Fallback to normal unmount if not supported by device.
-    { on = [ "M", "u" ], run = "plugin gvfs -- select-then-unmount --eject", desc = "Select device then eject" },
+    { on = [ "M", "U" ], run = "plugin gvfs -- select-then-unmount --eject", desc = "Select device then eject" },
 
     # Also support force unmount/eject.
     #   -> Ignore outstanding file operations when unmounting or ejecting
