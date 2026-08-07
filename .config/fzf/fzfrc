@@ -1,0 +1,15 @@
+--color=bg:-1
+--color=bg+:#690086
+--color=border:8
+--color=fg:-1
+--color=gutter:8
+--color=header:5
+--color=hl+:4
+--color=hl:4
+--color=info:8
+--color=marker:8
+--color=pointer:6
+--color=prompt:2
+--color=scrollbar:5
+--color=separator:8
+--color=spinner:6

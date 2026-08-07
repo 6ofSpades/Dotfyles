@@ -43,23 +43,7 @@ fastfetch -s none | lolcat --force -F 0.1 -S 21 -p 20| fastfetch --raw - --logo-
 LS_COLORS=$LS_COLORS:'di=1;34:' ; export LS_COLORS
 
 # fzf colors
-export FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS} \
-  --color=bg:-1 \
-  --color=bg+:#690086 \
-  --color=border:8 \
-  --color=fg:-1 \
-  --color=gutter:8 \
-  --color=header:5 \
-  --color=hl+:4 \
-  --color=hl:4\
-  --color=info:8 \
-  --color=marker:8 \
-  --color=pointer:6 \
-  --color=prompt:2 \
-  --color=scrollbar:5 \
-  --color=separator:8 \
-  --color=spinner:6 \
-"
+export FZF_DEFAULT_OPTS_FILE="/home/six/.config/fzf/fzfrc"
 
 # gum colors
 export GUM_INPUT_CURSOR_FOREGROUND=1

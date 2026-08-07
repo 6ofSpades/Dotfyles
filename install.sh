@@ -312,6 +312,9 @@ if [[ "$scripts" == "y" ]]; then
     sed -i "s/user/$USER/g" "$HOME/.config/flameshot/flameshot.ini"
   fi
 
+  # termfilechooser config for fzf
+  sed -i "s/user/$USER/g" "$HOME/.config/xdg-desktop-portal-termfilechooser/config"
+
   if [[ $(yay -Qs pear-desktop) ]]; then
     cd "$DOTFILES_DIR/scripts/theme-fixes/pear-desktop"
     ./patch
