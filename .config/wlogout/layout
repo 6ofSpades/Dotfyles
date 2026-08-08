@@ -6,31 +6,43 @@
 }
 {
     "label" : "hibernate",
-    "action" : "systemctl hibernate",
+    "action" : "sleep 0.2 && systemctl hibernate",
     "text" : "[H] - Hibernate",
     "keybind" : "h"
 }
 {
     "label" : "logout",
-    "action" : "loginctl terminate-user $USER",
+    "action" : "sleep 0.2 && loginctl terminate-user $USER",
     "text" : "[E] - Logout",
     "keybind" : "e"
 }
 {
+    "label" : "exit",
+    "action" : "sleep 0.2 && hyprctl dispatch 'hl.dsp.exit()'",
+    "text" : "[M] - Exit",
+    "keybind" : "m"
+}
+{
+    "label" : "reboot-windows",
+    "action" : "kitty --class kitty-float reboot-windows",
+    "text" : "[W] - Windows",
+    "keybind" : "w"
+}
+{
     "label" : "shutdown",
-    "action" : "systemctl poweroff",
+    "action" : "sleep 0.2 && systemctl poweroff",
     "text" : "[S] - Shutdown",
     "keybind" : "s"
 }
 {
     "label" : "suspend",
-    "action" : "systemctl suspend",
+    "action" : "sleep 0.2 && systemctl suspend",
     "text" : "[U] - Suspend",
     "keybind" : "u"
 }
 {
     "label" : "reboot",
-    "action" : "systemctl reboot",
+    "action" : "sleep 0.2 && systemctl reboot",
     "text" : "[R] - Reboot",
     "keybind" : "r"
 }

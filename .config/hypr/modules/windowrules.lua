@@ -49,6 +49,8 @@ hl.window_rule({ match = { class = "pytab" }, float = true })
 hl.window_rule({ match = { class = "pytab" }, size = "monitor_w*0.40 monitor_h*0.60" })
 hl.window_rule({ match = { class = "tridactyl-insert" }, float = true })
 hl.window_rule({ match = { class = "tridactyl-insert" }, size = "monitor_w*0.40 monitor_h*0.40" })
+hl.window_rule({ match = { class = "kitty-float" }, float = true })
+hl.window_rule({ match = { class = "kitty-float" }, size = "monitor_w*0.5 monitor_h*0.5" })
 
 -- -- workspaces --
 hl.window_rule({ match = { class = "zen" }, workspace = "2" })
