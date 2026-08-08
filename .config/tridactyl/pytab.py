@@ -14,7 +14,7 @@ from blessed import Terminal
 term = Terminal()
 
 SORT_NAMES = ["index", "recent", "state", "title"]
-TITLE_WIDTH = 35
+TITLE_WIDTH = 60
 
 DEFAULT_COLORS = {
     "normal": "normal",
@@ -456,7 +456,7 @@ def main():
                 + f"{'ID':<4}"
                 + border_fn(f"{'│':<2}")
                 + term.normal
-                + f"{'Title':<36}"
+                + f"{'Title':<{TITLE_WIDTH + 1}}"
                 + border_fn(f"{'│':<2}")
                 + term.normal
                 + f"{'URL'}"

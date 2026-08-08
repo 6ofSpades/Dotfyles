@@ -46,7 +46,7 @@ hl.window_rule({ match = { class = "org.qbittorrent.qBittorrent" }, float = true
 hl.window_rule({ match = { initial_title = "Gamescope WSI Layer Error" }, float = true })
 hl.window_rule({ match = { class = "org.kde.kdenlive" }, float = true })
 hl.window_rule({ match = { class = "pytab" }, float = true })
-hl.window_rule({ match = { class = "pytab" }, size = "monitor_w*0.40 monitor_h*0.60" })
+hl.window_rule({ match = { class = "pytab" }, size = "monitor_w*0.50 monitor_h*0.60" })
 hl.window_rule({ match = { class = "tridactyl-insert" }, float = true })
 hl.window_rule({ match = { class = "tridactyl-insert" }, size = "monitor_w*0.40 monitor_h*0.40" })
 hl.window_rule({ match = { class = "kitty-float" }, float = true })
