@@ -7,7 +7,9 @@ import re
 import socket
 import subprocess
 import sys
+import tempfile
 import time
+from datetime import date, datetime
 from pathlib import Path
 
 from blessed import Terminal
@@ -51,6 +53,7 @@ DEFAULT_KEYBINDS = {
     "center": "\x1a",  # Ctrl+Z
     "delete_word": "\x08",  # Ctrl+Backspace on kitty (same byte as Ctrl+H)
     "copy": "\x03",  # Ctrl+C -- safe to reuse since raw mode disables SIGINT
+    "markdown_view": "\x0e",  # Ctrl+N -- browse full history as Markdown in nvim
 }
 
 CONFIG_DIR = Path.home() / ".config" / "tridactyl" / "pyhist"
@@ -323,12 +326,69 @@ def ctrl_label(ch):
     return "^" + chr(ord(ch) + 0x40).lower()
 
 
+def bucket_label(ms, today):
+    """Groups an entry into a heading for the Markdown view. Buckets get
+    coarser the further back in time they are -- exact day for the last
+    week, then "This Month", then one heading per calendar month. Every
+    entry line still carries its own exact timestamp (see build_markdown)
+    so searching for a specific date works regardless of which heading
+    it landed under."""
+    if not ms:
+        return "Unknown"
+    dt = datetime.fromtimestamp(ms / 1000.0).date()
+    delta = (today - dt).days
+    if delta < 0:
+        delta = 0
+    if delta == 0:
+        return "Today"
+    if delta == 1:
+        return "Yesterday"
+    if delta <= 7:
+        return "Last 7 Days"
+    if dt.year == today.year and dt.month == today.month:
+        return "This Month"
+    return dt.strftime("%B %Y")
+
+
+def build_markdown(raw_items):
+    """Renders the full (unfiltered) history as Markdown grouped by
+    recency, for browsing/searching in Neovim -- not meant to be edited
+    back into history, just a much more scannable read-only view."""
+    items = sorted(raw_items, key=lambda t: -(t.get("lastVisitTime") or 0))
+    today = date.today()
+
+    lines = ["# History", ""]
+    current_label = None
+    for item in items:
+        ms = item.get("lastVisitTime")
+        label = bucket_label(ms, today)
+        if label != current_label:
+            if current_label is not None:
+                lines.append("")
+            lines.append(f"## {label}")
+            lines.append("")
+            current_label = label
+
+        title = (item.get("title") or item.get("url") or "").replace("\n", " ")
+        url = item.get("url") or ""
+        timestamp = (
+            time.strftime("%Y/%m/%d %H:%M", time.localtime(ms / 1000.0)) if ms else "?"
+        )
+        visits = item.get("visitCount", 0)
+        visits_str = f"{visits:<5}"
+        lines.append(f"- `{timestamp}` · {visits_str} visits — [{title}]({url})")
+
+    lines.append("")
+    return "\n".join(lines)
+
+
 def build_footer(keybinds, width):
     footer = (
         f"{ctrl_label(keybinds['down'])}/{ctrl_label(keybinds['up'])} move  "
         f"enter open  {ctrl_label(keybinds['open_new'])} new tab  "
         f"{ctrl_label(keybinds['delete'])} delete  {ctrl_label(keybinds['sort'])} sort  "
         f"{ctrl_label(keybinds['center'])} center  {ctrl_label(keybinds['copy'])} copy url  "
+        f"{ctrl_label(keybinds['markdown_view'])} browse  "
         f"esc quit"
     )
     return footer[: width - 1]
@@ -387,6 +447,14 @@ def main():
 
     hist_arg = sys.argv[1] if len(sys.argv) > 1 else "[]"
     raw_items = load_history(hist_arg)
+    # If hist_arg parses as JSON directly it's inline data (e.g. manual
+    # testing), not a cache file -- only delete it on exit if it's an
+    # actual path, so we never touch anything but our own cache file.
+    hist_is_file = False
+    try:
+        json.loads(hist_arg)
+    except Exception:
+        hist_is_file = Path(hist_arg).is_file()
 
     forced_sort = resolve_sort_arg(sys.argv[2]) if len(sys.argv) > 2 else None
     sort_mode = forced_sort if forced_sort is not None else load_sort_state()
@@ -417,171 +485,228 @@ def main():
     filter_query = search_query
     last_key_time = 0.0
 
-    with term.raw(), term.hidden_cursor():
-        while True:
-            width = term.width
-            height = term.height
-            max_visible_rows = max(1, height - 7)
+    try:
+        with term.raw(), term.hidden_cursor():
+            while True:
+                width = term.width
+                height = term.height
+                max_visible_rows = max(1, height - 7)
 
-            now = time.time()
-            if (
-                filter_query != search_query
-                and (now - last_key_time) >= debounce_seconds
-            ):
-                filter_query = search_query
+                now = time.time()
+                if (
+                    filter_query != search_query
+                    and (now - last_key_time) >= debounce_seconds
+                ):
+                    filter_query = search_query
 
-            current_key = (sort_mode, filter_query, id(raw_items))
-            if current_key != cache_key:
-                # display_index maps each item's identity to its position
-                # in the current sort order (mode-dependent, independent
-                # of search filtering) so numeric search jumps stay sensible.
-                base_sorted = sort_tabs(raw_items, sort_mode)
-                display_index = {id(t): i + 1 for i, t in enumerate(base_sorted)}
-                sorted_list = filter_and_sort(
-                    raw_items, sort_mode, display_index, filter_query
-                )
-                cache_key = current_key
+                current_key = (sort_mode, filter_query, id(raw_items))
+                if current_key != cache_key:
+                    # display_index maps each item's identity to its position
+                    # in the current sort order (mode-dependent, independent
+                    # of search filtering) so numeric search jumps stay sensible.
+                    base_sorted = sort_tabs(raw_items, sort_mode)
+                    display_index = {id(t): i + 1 for i, t in enumerate(base_sorted)}
+                    sorted_list = filter_and_sort(
+                        raw_items, sort_mode, display_index, filter_query
+                    )
+                    cache_key = current_key
 
-            if cursor_idx >= len(sorted_list):
-                cursor_idx = max(0, len(sorted_list) - 1)
-            if cursor_idx < scroll_top:
-                scroll_top = cursor_idx
-            elif cursor_idx >= scroll_top + max_visible_rows:
-                scroll_top = cursor_idx - max_visible_rows + 1
+                if cursor_idx >= len(sorted_list):
+                    cursor_idx = max(0, len(sorted_list) - 1)
+                if cursor_idx < scroll_top:
+                    scroll_top = cursor_idx
+                elif cursor_idx >= scroll_top + max_visible_rows:
+                    scroll_top = cursor_idx - max_visible_rows + 1
 
-            border_fn = color_fn(colors, "border")
-            footer_fn = color_fn(colors, "footer")
-            prompt_fn = color_fn(colors, "prompt")
+                border_fn = color_fn(colors, "border")
+                footer_fn = color_fn(colors, "footer")
+                prompt_fn = color_fn(colors, "prompt")
 
-            output = [term.clear]
+                output = [term.clear]
 
-            find_prefix = prompt_fn("HIST => ") + term.normal + search_query + "█"
-            output.append(term.move_yx(1, 3) + find_prefix)
+                find_prefix = prompt_fn("HIST => ") + term.normal + search_query + "█"
+                output.append(term.move_yx(1, 3) + find_prefix)
 
-            sort_label = f"sort: {SORT_NAMES[sort_mode]}"
-            sort_col = width - len(sort_label) - 2
-            if sort_col > term.length(find_prefix) + 4:
-                output.append(term.move_yx(1, sort_col) + border_fn(sort_label))
+                sort_label = f"sort: {SORT_NAMES[sort_mode]}"
+                sort_col = width - len(sort_label) - 2
+                if sort_col > term.length(find_prefix) + 4:
+                    output.append(term.move_yx(1, sort_col) + border_fn(sort_label))
 
-            output.append(term.move_yx(2, 0) + border_fn("─" * width))
-            output.append(
-                term.move_yx(3, 1)
-                + term.normal
-                + f"{'ID':<7}"
-                + border_fn(f"{'│':<2}")
-                + term.normal
-                + f"{'Title':<{TITLE_WIDTH + 1}}"
-                + border_fn(f"{'│':<2}")
-                + term.normal
-                + f"{'Visits':<{VISITS_WIDTH + 1}}"
-                + border_fn(f"{'│':<2}")
-                + term.normal
-                + f"{'Last Visit':<{LASTVISIT_WIDTH + 1}}"
-                + border_fn(f"{'│':<2}")
-                + term.normal
-                + f"{'URL'}"
-            )
-            output.append(term.move_yx(4, 0) + border_fn("─" * width))
-
-            for i in range(max_visible_rows):
-                list_idx = scroll_top + i
-                if list_idx >= len(sorted_list):
-                    break
-                row = i + 5
-                item = sorted_list[list_idx]
-                is_cursor = list_idx == cursor_idx
+                output.append(term.move_yx(2, 0) + border_fn("─" * width))
                 output.append(
-                    term.move_yx(row, 0)
-                    + build_row(
-                        colors,
-                        threshold,
-                        item,
-                        display_index.get(id(item), list_idx + 1),
-                        is_cursor,
-                        width,
-                    )
+                    term.move_yx(3, 1)
+                    + term.normal
+                    + f"{'ID':<7}"
+                    + border_fn(f"{'│':<2}")
+                    + term.normal
+                    + f"{'Title':<{TITLE_WIDTH + 1}}"
+                    + border_fn(f"{'│':<2}")
+                    + term.normal
+                    + f"{'Visits':<{VISITS_WIDTH + 1}}"
+                    + border_fn(f"{'│':<2}")
+                    + term.normal
+                    + f"{'Last Visit':<{LASTVISIT_WIDTH + 1}}"
+                    + border_fn(f"{'│':<2}")
+                    + term.normal
+                    + f"{'URL'}"
                 )
+                output.append(term.move_yx(4, 0) + border_fn("─" * width))
 
-            output.append(term.move_yx(height - 2, 0) + border_fn("─" * width))
-            footer_content = flash_text if flash_text else build_footer(keybinds, width)
-            output.append(
-                term.move_yx(height - 1, 0) + footer_fn(footer_content[: width - 1])
-            )
-            flash_text = None
-
-            print("".join(output), end="", flush=True)
-
-            val = term.inkey(timeout=0.05, esc_delay=0)
-
-            if not val:
-                # Timeout tick, no key pressed -- loop back up so the
-                # debounce check above gets another chance to fire once
-                # the user has paused.
-                continue
-
-            if val.name == "KEY_ESCAPE":
-                send_action_to_browser("exit", "")
-                break
-            elif val == "\x7f" or val.name == "KEY_DELETE":
-                search_query = search_query[:-1]
-                last_key_time = now
-                cursor_idx = 0
-                continue
-
-            if val == keybinds["delete_word"]:
-                search_query = delete_last_word(search_query)
-                last_key_time = now
-                cursor_idx = 0
-                continue
-            elif val == keybinds["down"]:
-                if cursor_idx < len(sorted_list) - 1:
-                    cursor_idx += 1
-                continue
-            elif val == keybinds["up"]:
-                if cursor_idx > 0:
-                    cursor_idx -= 1
-                continue
-            elif val == keybinds["delete"]:
-                if sorted_list:
-                    url = sorted_list[cursor_idx]["url"]
-                    send_action_to_browser("delete", url)
-                    raw_items = [t for t in raw_items if t.get("url") != url]
-                continue
-            elif val == keybinds["sort"]:
-                sort_mode = (sort_mode + 1) % len(SORT_NAMES)
-                save_sort_state(sort_mode)
-                continue
-            elif val == keybinds["center"]:
-                scroll_top = cursor_idx - max_visible_rows // 2
-                scroll_top = max(
-                    0, min(scroll_top, max(0, len(sorted_list) - max_visible_rows))
-                )
-                continue
-            elif val == keybinds["copy"]:
-                if sorted_list:
-                    url = sorted_list[cursor_idx]["url"]
-                    ok = copy_to_clipboard(url)
-                    flash_text = (
-                        f"copied: {url}"
-                        if ok
-                        else "copy failed -- is wl-copy installed?"
+                for i in range(max_visible_rows):
+                    list_idx = scroll_top + i
+                    if list_idx >= len(sorted_list):
+                        break
+                    row = i + 5
+                    item = sorted_list[list_idx]
+                    is_cursor = list_idx == cursor_idx
+                    output.append(
+                        term.move_yx(row, 0)
+                        + build_row(
+                            colors,
+                            threshold,
+                            item,
+                            display_index.get(id(item), list_idx + 1),
+                            is_cursor,
+                            width,
+                        )
                     )
-                continue
-            elif val == keybinds["open_new"]:
-                if sorted_list:
-                    send_action_to_browser("open-new", sorted_list[cursor_idx]["url"])
-                    break
-                continue
-            elif val.name == "KEY_ENTER" or val in ["\r", "\n"]:
-                if sorted_list:
-                    send_action_to_browser("open", sorted_list[cursor_idx]["url"])
-                    break
-                continue
 
-            if not val.is_sequence and len(val) == 1 and 32 <= ord(val) <= 126:
-                search_query += val
-                last_key_time = now
-                cursor_idx = 0
+                output.append(term.move_yx(height - 2, 0) + border_fn("─" * width))
+                footer_content = (
+                    flash_text if flash_text else build_footer(keybinds, width)
+                )
+                output.append(
+                    term.move_yx(height - 1, 0) + footer_fn(footer_content[: width - 1])
+                )
+                flash_text = None
+
+                print("".join(output), end="", flush=True)
+
+                val = term.inkey(timeout=0.05, esc_delay=0)
+
+                if not val:
+                    # Timeout tick, no key pressed -- loop back up so the
+                    # debounce check above gets another chance to fire once
+                    # the user has paused.
+                    continue
+
+                if val.name == "KEY_ESCAPE":
+                    send_action_to_browser("exit", "")
+                    break
+                elif val == "\x7f" or val.name == "KEY_DELETE":
+                    search_query = search_query[:-1]
+                    last_key_time = now
+                    cursor_idx = 0
+                    continue
+
+                if val == keybinds["delete_word"]:
+                    search_query = delete_last_word(search_query)
+                    last_key_time = now
+                    cursor_idx = 0
+                    continue
+                elif val == keybinds["down"]:
+                    if cursor_idx < len(sorted_list) - 1:
+                        cursor_idx += 1
+                    continue
+                elif val == keybinds["up"]:
+                    if cursor_idx > 0:
+                        cursor_idx -= 1
+                    continue
+                elif val == keybinds["delete"]:
+                    if sorted_list:
+                        url = sorted_list[cursor_idx]["url"]
+                        send_action_to_browser("delete", url)
+                        raw_items = [t for t in raw_items if t.get("url") != url]
+                    continue
+                elif val == keybinds["sort"]:
+                    sort_mode = (sort_mode + 1) % len(SORT_NAMES)
+                    save_sort_state(sort_mode)
+                    continue
+                elif val == keybinds["center"]:
+                    scroll_top = cursor_idx - max_visible_rows // 2
+                    scroll_top = max(
+                        0, min(scroll_top, max(0, len(sorted_list) - max_visible_rows))
+                    )
+                    continue
+                elif val == keybinds["markdown_view"]:
+                    md_path = None
+                    try:
+                        fd, md_path = tempfile.mkstemp(
+                            prefix="pyhist_view_", suffix=".md", dir="/tmp"
+                        )
+                        with open(fd, "w") as f:
+                            f.write(build_markdown(raw_items))
+                        # nvim manages its own terminal state on entry/exit
+                        # and restores whatever mode it found us in, so no
+                        # special handling needed around term.raw() here --
+                        # but it does leave the cursor visible, so we
+                        # re-hide it before the next redraw.
+                        subprocess.call(
+                            [
+                                "nvim",
+                                "-c",
+                                "lua vim.treesitter.stop()",
+                                "-c",
+                                "set syntax=markdown",
+                                "-c",
+                                "set nowrap",
+                                "-c",
+                                "set nospell",
+                                "-c",
+                                "map <silent> q :qa!<CR>",
+                                md_path,
+                            ]
+                        )
+                        print(term.hide_cursor, end="", flush=True)
+                    except FileNotFoundError:
+                        flash_text = "nvim not found on PATH"
+                    except Exception:
+                        flash_text = "couldn't open history view"
+                    finally:
+                        if md_path:
+                            try:
+                                Path(md_path).unlink()
+                            except Exception:
+                                pass
+                    continue
+                elif val == keybinds["copy"]:
+                    if sorted_list:
+                        url = sorted_list[cursor_idx]["url"]
+                        ok = copy_to_clipboard(url)
+                        flash_text = (
+                            f"copied: {url}"
+                            if ok
+                            else "copy failed -- is wl-copy installed?"
+                        )
+                    continue
+                elif val == keybinds["open_new"]:
+                    if sorted_list:
+                        send_action_to_browser(
+                            "open-new", sorted_list[cursor_idx]["url"]
+                        )
+                        break
+                    continue
+                elif val.name == "KEY_ENTER" or val in ["\r", "\n"]:
+                    if sorted_list:
+                        send_action_to_browser("open", sorted_list[cursor_idx]["url"])
+                        break
+                    continue
+
+                if not val.is_sequence and len(val) == 1 and 32 <= ord(val) <= 126:
+                    search_query += val
+                    last_key_time = now
+                    cursor_idx = 0
+    finally:
+        # Delete the cache file Pyhist was reading from -- if something
+        # sensitive got deleted from browser history during this session,
+        # it shouldn't linger in a leftover cache copy on disk. Runs on
+        # every exit path (open, delete-then-quit, esc, even a crash),
+        # and only ever touches a file we know we were pointed at.
+        if hist_is_file:
+            try:
+                Path(hist_arg).unlink()
+            except Exception:
+                pass
 
 
 if __name__ == "__main__":
