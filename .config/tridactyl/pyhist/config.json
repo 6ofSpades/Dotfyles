@@ -1,0 +1,21 @@
+{
+  "colors": {
+    "normal": "normal",
+    "cursor_bg": "#490085",
+    "border": "#6910a5",
+    "footer": "bright_black",
+    "prompt": "cyan",
+    "visits_high": "red"
+  },
+  "keybinds": {
+    "down": "C-j",
+    "up": "C-k",
+    "open_new": "C-o",
+    "delete": "C-d",
+    "sort": "C-s",
+    "center": "C-z",
+    "delete_word": "C-h",
+    "copy": "C-y"
+  },
+  "frequent_threshold": 25
+}

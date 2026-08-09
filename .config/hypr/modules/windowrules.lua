@@ -47,6 +47,8 @@ hl.window_rule({ match = { initial_title = "Gamescope WSI Layer Error" }, float 
 hl.window_rule({ match = { class = "org.kde.kdenlive" }, float = true })
 hl.window_rule({ match = { class = "pytab" }, float = true })
 hl.window_rule({ match = { class = "pytab" }, size = "monitor_w*0.50 monitor_h*0.60" })
+hl.window_rule({ match = { class = "pyhist" }, float = true })
+hl.window_rule({ match = { class = "pyhist" }, size = "monitor_w*0.60 monitor_h*0.60" })
 hl.window_rule({ match = { class = "tridactyl-insert" }, float = true })
 hl.window_rule({ match = { class = "tridactyl-insert" }, size = "monitor_w*0.40 monitor_h*0.40" })
 hl.window_rule({ match = { class = "kitty-float" }, float = true })
@@ -77,6 +79,7 @@ hl.workspace_rule({ workspace = "special:magic", gaps_out = 25 })
 
 -- -- animation overrides --
 hl.window_rule({ match = { class = "pytab" }, animation = "gnomed" })
+hl.window_rule({ match = { class = "pyhist" }, animation = "gnomed" })
 -- hl.window_rule({ match = { class = "pytab" }, no_anim = true })
 
 -- -- special overrides --
