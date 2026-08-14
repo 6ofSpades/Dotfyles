@@ -186,6 +186,19 @@ def load_tabs(arg):
         return []
 
 
+def tab_title(tab):
+    """title is an optional field in the browser.tabs API -- a tab that
+    hasn't finished loading yet (or that we lack permission to see the
+    title of) simply won't have the key at all once it round-trips
+    through JSON.stringify on the extension side. Fall back the same way
+    pyhist does, rather than assuming the key is always present."""
+    return tab.get("title") or tab.get("url") or "(untitled)"
+
+
+def tab_url(tab):
+    return tab.get("url") or ""
+
+
 def sort_tabs(tabs, mode):
     if mode == 0:  # index, pinned first (mirrors browser's own tab strip)
         return sorted(tabs, key=lambda t: (not t["pinned"], t["index"]))
@@ -194,7 +207,7 @@ def sort_tabs(tabs, mode):
     elif mode == 2:  # load state, pinned first
         return sorted(tabs, key=lambda t: (not t["pinned"], t["discarded"]))
     elif mode == 3:  # title, no pin priority (surfaces duplicates together)
-        return sorted(tabs, key=lambda t: t["title"].lower())
+        return sorted(tabs, key=lambda t: tab_title(t).lower())
     return tabs
 
 
@@ -242,8 +255,8 @@ def filter_and_sort(raw_tabs, sort_mode):
         candidates = [
             s
             for s in (
-                fuzzy_score(q, t["title"]),
-                fuzzy_score(q, t["url"]),
+                fuzzy_score(q, tab_title(t)),
+                fuzzy_score(q, tab_url(t)),
                 index_score(q, str(t["index"] + 1)),
             )
             if s is not None
@@ -344,7 +357,7 @@ def build_title_cell(colors, symbols, tab):
     marker_display = f"{marker} " if marker else ""
     marker_w = term.length(marker_display)
     body_w = max(0, TITLE_WIDTH - marker_w)
-    body = fit_width(tab["title"], body_w)
+    body = fit_width(tab_title(tab), body_w)
 
     fg_fn = color_fn(colors, state_key(tab))
     if not marker:
@@ -368,11 +381,11 @@ def build_row(colors, symbols, tab, is_cursor, width):
         marker = symbols.get("pinned", "") if tab["pinned"] else ""
         marker_display = f"{marker} " if marker else ""
         body_w = max(0, TITLE_WIDTH - term.length(marker_display))
-        title_inner = marker_display + fit_width(tab["title"], body_w)
+        title_inner = marker_display + fit_width(tab_title(tab), body_w)
         title_part = f" {title_inner} "
         prefix_len = len(index_part) + 1 + TITLE_WIDTH + 2 + 1
         available = max(0, (width - 1) - prefix_len)
-        url_part = fit_width(tab["url"], available)
+        url_part = fit_width(tab_url(tab), available)
         bg_fn = color_fn(colors, "cursor_bg", bg=True)
         line_str = f"{index_part}│{title_part}│ {url_part}"
         return bg_fn(fg_fn(line_str))
@@ -381,7 +394,7 @@ def build_row(colors, symbols, tab, is_cursor, width):
     title_cell = build_title_cell(colors, symbols, tab)
     prefix_len = len(index_part) + 1 + TITLE_WIDTH + 2 + 1
     available = max(0, (width - 1) - prefix_len)
-    url_part = fit_width(tab["url"], available)
+    url_part = fit_width(tab_url(tab), available)
     return (
         fg_fn(index_part)
         + border_fn("│")
@@ -547,7 +560,7 @@ def main():
                 continue
             elif val == keybinds["copy"]:
                 if sorted_list:
-                    url = sorted_list[cursor_idx]["url"]
+                    url = tab_url(sorted_list[cursor_idx])
                     ok = copy_to_clipboard(url)
                     flash_text = (
                         f"copied: {url}"
