@@ -53,10 +53,6 @@ PREV_WINDOW=$(hyprctl -j activewindow | jq -r '.address')
 $TERM_EXEC "${TERM_OPTS[@]}" env NVIM_APPNAME=nvim-anywhere nvim \
   +startinsert \
   -i NONE -n \
-  -c 'set wrap' \
-  -c 'set linebreak' \
-  -c 'nmap j gj' \
-  -c 'nmap k gk' \
   "$TMPFILE" \
   -u "$NVIM_CONFIG_DIR/init.lua" 63<&0 0</dev/null
 

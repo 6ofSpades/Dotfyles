@@ -18,11 +18,7 @@ set update.checkintervalsecs 86400
 
 " External Editor Configuration
 " Press <C-i> on the browser when in an input text to fire this.
-set editorcmd kitty --class nvim-anywhere -o background_opacity=0.5 env NVIM_APPNAME=nvim-anywhere nvim 63<&0 0</dev/null +startinsert -c 'set wrap' -c 'set linebreak' -c 'nmap j gj' -c 'nmap k gk' -u "~/.config/nvim-anywhere/init.lua"
-
-" Container config
-" Look at what container current tab is using and inherit it when opening a new tab
-set tabopencontaineraware true
+set editorcmd kitty --class nvim-anywhere -o background_opacity=0.5 env NVIM_APPNAME=nvim-anywhere nvim 63<&0 0</dev/null '+norm G$' '+startinsert!' -u "~/.config/nvim-anywhere/init.lua"
 
 " Search engine shortcuts
 set searchurls.y https://www.youtube.com/results?search_query=%s

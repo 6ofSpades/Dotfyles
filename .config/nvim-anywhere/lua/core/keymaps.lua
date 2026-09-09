@@ -6,6 +6,14 @@ vim.g.mapleader = " "
 -- Use <Esc> to exit terminal mode
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")
 
+-- Enable line wrapping
+vim.opt.wrap = true
+vim.opt.linebreak = true
+
+-- Move by visual lines instead of physical lines
+vim.keymap.set("n", "j", "gj")
+vim.keymap.set("n", "k", "gk")
+
 -- Make go and gO insert new lines while still staying in normal mode
 vim.keymap.set("n", "gO", "O<Esc>")
 vim.keymap.set("n", "go", "o<Esc>")
