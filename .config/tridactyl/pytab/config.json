@@ -1,16 +1,16 @@
 {
   "colors": {
-    "normal": "normal",
-    "active": "green",
-    "discarded": "bright_black",
-    "cursor_bg": "#490085",
-    "border": "#6910a5",
-    "footer": "bright_black",
-    "prompt": "cyan",
-    "pin_marker": "red"
+    "normal": "#c0caf5",
+    "active": "#6910c5",
+    "discarded": "#414a74",
+    "cursor_bg": "#290375",
+    "border": "#303aff",
+    "footer": "#414a74",
+    "prompt": "#00ffff",
+    "pin_marker": "#cc00fc"
   },
   "symbols": {
-    "pinned": " "
+    "pinned": "\uf435 "
   },
   "keybinds": {
     "down": "C-j",
@@ -20,6 +20,10 @@
     "pin": "C-p",
     "sort": "C-s",
     "center": "C-z",
-    "copy": "C-y"
+    "delete_word": "C-w",
+    "copy": "C-y",
+    "top": "C-i",
+    "bottom": "C-a",
+    "switch_stay": "C-]"
   }
 }

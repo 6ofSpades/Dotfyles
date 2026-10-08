@@ -1,65 +1,56 @@
-:root {
-  --bg: #000000;
-  --fg: #c0caf5;
-  --black: #000000;
-  --red: #cc00fc;
-  --green: #00bfa7;
-  --yellow: #e0af68;
-  --blue: #435aff;
-  --magenta: #8500bc;
-  --cyan: #00ffff;
-  --white: #dddddd;
-  --black_bright: #414a74;
-  --red_bright: #cc00fc;
-  --green_bright: #00bfa7;
-  --yellow_bright: #e0af68;
-  --blue_bright: #435aff;
-  --magenta_bright: #8500bc;
-  --cyan_bright: #00ffff;
-  --white_bright: #ffffff;
-  --gray1: #202331;
-  --gray2: #616789;
-  --magenta2: #9a28e3;
-  --magenta3: #5f00f7;
-  --accent: #6910a5;
-  --cursor: #8500bc;
-  --cursor_text_color: #000000;
-  --cursor_line: #202331;
-  --cursor_line_number: #00ffff;
-  --line_number: #414a74;
-  --selection_bg: #490085;
+@import "~/.config/theme/generated/colors-web.css";
 
-  --tridactyl-fg: var(--fg);
-  --tridactyl-bg: var(--bg);
+:root {
+  --tridactyl-fg: var(--themefg);
+  --tridactyl-bg: var(--themebg);
   --tridactyl-cmdl-bg: var(--tridactyl-bg);
-  --tridactyl-url-fg: var(--cyan);
-  --tridactyl-url-bg: var(--bg);
+  --tridactyl-url-fg: var(--themecyan);
+  --tridactyl-url-bg: var(--themebg);
   --tridactyl-highlight-box-bg: var(--base0B);
   --tridactyl-highlight-box-fg: var(--base00);
 
   /* Hint character tags */
-  --tridactyl-hintspan-fg: var(--white_bright) !important;
-  --tridactyl-hintspan-bg: var(--bg) !important;
-  --tridactyl-hintspan-js-background: var(--black_bright) !important;
-  --tridactyl-hintspan-border-color: var(--accent) !important;
+  --tridactyl-hintspan-fg: var(--themewhite_bright) !important;
+  --tridactyl-hintspan-bg: var(--themebg) !important;
+  --tridactyl-hintspan-border-color: var(--themeaccent) !important;
   --tridactyl-hintspan-border-width: 1px !important;
+  --tridactyl-hintspan-js-background: var(--themebg) !important;
+  --tridactyl-hintspan-js-border: var(--themegreen) !important;
+
+  --tridactyl-hintspan-pressed-fg: var(--themecyan) !important;
+
+  --tridactyl-hintspan-active-fg: var(--themewhite_bright) !important;
+  --tridactyl-hintspan-active-bg: var(--themebg) !important;
 
   /* Element Highlights */
-  --tridactyl-hint-active-fg: var(--red);
+  /* --tridactyl-hint-active-fg: var(--themered); */
   --tridactyl-hint-active-bg: none;
   --tridactyl-hint-active-outline: none;
   --tridactyl-hint-bg: bg;
-  --tridactyl-hint-outline: var(--accent);
+  --tridactyl-hint-outline: var(--themeaccent);
 }
 
 span.TridactylHint {
   font-family: JetBrainsMono Nerd Font !important;
+  font-style: italic !important;
   border-radius: 5px !important;
+}
+
+span.TridactylJSHint {
+  background-color: var(--tridactyl-hintspan-js-background) !important;
+  border-color: var(--tridactyl-hintspan-js-border) !important;
+}
+
+/* disable uppercase only letters */
+/* make them lowercase instead */
+span.TridactylHintUppercase,
+span.TridactylHintUppercase > span {
+  text-transform: lowercase !important;
 }
 
 #command-line-holder {
   order: 1;
-  border: 2px solid var(--accent);
+  border: 2px solid var(--themeaccent);
   color: var(--tridactyl-bg);
 }
 
@@ -171,20 +162,20 @@ span.TridactylHint {
   bottom: 0 !important;
   background: var(--tridactyl-bg) !important;
   border: unset !important;
-  border: 1px var(--accent) solid !important;
+  border: 1px var(--themeaccent) solid !important;
   font-size: 9pt !important;
   /*font-weight: 200 !important;*/
   padding: 0.8ex !important;
 }
 
 #completions .focused {
-  background: var(--selection_bg);
-  color: var(--white);
+  background: rgb(from var(--themecursor_line) r g b / 0.5);
+  color: var(--themewhite);
 }
 
 #completions .focused .url {
-  background: var(--selection_bg);
-  color: var(--white);
+  background: rgb(from var(--themecursor_line) r g b / 0.5);
+  color: var(--themewhite);
 }
 /* #Ocean-normal { */
 /*  border-color: green !important; */

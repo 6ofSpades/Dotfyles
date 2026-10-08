@@ -8,6 +8,8 @@ set theme lunara
 
 set smoothscroll true
 set scrollduration 100
+"smoothscrollwizard
+set themeprivacy true
 
 " Update Settings
 set update.lastchecktime 1783293436121
@@ -23,7 +25,37 @@ set editorcmd kitty --class nvim-anywhere -o background_opacity=0.5 env NVIM_APP
 " Search engine shortcuts
 set searchurls.y https://www.youtube.com/results?search_query=%s
 set searchurls.g https://www.google.com/search?q=%s
+set searchurls.ddg https://duckduckgo.com/?q=%s
 set searchurls.w https://en.wikipedia.org/wiki/Special:Search?search=%s
+" remove default search shortcuts
+setnull searchurls.google
+setnull searchurls.youtube
+setnull searchurls.duckduckgo
+
+
+" ==============================================================================
+" Container config
+" ==============================================================================
+" Auto create containers if they don't exist. If youtube.com is set 
+" to always open on Youtube container, create it if it doesnt exist
+set auconcreatecontainer true
+
+" Relaxed mode is less aggressive and instead treats container
+" domains as a default when opening a new tab.
+set autocontainmode relaxed
+
+" Automatically open these sites in the specified containers
+" Escaping Periods: periods in the domain are escaped (\.) to prevent
+" them from acting as wildcards (which would match any character).
+autocontain -s youtube\.com Youtube
+autocontain -s google\.com Google
+
+" Look at what container current tab is using and inherit it when opening a new tab
+" When entering YouTube or Google, turn container awareness off
+autocmd TabEnter (youtube|google)\.com set tabopencontaineraware false
+
+" When leaving YouTube or Google, turn container awareness back to true
+autocmd TabLeft (youtube|google)\.com set tabopencontaineraware true
 
 
 " ==============================================================================
@@ -47,12 +79,20 @@ bind <C-o> jumpprev
 bind <C-i> jumpnext
 
 " Miscellaneous Global Binds
+bind <Escape> composite mode normal ; hidecmdline ; nohlsearch
 bind \ nmode ignore 1 mode normal
 bind . repeat
 bind <S-Insert> mode ignore
-bind <Escape> composite mode normal ; hidecmdline
 bind <C-[> composite mode normal ; hidecmdline
 bind <F1> help
+
+" Rudimentary find mode
+ bind / fillcmdline find
+ bind ? fillcmdline find --reverse
+ bind n findnext --search-from-view
+ bind N findnext --search-from-view --reverse
+ bind gv findselect
+ bind gN composite findnext --search-from-view --reverse; findselect
 
 
 " ==============================================================================
@@ -97,8 +137,12 @@ bind tM mute toggle
 " ==============================================================================
 bind o fillcmdline open
 bind O fillcmdline tabopen
-bind w fillcmdline winopen
-bind W current_url winopen
+unbind w
+unbind W
+bind wo fillcmdline winopen
+bind Wo current_url winopen
+bind wp fillcmdline winopen -private
+bind Wp current_url winopen -private
 bind : fillcmdline_notrail
 bind s fillcmdline open search
 bind S fillcmdline tabopen search
@@ -119,6 +163,9 @@ bind gu urlparent
 bind gU urlroot
 bind gs viewsource
 bind ge current_url open
+
+" Conflicts with Youtube Enhancer shortcuts
+unbind --mode=browser <C-,>
 
 
 " ==============================================================================
@@ -283,8 +330,8 @@ bind --mode=ex <C-o>w ex.execute_ex_on_completion_args winopen
 " undefined on every fresh browser start (which is exactly what I want --
 " no loop yet), and only prevents a second loop if you mash T/tt while one
 " is already running.
-bind T jsb (async () => { if (!window.pytabLoopActive) { window.pytabLoopActive = true; (async () => { while (window.pytabLoopActive) { let res; try { res = await tri.native.run("~/.config/tridactyl/browser_server.sh"); } catch (e) { window.pytabLoopActive = false; break; } let content = (res.content || "").trim(); let output = content.split(" "); if (output.length < 2) { window.pytabLoopActive = false; break; } let action = output[0]; let id = parseInt(output[1]); if (action === "switch") { browser.tabs.update(id, {active: true}); window.pytabLoopActive = false; } else if (action === "close") { browser.tabs.remove(id); } else if (action === "discard") { browser.tabs.discard(id); } else if (action === "toggle-pin") { browser.tabs.get(id).then(t => browser.tabs.update(id, {pinned: !t.pinned})); } else if (action === "exit") { window.pytabLoopActive = false; } } })(); } browser.tabs.query({currentWindow:true}).then(tabs => { const data = JSON.stringify(tabs.map(t => ({id: t.id, index: t.index, title: t.title, url: t.url, pinned: t.pinned, discarded: t.discarded, lastAccessed: t.lastAccessed, active: t.active}))); tri.native.run("kitty -1 --instance-group=pytab --class=pytab -e python3 ~/.config/tridactyl/pytab.py '" + data.replace(/'/g, "'\\''") + "' recent"); }); })()
-bind tt jsb (async () => { if (!window.pytabLoopActive) { window.pytabLoopActive = true; (async () => { while (window.pytabLoopActive) { let res; try { res = await tri.native.run("~/.config/tridactyl/browser_server.sh"); } catch (e) { window.pytabLoopActive = false; break; } let content = (res.content || "").trim(); let output = content.split(" "); if (output.length < 2) { window.pytabLoopActive = false; break; } let action = output[0]; let id = parseInt(output[1]); if (action === "switch") { browser.tabs.update(id, {active: true}); window.pytabLoopActive = false; } else if (action === "close") { browser.tabs.remove(id); } else if (action === "discard") { browser.tabs.discard(id); } else if (action === "toggle-pin") { browser.tabs.get(id).then(t => browser.tabs.update(id, {pinned: !t.pinned})); } else if (action === "exit") { window.pytabLoopActive = false; } } })(); } browser.tabs.query({currentWindow:true}).then(tabs => { const data = JSON.stringify(tabs.map(t => ({id: t.id, index: t.index, title: t.title, url: t.url, pinned: t.pinned, discarded: t.discarded, lastAccessed: t.lastAccessed, active: t.active}))); tri.native.run("kitty -1 --instance-group=pytab --class=pytab -e python3 ~/.config/tridactyl/pytab.py '" + data.replace(/'/g, "'\\''") + "' index"); }); })()
+bind T jsb (async () => { if (!window.pytabLoopActive) { window.pytabLoopActive = true; (async () => { while (window.pytabLoopActive) { let res; try { res = await tri.native.run("~/.config/tridactyl/browser_server.sh"); } catch (e) { window.pytabLoopActive = false; break; } let content = (res.content || "").trim(); let output = content.split(" "); if (output.length < 2) { window.pytabLoopActive = false; break; } let action = output[0]; let id = parseInt(output[1]); if (action === "switch") { browser.tabs.update(id, {active: true}); window.pytabLoopActive = false; } else if (action === "switch-stay") { browser.tabs.update(id, {active: true}); } else if (action === "close") { browser.tabs.remove(id); } else if (action === "discard") { browser.tabs.discard(id); } else if (action === "toggle-pin") { browser.tabs.get(id).then(t => browser.tabs.update(id, {pinned: !t.pinned})); } else if (action === "exit") { window.pytabLoopActive = false; } } })(); } browser.tabs.query({currentWindow:true}).then(tabs => { const data = JSON.stringify(tabs.map(t => ({id: t.id, index: t.index, title: t.title, url: t.url, pinned: t.pinned, discarded: t.discarded, lastAccessed: t.lastAccessed, active: t.active}))); tri.native.run("kitty -1 --instance-group=pytab --class=pytab -e python3 ~/.config/tridactyl/pytab.py '" + data.replace(/'/g, "'\\''") + "' recent"); }); })()
+bind tt jsb (async () => { if (!window.pytabLoopActive) { window.pytabLoopActive = true; (async () => { while (window.pytabLoopActive) { let res; try { res = await tri.native.run("~/.config/tridactyl/browser_server.sh"); } catch (e) { window.pytabLoopActive = false; break; } let content = (res.content || "").trim(); let output = content.split(" "); if (output.length < 2) { window.pytabLoopActive = false; break; } let action = output[0]; let id = parseInt(output[1]); if (action === "switch") { browser.tabs.update(id, {active: true}); window.pytabLoopActive = false; } else if (action === "switch-stay") { browser.tabs.update(id, {active: true}); } else if (action === "close") { browser.tabs.remove(id); } else if (action === "discard") { browser.tabs.discard(id); } else if (action === "toggle-pin") { browser.tabs.get(id).then(t => browser.tabs.update(id, {pinned: !t.pinned})); } else if (action === "exit") { window.pytabLoopActive = false; } } })(); } browser.tabs.query({currentWindow:true}).then(tabs => { const data = JSON.stringify(tabs.map(t => ({id: t.id, index: t.index, title: t.title, url: t.url, pinned: t.pinned, discarded: t.discarded, lastAccessed: t.lastAccessed, active: t.active}))); tri.native.run("kitty -1 --instance-group=pytab --class=pytab -e python3 ~/.config/tridactyl/pytab.py '" + data.replace(/'/g, "'\\''") + "' index"); }); })()
 
 " ==============================================================================
 " Pyhist -- history picker, sibling of Pytab

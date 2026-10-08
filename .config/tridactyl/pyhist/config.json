@@ -1,20 +1,20 @@
 {
   "colors": {
-    "normal": "normal",
-    "cursor_bg": "#490085",
-    "border": "#6910a5",
-    "footer": "bright_black",
-    "prompt": "cyan",
-    "visits_high": "red"
+    "normal": "#c0caf5",
+    "cursor_bg": "#290375",
+    "border": "#303aff",
+    "footer": "#414a74",
+    "prompt": "#00ffff",
+    "visits_high": "#cc00fc"
   },
   "keybinds": {
     "down": "C-j",
     "up": "C-k",
-    "open_new": "C-o",
+    "open_new": "C-]",
     "delete": "C-d",
     "sort": "C-s",
     "center": "C-z",
-    "delete_word": "C-h",
+    "delete_word": "C-w",
     "copy": "C-y"
   },
   "frequent_threshold": 25

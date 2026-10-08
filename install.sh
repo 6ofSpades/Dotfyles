@@ -276,6 +276,15 @@ else
   yay -S --makepkgconf="$HOME/.config/pacman/makepkg.conf" --config="$HOME/.config/pacman/pacman.conf" --devel --cleanafter --answerclean "a" --save
 fi
 
+# pytab and pyhist
+git clone https://github.com/6ofSpades/pytab /tmp/pytab
+cp /tmp/pytab/pytab.py ~/.config/tridactyl/
+cp /tmp/pytab/browser_server.sh ~/.config/tridactyl/
+
+git clone https://github.com/6ofSpades/pyhist /tmp/pyhist
+cp /tmp/pyhist/pyhist.py ~/.config/tridactyl/
+cp /tmp/pyhist/history_server.sh ~/.config/tridactyl/
+
 gum confirm --default "Install and enable ydotool service?" && ydot_serv="y" || ydot_serv="n"
 if [[ "$ydot_serv" == "y" ]]; then
   USER_UID=$(id -u)
