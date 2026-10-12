@@ -1,0 +1,23 @@
+return {
+    colors = {
+        border = "#303aff",
+        border_animation = "#303aff",
+        border_pin = "#cc00fc",
+        border_maximized = "#8500bc",
+        border_alt = "#00bf97",
+        border_float = "#6910c5",
+        border_inactive = "rgba(30,30,30,0.7)",
+        border_group_active = "#00ffff",
+        border_group_inactive = "rgba(30,30,30,0.7)",
+        border_group_locked_active = "#e0af68",
+        border_group_locked_inactive = "rgba(30,30,30,0.7)",
+        groupbar_active = "rgba(41,3,117,0.7)",
+        groupbar_inactive = "rgba(65,74,116,0.5)",
+        hyprlock_input_bg = "rgba(0,0,0,0.4)",
+        hyprlock_input_border = "#6910c5",
+        hyprlock_input_border_anim = "#6910c5",
+        hyprlock_input_check = "#303aff",
+        hyprlock_input_fail = "#cc00fc",
+        hyprlock_input_caps = "#cc00fc",
+    },
+}

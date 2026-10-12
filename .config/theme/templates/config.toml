@@ -1,8 +1,8 @@
 # whether to sort tray items by their titles
-sorting = false
+sorting = true
 
 # max amount of columns in layout
-columns = 3
+columns = 4
 
 # enable mouse support
 mouse = false
@@ -41,22 +41,22 @@ bg = "reset"
 bg_focused = "reset"
 
 # foreground color for menu
-fg = "gray"
+fg = "#c0caf5"
 
 # foreground color for focused menu
-fg_focused = "white"
+fg_focused = "#dddddd"
 
 # background color for highlighted item in menu
-bg_highlighted = "#690086"
+bg_highlighted = "#490085"
 
 # foreground color for highlighted item in menu
-fg_highlighted = "white"
+fg_highlighted = "#ffffff"
 
 # foreground color for border
-border_fg = "white"
+border_fg = "#414a74"
 
 # foreground color for focused border
-border_fg_focused = "magenta"
+border_fg_focused = "#6910a5"
 
 # backrgound color for border
 border_bg = "reset"

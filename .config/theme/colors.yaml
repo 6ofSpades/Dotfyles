@@ -4,9 +4,9 @@ colors:
 
   black: "#000000"
   red: "#cc00fc"
-  green: "#00bfa7"
+  green: "#00bf97"
   yellow: "#e0af68"
-  blue: "#335aff"
+  blue: "#303aff"
   magenta: "#8500bc"
   cyan: "#00ffff"
   white: "#dddddd"
@@ -20,57 +20,295 @@ colors:
   cyan_bright: cyan
   white_bright: "#ffffff"
 
-  gray1: "#202331"
-  gray2: "#616789"
+  gray0: "#1e1e1e"
+  gray1: "#161626"
+  gray2: "#616a94"
 
   magenta2: "#9A28e3"
   magenta3: "#5F00f7"
 
 ui:
-  accent: "#6910a5"
+  accent: "#6910c5"
+  accent_darker: "#290375" #240a41
+  accent_lighter: "#efaeff"
 
-  cursor: magenta
-  cursor_text_color: black
-  cursor_line: gray1
+  cursor: accent
+  cursor_text_color: white
+
+  cursor_line: accent_darker
+
   cursor_line_number: cyan
   line_number: black_bright
 
   selection_fg:
-  selection_bg: "#490085"
+  selection_bg: "#060085"
 
 kitty:
-  kitty_transparent: "#490085@0.75 #202331@0.75"
+  background_opacity: 0.7
 
   active_tab_fg: white
   active_tab_bg: accent
   inactive_tab_fg: gray2
-  inactive_tab_bg: gray1
+  inactive_tab_bg: gray0
+
+  active_border_color: accent
+  inactive_border_color: gray0
+
+  transparent1: selection_bg
+  transparent1o: 0.8
+  transparent2: cursor_line
+  transparent2o: 0.85
+  transparent3: gray1
+  transparent3o: 0.8
+
+nvim:
+  mode_normal_fg: $colors.bg
+  mode_normal_bg: blue
+
+  mode_insert_fg: $colors.bg
+  mode_insert_bg: green
+
+  mode_visual_fg: $colors.bg
+  mode_visual_bg: magenta
+
+  mode_command_fg: $colors.bg
+  mode_command_bg: yellow
+
+  mode_replace_fg: $colors.bg
+  mode_replace_bg: red
+
+  # mode_alt_fg: black_bright
+  mode_alt_bg: gray0
+
+  mode_inactive_fg: black_bright
+  mode_inactive_bg: gray0
+
+  floatborders: accent
+  splitborders: blue
+
+  searchfg: $fzf.hl
+  searchbg: blue
+  incsearchfg: $fzf.hl
+  incsearchbg: red
+
+  whichkeykey: cyan
+  whichkeyseparator: black_bright
+  whichkeydescription: blue
+  whichkeygroup: black_bright
+
+  telescopeborder: $fzf.border
+  telescopepromptborder: $fzf.input-border
+  telescopeprompttitle: $fzf.input-border
+  telescopepreviewborder: $fzf.preview-border
+  telescopepreviewtitle: $fzf.preview-border
+  telescopeselection: $fzf.bg+
+  telescopepromptprefix: $fzf.prompt
+  telescopematch: $fzf.hl
+
+yazi:
+  mgr.cwd.fg: blue
+
+  mgr.find_keyword.fg: $fzf.hl
+  mgr.find_keyword.bg: blue
+  mgr.find_position.fg: magenta
+
+  mgr.marker_marked.fg: selection_bg
+  mgr.marker_marked.bg: selection_bg
+  mgr.marker_selected.fg: cyan
+  mgr.marker_selected.bg: cyan
+  mgr.marker_copied.fg: green
+  mgr.marker_copied.bg: green
+  mgr.marker_cut.fg: red
+  mgr.marker_cut.bg: red
+
+  mgr.count_selected.fg: black
+  mgr.count_selected.bg: mgr.marker_selected.bg
+  mgr.count_copied.fg: black
+  mgr.count_copied.bg: mgr.marker_copied.bg
+  mgr.count_cut.fg: black
+  mgr.count_cut.bg: mgr.marker_cut.bg
+
+  mgr.border_style.fg: $nvim.splitborders
+
+  # tabs
+  tabs.active.fg: white
+  tabs.active.bg: accent
+  tabs.inactive.fg: gray2
+  tabs.inactive.bg: gray0
+
+  # mode indicator
+  mode.normal_main.bg: $nvim.mode_normal_bg
+  mode.normal_main.fg: $nvim.mode_normal_fg
+  mode.normal_alt.bg: $nvim.mode_alt_bg
+  mode.normal_alt.fg: $nvim.mode_normal_bg
+
+  mode.select_main.bg: $nvim.mode_visual_bg
+  mode.select_main.fg: $nvim.mode_visual_fg
+  mode.select_alt.bg: $nvim.mode_alt_bg
+  mode.select_alt.fg: $nvim.mode_visual_bg
+
+  mode.unset_main.bg: $nvim.mode_replace_bg
+  mode.unset_main.fg: $nvim.mode_replace_fg
+  mode.unset_alt.bg: $nvim.mode_alt_bg
+  mode.unset_alt.fg: $nvim.mode_replace_bg
+
+  # permissions
+  status.perm_sep.fg: black_bright
+  status.perm_type.fg: blue
+  status.perm_read.fg: magenta
+  status.perm_write.fg: cyan
+  status.perm_exec.fg: green
+
+  # selection background
+  indicator.parent.bg: cursor_line
+  indicator.current.bg: cursor_line
+
+  # git signs
+  git.untracked.fg: $git.untracked
+  git.modified.fg: $git.changed
+  git.deleted.fg: red
+  git.clean.fg: green
+
+  # whichkey
+  which.border.fg: $nvim.floatborders
+  which.cand.fg: $nvim.whichkeykey
+  which.separator_style.fg: $nvim.whichkeyseparator
+  which.desc.fg: $nvim.whichkeydescription
+
+  # spotter
+  spot.border.fg: which.border.fg
+  spot.title.fg: which.border.fg
+  spot.tbl_col.fg: which.desc.fg
+  spot.tbl_cell.bg: cursor_line
+
+  # picker
+  pick.border.fg: $nvim.floatborders
+  pick.active.fg: accent
+
+  # task manager
+  tasks.border.fg: $nvim.floatborders
+  tasks.hovered.fg: accent
+
+fastfetch:
+  # Unfortunately the fastfetch patcher doesn't preserve comments
+  # or formatting made in the config.jsonc file
+  # so anything in there will be overwritten
+
+  logo.color.1: blue
+  logo.color.2: blue
+
+  display.color.title: red
+  display.color.keys: magenta
+  display.color.separator: black_bright
+  display.color.output: $colors.fg
+
+  display.percent.type: 2 # 1=number, 2=bar, 3=both, 9=colored number
+  display.percent.color.green: cyan
+  display.percent.color.yellow: blue
+  display.percent.color.red: magenta
+
+  modules.outputColor: blue
+
+  # module specific theming
+  # works cause of the "type" key
+  module.title.color.user: magenta
+  module.title.color.at: cyan
+  module.title.color.host: magenta
+
+git:
+  # just so the colors can be reused later
+  diff: blue
+  HEAD: green
+  branch: cyan
+  untracked: magenta
+  changed: yellow
+
+  # actual colors
+  color "diff".commit: diff
+
+  color "decorate".HEAD: HEAD
+  color "decorate".branch: branch
+
+  color "status".untracked: untracked
+  color "status".changed: changed
+
+waybar:
+  text: $colors.fg
+  subtext: rgba($colors.fg,0.9)
+
+  border: $hyprland.border_inactive
+
+  workspace-current-bg: rgba(cursor_line,0.5)
+  workspace-current-border: accent
+
+  distro: accent
+  powermenu: accent
+  clock: accent_lighter
+
+  hover-bg: rgba(cursor_line,0.5)
+
+  privacydotcam: yellow
+  privacydotloc: blue
+  micstatus: green
+
+  obs-studio: "#ff0000"
+  protonvpn: blue
+
+  warning: accent_lighter
+  critical: red
+  charging: green
+
+  submap-mains: $nvim.mode_normal_bg
+  submap-mvrsw: $nvim.mode_visual_bg
+  submap-mouse: $nvim.mode_insert_bg
+  submap-plctl: red
 
 hyprland:
-  border: red
-  border_pin: yellow
-  border_maximized: cyan
+  # window borders
+  border: blue
+  border_animation: $hyprland.border
+  border_pin: red
+  border_maximized: magenta
+  border_alt: green
+  border_float: accent
+  border_inactive: rgba(gray0,0.7)
+
+  # window group borders
+  border_group_active: cyan
+  border_group_inactive: border_inactive
+  border_group_locked_active: yellow
+  border_group_locked_inactive: border_inactive
+
+  groupbar_active: rgba(cursor_line,0.7)
+  groupbar_inactive: rgba(black_bright,0.5)
+
+  hyprlock_input_bg: rgba($colors.bg,0.4)
+  hyprlock_input_border: accent
+  hyprlock_input_border_anim: accent
+  hyprlock_input_check: blue
+  hyprlock_input_fail: red
+  hyprlock_input_caps: red
 
 rofi:
   rofi-bg: rgba(bg,0.5)
   frecency-bg: rgba(bg,0.3)
   rofi-border: rgb(accent)
 
-  selected-bg: rgba(accent,0.5)
-  active-fg: rgb(red)
+  selected-bg: rgba(cursor_line,0.4)
+  active-fg: rgb(magenta)
 
 mpv:
-  # accent color of the OSC and title bar
-  osc_color: bg
+  # accent color of the osc and title bar
+  osc_color: $colors.bg
   # color of the title in borderless/fullscreen mode
-  window_title_color: fg
+  window_title_color: $colors.fg
   # color of the window controls (close, minimize, maximize) in borderless/fullscreen mode
-  window_controls_color: fg
+  window_controls_color: $colors.fg
 
   # color of the title
   title_color: white
   # color of the cache information
-  cache_info_color: fg
+  cache_info_color: $colors.fg
   # color of the cache ranges on the seekbar
   seekbar_cache_color: black_bright
   # color of the seekbar progress
@@ -82,28 +320,28 @@ mpv:
   # inner border color drawn inside the seekbar handle (set to disable to disable)
   seek_handle_border_color: accent
   # color of the timestamps (below seekbar)
-  time_color: fg
+  time_color: $colors.fg
   # color of the chapter title
-  chapter_title_color: fg
+  chapter_title_color: $colors.fg
   # color of the side buttons (audio, subtitles, playlist, etc.)
-  side_buttons_color: fg
+  side_buttons_color: $colors.fg
   # color of the middle buttons (skip, jump, chapter, etc.)
-  middle_buttons_color: fg
+  middle_buttons_color: $colors.fg
   # color of the play/pause button
-  playpause_color: fg
+  playpause_color: $colors.fg
   # color of the element when held down (pressed)
   held_element_color: gray1
   # color of a hovered button when hover_effect includes "color"
   hover_effect_color: accent
   # color of the background for thumbnail box
-  thumbnail_box_color: bg
+  thumbnail_box_color: $colors.bg
   # color of the border outline for thumbnail box
   thumbnail_box_outline: accent
   # color of chapter nibbles on the seekbar
   nibble_color: accent
   # color of the current chapter nibble on the seekbar
-  nibble_current_color: fg
-  # color of the A/B loop range on the seekbar
+  nibble_current_color: $colors.fg
+  # color of the a/b loop range on the seekbar
   ab_loop_color: "#2596be"
 
 zathura:
@@ -128,34 +366,35 @@ zathura:
   completion-fg: rgb(fg)
 
 dunst:
+  # border color
   frame_color: accent
 
-  urgency_low.background: "#00000080"
-  urgency_low.foreground: fg
+  urgency_low.background: $colors.bg+80
+  urgency_low.foreground: $colors.fg
   urgency_low.highlight: "#8500bc, #1a75cf"
 
-  urgency_normal.background: "#00000080"
-  urgency_normal.foreground: fg
+  urgency_normal.background: $colors.bg+80
+  urgency_normal.foreground: $colors.fg
   urgency_normal.highlight: "#8500bc, #1a75cf"
 
   urgency_critical.background: "#90000066"
-  urgency_critical.foreground: fg
+  urgency_critical.foreground: $colors.fg
   urgency_critical.highlight: "#d54e53, #f0f0f0"
   urgency_critical.frame_color: red
 
 flameshot:
-  uiColor: accent
-  drawColor: "#ff0000"
+  uicolor: accent
+  drawcolor: "#ff0000"
 
 btop:
-  # Main text color
-  theme[main_fg]: fg
-  # Title color for boxes
+  # main text color
+  theme[main_fg]: $colors.fg
+  # title color for boxes
   theme[title]: white
-  # Color of inactive/disabled text
+  # color of inactive/disabled text
   theme[inactive_fg]: gray1
 
-  # Process box color gradients for threads, men, and cpu usage
+  # process box color gradients for threads, men, and cpu usage
   theme[process_start]: green
 
   # boder color for both cpu and gpu box
@@ -165,102 +404,259 @@ btop:
   theme[net_box]: blue
   theme[proc_box]: blue
 
-  # Highlight color for keyboard shortcuts
+  # highlight color for keyboard shortcuts
   theme[hi_fg]: cyan
 
-  # Background color of selected item in processes box
-  theme[selected_bg]: selection_bg
-  # Foreground color of selected item in processes box
+  # background color of selected item in processes box
+  theme[selected_bg]: cursor_line
+  # foreground color of selected item in processes box
   theme[selected_fg]: white
 
-  # Box divider line and small boxes line color
+  # box divider line and small boxes line color
   theme[div_line]: black_bright
 
-  # Misc colors for processes box including mini cpu graphs, details memory graph and details status text
+  # misc colors for processes box including mini cpu graphs, details memory graph and details status text
   theme[proc_misc]: accent
-  # Color of text appearing on top of graphs, i.e uptime and current network graph scaling
-  theme[graph_text]: fg
+  # color of text appearing on top of graphs, i.e uptime and current network graph scaling
+  theme[graph_text]: $colors.fg
 
   # graphs
-  # Temperature graph colors
+  # temperature graph colors
   theme[temp_start]: blue
   theme[temp_mid]: yellow
   theme[temp_end]: red
 
-  # CPU graph colors
+  # cpu graph colors
   theme[cpu_start]: magenta
   theme[cpu_mid]: blue
   theme[cpu_end]: red
 
-  # Mem/Disk used meter
+  # mem/disk used meter
   theme[used_start]: blue
   theme[used_mid]: magenta
   theme[used_end]: red
 
-  # Mem/Disk available meter
+  # mem/disk available meter
   theme[available_start]: cyan
   theme[available_mid]: blue
   theme[available_end]: green
 
-  # Mem/Disk cached meter
+  # mem/disk cached meter
   theme[cached_start]: magenta
   theme[cached_mid]: blue
   theme[cached_end]: magenta
 
-  # Mem/Disk free meter
+  # mem/disk free meter
   theme[free_start]: green
   theme[free_mid]: cyan
   theme[free_end]: blue
 
-  # Download graph colors
+  # download graph colors
   theme[download_start]: blue
   theme[download_mid]: magenta
   theme[download_end]: red
 
-  # Upload graph colors
+  # upload graph colors
   theme[upload_start]: blue
   theme[upload_mid]: magenta
   theme[upload_end]: red
 
-yazi:
-  mgr.cwd.fg: cyan
+# starship:
+# mgr.cwd.fg: cyan
 
-  mgr.find_keyword.fg: cyan
+wiremix:
+  themes.default.selector.fg: cyan
 
-  mgr.find_keyword.fg: cyan
+  themes.default.tab_selected.fg: accent
+  themes.default.tab_marker.fg: blue
 
-  mgr.border_style.fg: black_bright
+  themes.default.list_more.fg: black_bright
 
-  tabs.active.fg: white
-  tabs.active.bg: accent
-  tabs.inactive.fg: gray2
-  tabs.inactive.bg: gray1
+  themes.default.volume_empty.fg: black_bright
+  themes.default.volume_filled.fg: accent
 
-  mode.normal_main.bg: blue
-  mode.normal_main.fg: bg
-  mode.normal_alt.bg: gray1
-  mode.normal_alt.fg: blue
-  mode.select_main.bg: magenta
-  mode.select_main.fg: bg
-  mode.select_alt.bg: gray1
-  mode.select_alt.fg: magenta
-  mode.unset_main.bg: red
-  mode.unset_main.fg: bg
-  mode.unset_alt.bg: gray1
-  mode.unset_alt.fg: red
+  themes.default.meter_inactive.fg: black_bright
+  themes.default.meter_active.fg: green
+  themes.default.meter_overload.fg: red
 
-  indicator.parent.bg: selection_bg
-  indicator.current.bg: selection_bg
+  themes.default.meter_center_inactive.fg: black_bright
+  themes.default.meter_center_active.fg: green
+
+  themes.default.dropdown_border.fg: blue
+  themes.default.dropdown_selected.bg: cursor_line
+  themes.default.dropdown_more.fg: black_bright
+  themes.default.help_more.fg: black_bright
+
+surge:
+  colors.primary.background: $colors.bg
+  colors.primary.foreground: $colors.fg
+
+  colors.normal.black: black_bright
+  colors.normal.red: red
+  colors.normal.green: green
+  colors.normal.yellow: yellow
+  colors.normal.blue: blue
+  colors.normal.magenta: magenta
+  colors.normal.cyan: blue # scondary border and color of home page
+  colors.normal.white: white
+
+  colors.bright.black: black_bright
+  colors.bright.red: magenta # border and main color of home page
+  colors.bright.green: green
+  colors.bright.yellow: yellow
+  colors.bright.blue: blue
+  colors.bright.magenta: magenta
+  colors.bright.cyan: cyan
+  colors.bright.white: white
 
 traytui:
-  colors.bg: bg
-  colors.bg_focused: bg
+  colors.bg: $colors.bg
+  colors.bg_focused: $colors.bg
 
-  colors.fg: fg
-  colors.fg_focused: white
+  colors.fg: black_bright
+  colors.fg_focused: $colors.fg
 
   colors.border_fg: black_bright
   colors.border_fg_focused: accent
 
-  colors.bg_highlighted: selection_bg
+  colors.bg_highlighted: cursor_line
   colors.fg_highlighted: white_bright
+
+clipse:
+  titlefore: white
+  titleback: accent
+  titleinfo: blue
+  normaltitle: $colors.fg
+  dimmedtitle: black_bright
+  selectedtitle: magenta
+  selecteddesc: gray2
+  normaldesc: black_bright
+  dimmeddesc: black_bright
+  statusmsg: cyan
+  pinindicatorcolor: red
+  selectedborder: cyan
+  selecteddescborder: cyan
+  filteredmatch: $colors.fg
+  filterprompt: cyan
+  filterinfo: black_bright
+  filtertext: $colors.fg
+  filtercursor: magenta
+  helpkey: cyan
+  helpdesc: black_bright
+  pageactivedot: accent
+  pageinactivedot: black_bright
+  dividerdot: blue
+  previewedtext: $colors.fg
+  previewborder: accent
+
+pytab:
+  colors.normal: $colors.fg
+  colors.active: accent
+  colors.discarded: black_bright
+  colors.cursor_bg: cursor_line
+  colors.border: blue
+  colors.footer: black_bright
+  colors.prompt: cyan
+  colors.pin_marker: red
+
+pyhist:
+  colors.normal: $colors.fg
+  colors.cursor_bg: cursor_line
+  colors.border: blue
+  colors.footer: black_bright
+  colors.prompt: cyan
+  colors.visits_high: red
+
+pear_desktop:
+  background-color: $colors.bg
+  progress-bar-1: magenta # #9100ff
+  progress-bar-2: red # #ff27f8
+  knob: accent
+
+wlkbptr:
+  mode_tile.label_color: white
+  mode_tile.label_select_color: $fzf.hl
+  mode_tile.unselectable_bg_color: $colors.bg+60
+  mode_tile.selectable_bg_color: $colors.bg+b0
+  mode_tile.selectable_border_color: accent
+
+  mode_floating.label_color: white
+  mode_floating.label_select_color: $fzf.hl
+  mode_floating.unselectable_bg_color: $colors.bg+60
+  mode_floating.selectable_bg_color: $colors.bg+cc
+  mode_floating.selectable_border_color: accent
+
+wvkbd:
+  # fg color
+  text: $colors.fg
+  text-sp: white
+  text-press: white_bright
+  text-press-sp: white_bright
+
+  # bg color
+  bg: $colors.bg+80 # bg of first layer
+  fg: $colors.bg+b3 # bg of normal keys
+  fg-sp: $colors.bg+cc # bg of special keys
+  press: cursor_line+cc
+  press-sp: cursor_line+cc
+
+fzf:
+  fg: $colors.fg
+  fg+: $colors.white_bright # fg on selected line
+
+  bg: $colors.bg
+  bg+: $ui.cursor_line # selected line
+
+  border: $colors.blue
+  input-border: accent
+  preview-border: $colors.black_bright
+  footer-border: $colors.black_bright
+
+  gutter: $colors.black_bright # border on the left
+
+  hl: $colors.cyan # highlighted substring, when you type something
+  hl+: hl # highlighted substring on selected line
+
+  prompt: $colors.cyan
+  info: $colors.black_bright # result numbers
+  separator: $colors.black_bright # line beside the info
+  pointer: accent # border of selected line on the gutter
+  scrollbar: $colors.black_bright
+
+  spinner: $colors.yellow
+
+tlrc: # tldr rust version
+  style.title.color: $colors.white_bright
+  style.title.background: $ui.accent
+
+  style.description.color: $colors.black_bright
+
+  style.url.color: $colors.cyan
+
+  style.bullet.color: $colors.magenta
+
+  style.inline_code.color: $colors.blue
+
+  style.example.color: $colors.fg
+
+  style.placeholder.color: $colors.blue
+
+gdu:
+  style.header.text-color: $colors.gray2
+  style.header.background-color: $colors.gray1
+
+  style.footer.text-color: $colors.gray2
+  style.footer.background-color: $colors.gray1
+  style.footer.number-color: $colors.red
+
+  style.selected-row.text-color: $colors.white_bright
+  style.selected-row.background-color: $ui.cursor_line
+
+  style.marked.text-color: $colors.yellow
+  style.marked.background-color: $ui.selection_bg
+
+  style.result-row.number-color: $colors.magenta
+  style.result-row.directory-color: $colors.blue
+
+wlogout:
+  buttons: $colors.fg
