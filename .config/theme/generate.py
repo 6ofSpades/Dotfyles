@@ -390,6 +390,12 @@ def generate_web_css():
         "\n".join(lines),
     )
 
+    # write one for the signal themer tool
+    write_file(
+        OUTPUT_DIR / ".." / "tools" / "signal-themer" / "colors-web.css",
+        "\n".join(lines),
+    )
+
 
 def generate_waybar():
     lines = []
@@ -405,6 +411,12 @@ def generate_waybar():
         BASE_DIR / "waybar" / "themes" / "waybar.css",
         "\n".join(lines),
     )
+
+
+# signal-desktop
+# run the tool we already have for theming it
+def generate_signal():
+    subprocess.run(["./patch.sh"], cwd="./tools/signal-themer/", check=True)
 
 
 # Pear-desktop / Youtube music CSS
@@ -1061,6 +1073,7 @@ def main():
     generate_fastfetch()
     generate_git()
     generate_wlogout()
+    generate_signal()
 
 
 if __name__ == "__main__":

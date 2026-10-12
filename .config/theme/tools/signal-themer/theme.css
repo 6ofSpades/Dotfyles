@@ -1,3 +1,5 @@
+@import "colors-web.css";
+
 /* These are necessary if you want transparent background
    If you don't then just comment it out */
 body.dark-theme {
@@ -7,9 +9,31 @@ body.dark-theme {
   background-color: #00000000 !important;
 }
 
-/* Accent color */
 :root {
-  --accent-color: 105, 0, 133;
+  --axo-color-fill-accent: rgb(from var(--themeaccent) r g b / 1);
+  --axo-color-label-accent: rgb(from var(--themeaccent_lighter) r g b / 1);
+  /* selection on context menus */
+  --axo-color-fill-primary-pressed: rgb(
+    from var(--themecursor_line) r g b / 0.5
+  );
+
+  /* text and icons colors in the UI, not in messages */
+  --axo-color-label-primary: rgb(from var(--themewhite) r g b / 1);
+  --axo-color-label-secondary: rgb(from var(--themewhite) r g b / 0.8);
+  --axo-color-label-placeholder: rgb(from var(--themeblack_bright) r g b / 1);
+
+  /* header in conversations, like pinned messages */
+  --axo-color-legacy-conversation-header-bg: rgb(
+    from var(--themegray0) r g b / 0.3
+  );
+
+  /* scrollbar color */
+  --default-scrollbar-thumb: rgb(from var(--themeaccent) r g b / 1);
+}
+
+/* context menus */
+.legacy-z-index-context-menu {
+  background-color: rgb(from var(--themebg) r g b / 0.5) !important;
 }
 
 /*
@@ -20,22 +44,23 @@ body.dark-theme {
 
 /* left most bar */
 .NavTabs {
-  background-color: #00000080 !important;
+  background-color: rgb(from var(--themebg) r g b / 0.4) !important;
 }
 
 /* message number */
 .NavTabs__ItemUnreadBadge {
-  background-color: rgb(var(--accent-color)) !important;
+  background-color: rgb(from var(--themeaccent) r g b / 1) !important;
 }
 
+/* hover */
 .NavTabs__ItemButton:hover {
-  background-color: rgba(var(--accent-color), 0.2) !important;
-  border: 1px solid rgba(var(--accent-color), 0.4) !important;
+  background-color: rgb(from var(--themecursor_line) r g b / 0.4) !important;
 }
 
+/* selected */
 .NavTabs__Item[aria-selected="true"] > span > .NavTabs__ItemButton {
-  background-color: rgba(var(--accent-color), 0.5) !important;
-  border: 1px solid rgba(var(--accent-color), 0.9) !important;
+  background-color: rgb(from var(--themecursor_line) r g b / 0.5) !important;
+  border: 1px solid rgb(from var(--themeaccent) r g b / 1) !important;
 }
 
 /* buttons in qr and link section of personal user profile */
@@ -46,29 +71,29 @@ body.dark-theme {
 
 /* second to left bar */
 .NavSidebar {
-  background-color: #00000080 !important;
-}
-
-/* verified badge */
-.ContactModal__official-badge::after {
-  background-color: rgb(var(--accent-color)) !important;
+  background-color: rgb(from var(--themebg) r g b / 0.5) !important;
 }
 
 /* message number */
 .dark-theme
   .module-conversation-list__item--contact-or-conversation
   .module-conversation-list__item--contact-or-conversation__unread-indicator {
-  background-color: rgb(var(--accent-color)) !important;
+  background-color: rgb(from var(--themeaccent) r g b / 1) !important;
 }
 
-/* view archive button when clicking on ... */
-.ContextMenu__popper--single-item {
-  background-color: #252a84 !important;
+/* hovered contact/conversation */
+.module-conversation-list__item--contact-or-conversation:hover,
+.module-conversation-list__item--contact-or-conversation:focus,
+.module-conversation-list__item--archive-button:hover,
+.module-conversation-list__item--archive-button:focus {
+  background-color: rgb(from var(--themecursor_line) r g b / 0.4) !important;
+  /* border: 1px solid rgb(from var(--themeaccent) r g b / 0.4) !important; */
 }
 
+/* selected contact/conversation */
 .module-conversation-list__item--contact-or-conversation--is-selected {
-  background-color: rgba(var(--accent-color), 0.5) !important;
-  border: 1px solid rgba(var(--accent-color), 0.9) !important;
+  background-color: rgb(from var(--themecursor_line) r g b / 0.5) !important;
+  border: 1px solid rgb(from var(--themeaccent) r g b / 1) !important;
 }
 
 /* no archived chat text */
@@ -76,12 +101,9 @@ body.dark-theme {
   background-color: #1c24b1 !important;
 }
 
-.module-conversation-list__item--contact-or-conversation:hover,
-.module-conversation-list__item--contact-or-conversation:focus,
-.module-conversation-list__item--archive-button:hover,
-.module-conversation-list__item--archive-button:focus {
-  background-color: rgba(var(--accent-color), 0.2) !important;
-  border: 1px solid rgba(var(--accent-color), 0.4) !important;
+/* search bar */
+.module-SearchInput__input {
+  background-color: rgb(from var(--themebg) r g b / 0.6) !important;
 }
 
 /*
@@ -91,7 +113,7 @@ body.dark-theme {
 */
 
 .Inbox__no-conversation-open {
-  background-color: #00000080 !important;
+  background-color: rgb(from var(--themebg) r g b / 0.6) !important;
 }
 
 /*
@@ -102,54 +124,54 @@ body.dark-theme {
 
 /* the bar at the top containing your contact name */
 .module-ConversationHeader {
-  background-color: #11111b78 !important;
+  background-color: rgb(from var(--themegray0) r g b / 0.3) !important;
 }
 
 /* call, search, etc button present at conversation header */
 .module-ConversationHeader__button:hover,
 .module-ConversationHeader__button:focus {
-  background-color: rgba(var(--accent-color), 0.3) !important;
+  background-color: rgb(from var(--themecursor_line) r g b / 0.5) !important;
 }
 
 /* ... menu at conversation header */
 .react-contextmenu {
-  background-color: #000000a0 !important;
+  background-color: rgb(from var(--themebg) r g b / 0.6) !important;
   backdrop-filter: blur(10px);
 }
 
 /* ... menu hover */
 .react-contextmenu-item--selected {
-  background-color: rgba(var(--accent-color), 0.3) !important;
-  border: 1px solid rgba(var(--accent-color), 0.5) !important;
+  background-color: rgb(from var(--themecursor_line) r g b / 0.5) !important;
+  border: 1px solid rgb(from var(--themeaccent) r g b / 1) !important;
 }
 
 /* the vm player that appears at top */
 .MiniPlayer {
-  background-color: #000000a0 !important;
+  background-color: rgb(from var(--themegray0) r g b / 0.3) !important;
 }
 
 /* conversation area */
 .module-timeline {
-  background-color: #00000000 !important;
+  background-color: rgb(from var(--themebg) r g b / 0.6) !important;
 }
 .dark-theme .ConversationView__pane {
-  background-color: #00000000 !important;
+  background-color: rgb(from var(--themebg) r g b / 0.6) !important;
 }
 .ConversationPanel,
 .ConversationPanel__header {
-  background-color: #00000059 !important;
+  background-color: rgb(from var(--themebg) r g b / 0.4) !important;
 }
 
 /* other people's messages */
 .module-message__container--incoming {
-  background-color: #00000060 !important;
+  background-color: rgb(from var(--themegray0) r g b / 0.3) !important;
 }
 /* your own messages*/
 /* cause over here you have more control than on the config */
 .dark-theme .module-message__container--outgoing {
-  background-color: #00000000 !important;
+  background-color: rgb(from var(--themebg) r g b / 0) !important;
 }
-.module-message__container--outgoing-ultramarine {
+.module-message__container--outgoing {
   background-image: linear-gradient(
     90deg,
     #69008580,
@@ -160,53 +182,51 @@ body.dark-theme {
 }
 
 /* replying box */
-.module-quote--incoming > .module-quote__primary,
-.module-quote--incoming > .module-quote__icon-container {
-  background-color: #00000080 !important;
-  border: 0px !important;
-}
-.dark-theme .module-quote--compose-ultramarine,
-.dark-theme .module-quote--incoming-ultramarine,
-.dark-theme .module-quote--outgoing-ultramarine {
+.module-quote {
   background-image: none !important;
-  background-color: rgba(var(--accent-color), 0.8) !important;
+  background-color: rgb(from var(--themeselection_bg) r g b / 0.5) !important;
 }
-.module-quote--outgoing-ultramarine .module-quote__primary,
-.module-quote--outgoing-ultramarine.module-quote__reference-warning {
-  background-color: #00000080 !important;
+.module-quote__primary {
+  border-inline-start-color: rgb(
+    from var(--themeaccent) r g b / 0.8
+  ) !important;
+  /* border: 1px solid rgb(from var(--themeaccent) r g b / 0.8) !important; */
 }
 
-/* call again button */
+/* "call again","go to message",etc buttons */
 .dark-theme .module-Button--system-message {
-  background-color: #00000080 !important;
+  background-color: rgb(from var(--themegray0) r g b / 0.3) !important;
 }
 
 /* the area where you write message, attach file, send vm, etc. */
 .CompositionArea {
-  background-color: #1111117a !important;
+  background-color: rgb(from var(--themegray0) r g b / 0.3) !important;
 }
 
 /* the actual typing box */
 .module-composition-input__input {
-  background-color: #0000007a !important;
+  background-color: rgb(from var(--themebg) r g b / 0.5) !important;
 }
-
 .module-composition-input__input:focus-within {
-  border: 1px solid rgb(var(--accent-color)) !important;
+  border: 1px solid rgb(from var(--themeaccent) r g b / 1) !important;
 }
 
 /* the today or yesterday thing that appears when you scroll up */
 .TimelineDateHeader--floating {
-  background-color: #00000080 !important;
+  background-color: rgb(from var(--themegray0) r g b / 0.3) !important;
   backdrop-filter: blur(10px) !important;
 }
-
 .TimelineFloatingHeader__spinner-container {
-  background-color: #313244 !important;
+  background-color: rgb(from var(--themegray0) r g b / 0.3) !important;
+  /* background-color: #313244 !important; */
+}
+.bg-material-tertiary {
+  background-color: #00000080;
 }
 
+/* the button with an arrow to scroll down */
 .ScrollDownButton {
-  background-color: #00000080 !important;
+  background-color: rgb(from var(--themebg) r g b / 0.5) !important;
   backdrop-filter: blur(10px) !important;
 }
 

@@ -21,6 +21,7 @@ asar e "${SIGNAL_DIR}/app.asar" ${TEMP}
 # Copy the theme file into the asar folder
 echo "Applying theme..."
 cp -rf theme.css "${TEMP}/stylesheets/theme.css"
+cp -rf colors-web.css "${TEMP}/stylesheets/colors-web.css"
 cp -rf tray-icons/ "${TEMP}/images/"
 
 # Add import for the theme to the start of manifest.css
@@ -29,16 +30,18 @@ if ! grep -q '@import "theme.css"' "${TEMP}/stylesheets/manifest.css"; then
   sed -i "1i @import \"theme.css\";" "${TEMP}/stylesheets/manifest.css"
 fi
 
+###### This part stopped working and I'm too lazy to fix it -_- #####
 # Now for the transparency part
 # Check if transparency is already applied
-echo "Enabling transparency..."
-if ! grep -q 'transparent: true' "${TEMP}/app/main.main.js"; then
-  sed -i '/const windowOptions = {/,/}/ {/^[[:space:]]*backgroundColor,*/d}' "${TEMP}/app/main.main.js"
-  sed -i '/const windowOptions = {/a \    transparent: true,\n    frame: false,\n    backgroundColor: "#00000000",' "${TEMP}/app/main.main.js"
-  #sed -i '/const windowOptions = {/a \  transparent: true,\n  frame: false,\n  backgroundColor: "#00000000",' "${TEMP}/app/main.js"
-else
-  echo "Transparency already applied."
-fi
+# echo "Enabling transparency..."
+# if ! grep -q 'transparent: true' "${TEMP}/app/main.main.js"; then
+#   sed -i '/const windowOptions = {/,/}/ {/^[[:space:]]*backgroundColor,*/d}' "${TEMP}/app/main.main.js"
+#   sed -i '/const windowOptions = {/a \    transparent: true,\n    frame: false,\n    backgroundColor: "#00000000",' "${TEMP}/app/main.main.js"
+#   #sed -i '/const windowOptions = {/a \  transparent: true,\n  frame: false,\n  backgroundColor: "#00000000",' "${TEMP}/app/main.js"
+# else
+#   echo "Transparency already applied."
+# fi
+# ########## ##############
 
 # Pack the new theme into a new app.asar (needs sudo in order to write to /usr/lib)
 echo "Repacking... (sudo is needed)"
@@ -48,5 +51,3 @@ sudo asar p ${TEMP} "${SIGNAL_DIR}/app.asar"
 rm -rf "$TEMP"
 
 echo "Done."
-
-
