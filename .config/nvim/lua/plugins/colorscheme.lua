@@ -18,8 +18,8 @@ return {
 				colors.bg_float = theme.colors.bg
 				colors.bg_sidebar = theme.colors.bg
 
-				colors.border = theme.ui.accent
-				colors.border_highlight = theme.ui.accent
+				colors.border = theme.nvim.floatborders
+				colors.border_highlight = theme.nvim.floatborders
 
 				colors.comment = theme.colors.black_bright
 
@@ -44,7 +44,7 @@ return {
 					yellow_bright = theme.colors.yellow_bright,
 				}
 
-				colors.black = theme.colors.bg
+				colors.black = theme.colors.black
 				colors.cyan = theme.colors.cyan
 				colors.purple = theme.colors.magenta2
 				colors.green = theme.colors.green
@@ -56,7 +56,6 @@ return {
 			on_highlights = function(highlights)
 				highlights.CursorLine = {
 					bg = theme.ui.cursor_line,
-					bold = true,
 				}
 				highlights.CursorLineNr = {
 					fg = theme.ui.cursor_line_number,
@@ -69,6 +68,54 @@ return {
 				}
 				highlights.LineNr = {
 					fg = theme.ui.line_number,
+				}
+				-- splits borders
+				highlights.WinSeparator = {
+					fg = theme.nvim.splitborders,
+				}
+
+				-- markdown small code block
+				highlights["@markup.raw.markdown_inline"] = {
+					fg = theme.colors.magenta,
+					bg = theme.colors.gray0,
+				}
+
+				-- folds
+				highlights.Folded = {
+					fg = theme.colors.blue,
+					bg = theme.colors.gray0,
+				}
+
+				-- search highlights
+				highlights.Search = {
+					fg = theme.nvim.searchfg,
+					bg = theme.nvim.searchbg,
+				}
+				highlights.IncSearch = {
+					fg = theme.nvim.incsearchfg,
+					bg = theme.nvim.incsearchbg,
+				}
+
+				-- suggestions menu
+				highlights.Pmenu = {
+					fg = theme.colors.fg,
+					bg = theme.colors.gray1,
+				}
+				highlights.PmenuSel = {
+					bg = theme.ui.cursor_line,
+				}
+				highlights.PmenuMatch = {
+					fg = theme.nvim.searchfg,
+				}
+				highlights.PmenuMatchSel = {
+					fg = theme.nvim.searchfg,
+				}
+				-- scrollbar
+				highlights.PmenuSbar = {
+					bg = theme.colors.gray0,
+				}
+				highlights.PmenuThumb = {
+					bg = theme.ui.accent,
 				}
 
 				-- barbar.nvim
@@ -89,6 +136,20 @@ return {
 					fg = theme.colors.fg,
 					bg = theme.colors.bg,
 				}
+				-- inactive buffer
+				highlights.BufferInactive = {
+					fg = theme.colors.gray2,
+					bg = theme.colors.gray1,
+				}
+				highlights.BufferInactiveSign = {
+					fg = theme.colors.bg,
+					bg = theme.colors.gray0,
+				}
+				-- inactive modified buffer
+				highlights.BufferInactiveMod = {
+					fg = theme.colors.yellow,
+					bg = theme.colors.gray1,
+				}
 				-- tabs
 				highlights.BufferTabpagesSep = {
 					bg = theme.ui.accent,
@@ -99,7 +160,7 @@ return {
 				}
 				-- buffer bar background
 				highlights.BufferTabpageFill = {
-					bg = theme.ui.cursor_line,
+					bg = theme.colors.gray1,
 				}
 				-- buffer picker
 				highlights.BufferVisibleTarget = {
@@ -114,6 +175,9 @@ return {
 
 				-- marks.nvim
 				highlights.MarkSignHL = {
+					fg = theme.colors.red,
+				}
+				highlights.MarkSignNumHL = {
 					fg = theme.colors.red,
 				}
 
@@ -133,6 +197,58 @@ return {
 				highlights.HopUnmatched = {
 					fg = theme.colors.black_bright, -- Fades out normal text
 					bg = theme.colors.bg,
+				}
+
+				-- whichkey
+				highlights.WhichKeyBorder = {
+					fg = theme.nvim.floatborders,
+				}
+				highlights.WhichKeyTitle = {
+					fg = theme.nvim.floatborders,
+				}
+
+				highlights.WhichKey = {
+					fg = theme.nvim.whichkeykey,
+				}
+				highlights.WhichKeySeparator = {
+					fg = theme.nvim.whichkeyseparator,
+				}
+				highlights.WhichKeyDesc = {
+					fg = theme.nvim.whichkeydescription,
+				}
+				highlights.WhichKeyGroup = {
+					fg = theme.nvim.whichkeygroup,
+				}
+
+				-- Telescope
+				highlights.TelescopeBorder = {
+					fg = theme.nvim.telescopeborder,
+				}
+				highlights.TelescopePromptBorder = {
+					fg = theme.nvim.telescopepromptborder,
+				}
+				highlights.TelescopePromptTitle = {
+					fg = theme.nvim.telescopeprompttitle,
+				}
+				highlights.TelescopePreviewBorder = {
+					fg = theme.nvim.telescopepreviewborder,
+				}
+				highlights.TelescopePreviewTitle = {
+					fg = theme.nvim.telescopepreviewtitle,
+				}
+				highlights.TelescopeSelection = {
+					bg = theme.nvim.telescopeselection,
+				}
+				highlights.TelescopePromptPrefix = {
+					fg = theme.nvim.telescopepromptprefix,
+				}
+				highlights.TelescopeMatching = {
+					fg = theme.nvim.telescopematch,
+				}
+
+				-- nvimtree
+				highlights.NvimTreeWinSeparator = {
+					fg = theme.nvim.splitborders,
 				}
 			end,
 		})

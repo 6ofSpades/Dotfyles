@@ -46,7 +46,7 @@ https://github.com/user-attachments/assets/fb74a710-5f05-4bf4-b95f-10f40583c5a0
 
 ## Requirements
 
-1. [yazi >= 25.5.31](https://github.com/sxyazi/yazi)
+1. [yazi >= 26.5.6](https://github.com/sxyazi/yazi)
 
 2. This plugin only supports Linux, and requires having [GLib](https://github.com/GNOME/glib), [gvfs](https://gitlab.gnome.org/GNOME/gvfs) (need D-Bus Session)
 
@@ -256,34 +256,39 @@ Especially when you use `Google-drive` or `One-drive`.
 - Replace `1000` with your real user id (run `id -u` to get user id).
 - Replace `USER_NAME` with your real user name (run `whoami` to get username).
 
-> [!IMPORTANT]
->
-> For yazi (>=v25.12.29) replace `name` with `url`
-
 ```toml
 [plugin]
 prepend_preloaders = [
   # Do not preload files in mounted locations:
   # Environment variable won't work here.
   # Using absolute path instead.
-  { name = "/run/user/1000/gvfs/**/*", run = "noop" },
+  { url = "/run/user/1000/gvfs/**/*", run = "noop" },
 
   # For mounted hard disk/drive
-  { name = "/run/media/USER_NAME/**/*", run = "noop" },
+  { url = "/run/media/USER_NAME/**/*", run = "noop" },
+
+  # You can also use glob pattern to match paths
+  { url = "/run/user/*/gvfs/google-drive:host=gmail.com,user=*/**/*", run = "noop", prio = "high" },
+  { url = "/run/user/*/gvfs/google-drive:host=gmail.com,user=*/**/*/", run = "noop", prio = "high" },
+
 ]
 prepend_previewers = [
   # Allow to preview folder.
-  { name = "*/", run = "folder" },
+  { url = "*/", run = "folder" },
 
   # Do not previewing files in mounted locations.
   # Uncomment the line below to allow previewing text files.
   # { mime = "{text/*,application/x-subrip}", run = "code" },
 
   # Using absolute path.
-  { name = "/run/user/1000/gvfs/**/*", run = "noop" },
+  { url = "/run/user/1000/gvfs/**/*", run = "noop" },
 
   # For mounted hard disk/drive.
-  { name = "/run/media/USER_NAME/**/*", run = "noop" },
+  { url = "/run/media/USER_NAME/**/*", run = "noop" },
+
+  # You can also use glob pattern to match paths
+  { url = "/run/user/*/gvfs/google-drive:host=gmail.com,user=*/**/*", run = "noop", prio = "high" },
+  { url = "/run/user/*/gvfs/google-drive:host=gmail.com,user=*/**/*/", run = "noop", prio = "high" },
 ]
 ```
 

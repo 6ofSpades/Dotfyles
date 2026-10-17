@@ -1,0 +1,26 @@
+[colors]
+name = "surge"
+
+[colors.primary]
+background = "#000000"
+foreground = "#c0caf5"
+
+[colors.normal]
+black   = "#414a74"
+red     = "#cc00fc"
+green   = "#00bf97"
+yellow  = "#e0af68"
+blue    = "#303aff"
+magenta = "#8500bc"
+cyan    = "#303aff" # secondary border and color of home page
+white   = "#dddddd"
+
+[colors.bright]
+black   = "#414a74"
+red     = "#8500bc" # border and main color of home page
+green   = "#00bf97"
+yellow  = "#e0af68"
+blue    = "#303aff"
+magenta = "#8500bc"
+cyan    = "#00ffff"
+white   = "#dddddd"

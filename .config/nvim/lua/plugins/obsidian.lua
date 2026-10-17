@@ -18,8 +18,7 @@ return {
 			return title
 		end,
 
-		-- directory where notes should be created by default
-		notes_subdir = "Notes",
+		new_notes_location = "Notes",
 
 		-- templates folder
 		templates = {

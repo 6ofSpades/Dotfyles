@@ -6,23 +6,27 @@ vim.g.mapleader = " "
 -- Use <Esc> to exit terminal mode
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")
 
--- Make go and gO insert new lines while still staying in normal mode
-vim.keymap.set("n", "gO", "O<Esc>")
-vim.keymap.set("n", "go", "o<Esc>")
-
--- Map <A-j>, <A-k>, <A-h>, <A-l> to navigate between windows in normal mode
--- vim.keymap.set({ "t" }, "<A-h>", "<C-\\><C-n><C-w>h")
--- vim.keymap.set({ "t" }, "<A-j>", "<C-\\><C-n><C-w>j")
--- vim.keymap.set({ "t" }, "<A-k>", "<C-\\><C-n><C-w>k")
--- vim.keymap.set({ "t" }, "<A-l>", "<C-\\><C-n><C-w>l")
 vim.keymap.set({ "n" }, "H", "<C-w>h")
 vim.keymap.set({ "n" }, "J", "<C-w>j")
 vim.keymap.set({ "n" }, "K", "<C-w>k")
 vim.keymap.set({ "n" }, "L", "<C-w>l")
 
 -- Window management
-vim.keymap.set("n", "<leader>sv", "<C-w>v", { desc = "Split window vertically" })
-vim.keymap.set("n", "<leader>sh", "<C-w>s", { desc = "Split window horizontally" })
+-- Split right
+vim.keymap.set("n", "<leader>sl", "<C-w>v", { desc = "Split window right" })
+
+-- Split left
+vim.keymap.set("n", "<leader>sh", function()
+	vim.cmd("leftabove vsplit")
+end, { desc = "Split window left" })
+
+-- Split below
+vim.keymap.set("n", "<leader>sj", "<C-w>s", { desc = "Split window below" })
+
+-- Split above
+vim.keymap.set("n", "<leader>sk", function()
+	vim.cmd("leftabove split")
+end, { desc = "Split window above" })
 
 vim.keymap.set(
 	"n",
@@ -60,50 +64,17 @@ vim.keymap.set("n", "<leader>bx", "<cmd>BufferLinePickClose<CR>", { desc = "Pick
 vim.keymap.set("n", "<leader>bh", "<cmd>BufferLineMovePrev<CR>", { desc = "Move buffer to the left" })
 vim.keymap.set("n", "<leader>bl", "<cmd>BufferLineMoveNext<CR>", { desc = "Move buffer to the right" })
 
--- Better navigation in insert mode
-vim.keymap.set("i", "<a-h>", "<Left>")
-vim.keymap.set("i", "<a-j>", "<Down>")
-vim.keymap.set("i", "<a-k>", "<Up>")
-vim.keymap.set("i", "<a-l>", "<Right>")
-
-vim.keymap.set("i", "<a-b>", "<Esc>bi")
-vim.keymap.set("i", "<a-e>", "<Esc>ea")
-vim.keymap.set("i", "<a-w>", "<Esc>lwi")
-vim.keymap.set("i", "<a-x>", "<Delete>")
-vim.keymap.set("i", "<a-d>", "<Right><Esc>cw")
-
-vim.keymap.set("i", "<a-0>", "<Home>")
-vim.keymap.set("i", "<a-$>", "<End>")
-
--- Persistence.nvim
-vim.keymap.set("n", "<leader>wr", function()
-	require("persistence").load()
-end, { desc = "Load the session for the current directory" })
-
-vim.keymap.set("n", "<leader>wR", function()
-	require("persistence").select()
-end, { desc = "Select a session to load" })
-
-vim.keymap.set("n", "<leader>wl", function()
-	require("persistence").load({ last = true })
-end, { desc = "Load the last session" })
-
-vim.keymap.set("n", "<leader>wx", function()
-	require("persistence").stop()
-end, { desc = "Stop Persistence => session won't be saved on exit" })
-
--- Leap
-vim.keymap.set({ "n", "x", "o" }, "f", "<Plug>(leap)")
-vim.keymap.set("n", "F", "<Plug>(leap-from-window)")
-
--- Notifications
-vim.keymap.set("n", "<leader>nn", "<cmd>:Notifications<CR>", { desc = "See notification logs" })
-vim.keymap.set("n", "<leader>nx", function()
-	require("notify").dismiss()
-end, { desc = "Dismiss all notifications" })
-
 -- Select all with Ctrl-a
 vim.keymap.set("n", "<C-a>", "ggVG", { desc = "Select all" })
 
 -- Keep cursor in place after yanking in visual mode
 vim.keymap.set("v", "y", "ygv<Esc>")
+
+-- Keep cursor and selection after pasting in visual mode
+vim.keymap.set("v", "p", "pgv")
+
+-- Don't end of line in blank character when in visual mode
+-- vim.keymap.set("v", "$", "$h")
+
+-- swap ' and ` just cause it's easier on ABNT keyboard
+vim.keymap.set("n", "'", "`")

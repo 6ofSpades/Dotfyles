@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Citron Neo
+GenericName=Switch Emulator
+Comment=Switch Emulator
+Exec=/usr/local/bin/Citron-neo.AppImage
+TryExec=/usr/local/bin/Citron-neo.AppImage
+Icon=citron-neo

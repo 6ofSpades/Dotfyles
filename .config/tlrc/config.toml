@@ -23,8 +23,8 @@ bullet = 2
 example = 4
 
 [style.title]
-color = "green"
-background = "default"
+color = {hex = "#ffffff"}
+background = {hex = "#6910a5"}
 bold = true
 underline = false
 italic = false
@@ -32,7 +32,7 @@ dim = false
 strikethrough = false
 
 [style.description]
-color = "red"
+color = {hex = "#414a74"}
 background = "default"
 bold = false
 underline = false
@@ -41,7 +41,7 @@ dim = false
 strikethrough = false
 
 [style.bullet]
-color = "magenta"
+color = {hex = "#8500bc"}
 background = "default"
 bold = true
 underline = false
@@ -50,7 +50,7 @@ dim = false
 strikethrough = false
 
 [style.example]
-color = "blue"
+color = {hex = "#c0caf5"}
 background = "default"
 bold = false
 underline = false
@@ -59,7 +59,7 @@ dim = false
 strikethrough = false
 
 [style.url]
-color = "white"
+color = {hex = "#00ffff"}
 background = "default"
 bold = false
 underline = true
@@ -68,7 +68,7 @@ dim = false
 strikethrough = false
 
 [style.inline_code]
-color = "yellow"
+color = {hex = "#303aff"}
 background = "default"
 bold = false
 underline = false
@@ -77,7 +77,7 @@ dim = false
 strikethrough = false
 
 [style.placeholder]
-color = "white"
+color = {hex = "#303aff"}
 background = "default"
 bold = false
 underline = false

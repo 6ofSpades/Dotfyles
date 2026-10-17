@@ -17,7 +17,6 @@ local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 -- terminal / browser / fileManager / hyprscripts come from hyprland.lua's top-level locals.
 -- Since Hyprland gives each require()'d file its own scope, we redeclare the ones we need here.
 local terminal = "kitty"
-local browser = "zen-browser"
 local fileManager = terminal .. " yazi"
 local hyprscripts = os.getenv("HOME") .. "/.config/hypr/scripts"
 
@@ -27,13 +26,7 @@ local hyprscripts = os.getenv("HOME") .. "/.config/hypr/scripts"
 hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("pkill wlogout || wlogout -b 4"))
 
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(terminal), { submap_universal = true })
-hl.bind(mainMod .. " + SHIFT + T", hl.dsp.exec_cmd(terminal), { submap_universal = true }) -- TODO: this used to open floating+centered at 50%/50% via
--- `[float; size (monitor_w*0.5) (monitor_h*0.5); center 1]`.
--- exec-time window rules like that aren't in hl.exec_cmd's rule
--- table; easiest fix is a named hl.window_rule() matching this
--- terminal's class/title, or pass a rule table as hl.exec_cmd's
--- 2nd argument if your Hyprland build supports float/size/center there.
--- hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser), { submap_universal = true })
+hl.bind(mainMod .. " + SHIFT + T", hl.dsp.exec_cmd(terminal .. " --class kitty-float"), { submap_universal = true })
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager), { submap_universal = true })
 hl.bind(
 	mainMod .. " + Y",
@@ -63,33 +56,39 @@ hl.bind(
 	hl.dsp.exec_cmd(
 		'hyprctl hyprsunset gamma +10 && notify-send -a Hyprsunset "Gamma:" "$(hyprctl hyprsunset gamma)" -t 2000 -i text-x-script -u low -r 2427'
 	),
-	{ submap_universal = true }
+	{ submap_universal = true, locked = true }
 )
 hl.bind(
 	mainMod .. " + F11",
 	hl.dsp.exec_cmd(
 		'hyprctl hyprsunset gamma -10 && notify-send -a Hyprsunset "Gamma:" "$(hyprctl hyprsunset gamma)" -t 2000 -i text-x-script -u low -r 2427'
 	),
-	{ submap_universal = true }
+	{ submap_universal = true, locked = true }
 )
 hl.bind(
 	mainMod .. " + SHIFT + F12",
 	hl.dsp.exec_cmd(
 		'hyprctl hyprsunset temperature +100 && notify-send -a Hyprsunset "Temperature:" "$(hyprctl hyprsunset temperature)" -t 2000 -i text-x-script -u low -r 2427'
 	),
-	{ submap_universal = true }
+	{ submap_universal = true, locked = true }
 )
 hl.bind(
 	mainMod .. " + SHIFT + F11",
 	hl.dsp.exec_cmd(
 		'hyprctl hyprsunset temperature -100 && notify-send -a Hyprsunset "Temperature:" "$(hyprctl hyprsunset temperature)" -t 2000 -i text-x-script -u low -r 2427'
 	),
-	{ submap_universal = true }
+	{ submap_universal = true, locked = true }
 )
 hl.bind(
 	mainMod .. " + F10",
 	hl.dsp.exec_cmd("killall hyprsunset & sleep 0.2 && hyprsunset"),
-	{ submap_universal = true }
+	{ submap_universal = true, locked = true }
+) -- reset hyprsunset
+
+hl.bind(
+	mainMod .. " + F8",
+	hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle 2>/dev/null"),
+	{ submap_universal = true, locked = true }
 ) -- reset hyprsunset
 
 -- ------
@@ -117,7 +116,7 @@ hl.bind(mainMod .. " + F9", function()
 				.. "'"
 		)
 	)
-end)
+end, { allow_input_capture = true, dont_inhibit = true })
 -- ------
 
 -- quick-notes with obsidian/nvim
@@ -137,8 +136,8 @@ hl.bind(
 )
 
 -- close windows
-hl.bind(mainMod .. " + C", hl.dsp.window.close(), { submap_universal = true })
-hl.bind(mainMod .. " + CTRL + C", hl.dsp.window.kill(), { submap_universal = true }) -- for when a window is not responding
+hl.bind(mainMod .. " + D", hl.dsp.window.close(), { submap_universal = true })
+hl.bind(mainMod .. " + SHIFT + D", hl.dsp.window.kill(), { submap_universal = true }) -- for when a window is not responding
 
 hl.bind(mainMod .. " + F", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + M", hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" })) -- Maximize window
@@ -157,13 +156,42 @@ hl.bind(
 	)
 )
 
+-- Group windows
+hl.bind(mainMod .. " + ALT + L", hl.dsp.group.next())
+hl.bind(mainMod .. " + ALT + H", hl.dsp.group.prev())
+
+hl.bind(mainMod .. " + G", hl.dsp.submap("GROUP"))
+hl.define_submap("GROUP", function()
+	hl.bind("G", hl.dsp.group.toggle(), { ignore_mods = true })
+	hl.bind("G", hl.dsp.submap("reset"), { ignore_mods = true })
+
+	hl.bind("ALT + L", hl.dsp.group.next())
+	hl.bind("ALT + H", hl.dsp.group.prev())
+
+	hl.bind("SHIFT + H", hl.dsp.window.move({ direction = "left", group_aware = true }))
+	hl.bind("SHIFT + L", hl.dsp.window.move({ direction = "right", group_aware = true }))
+	hl.bind("SHIFT + K", hl.dsp.window.move({ direction = "up", group_aware = true }))
+	hl.bind("SHIFT + J", hl.dsp.window.move({ direction = "down", group_aware = true }))
+
+	hl.bind("SHIFT + H", hl.dsp.submap("reset"))
+	hl.bind("SHIFT + L", hl.dsp.submap("reset"))
+	hl.bind("SHIFT + K", hl.dsp.submap("reset"))
+	hl.bind("SHIFT + J", hl.dsp.submap("reset"))
+
+	hl.bind("L", hl.dsp.group.lock_active())
+	hl.bind("L", hl.dsp.submap("reset"))
+
+	-- returns to the global submap
+	hl.bind("Escape", hl.dsp.submap("reset"))
+end)
+
 -- Rofi
 hl.bind(
 	"ALT + SPACE",
 	hl.dsp.exec_cmd("pkill rofi || rofi -show drun -icon-theme candy-icons"),
 	{ submap_universal = true }
 )
-hl.bind("ALT + TAB", hl.dsp.exec_cmd("pkill rofi || rofi -show window"), { submap_universal = true })
+hl.bind("ALT + CTRL + TAB", hl.dsp.exec_cmd("pkill rofi || rofi -show window"), { submap_universal = true })
 hl.bind(
 	mainMod .. " + EQUAL",
 	hl.dsp.exec_cmd(
@@ -173,16 +201,14 @@ hl.bind(
 hl.bind(
 	mainMod .. " + V",
 	hl.dsp.exec_cmd(
-		"pkill rofi || rofi -modi clipboard:"
-			.. os.getenv("HOME")
-			.. "/.config/hypr/scripts/clipvault-rofi -show clipboard -show-icons -config "
-			.. os.getenv("HOME")
-			.. "/.config/rofi/clipboard.rasi"
+		"pkill clipse || "
+			.. hyprscripts
+			.. '/open-and-focus "kitty -1 --instance-group=tui --class clipse clipse" "clipse"'
 	)
 )
 hl.bind(
 	mainMod .. " + W",
-	hl.dsp.exec_cmd("pkill rofi || nice -n 19 " .. os.getenv("HOME") .. "/.config/hypr/scripts/wp-selector")
+	hl.dsp.exec_cmd("pkill rofi || nice -n 19 ionice -c 3 " .. os.getenv("HOME") .. "/.config/hypr/scripts/wp-selector")
 ) -- launch with low priority to avoid CPU spikes
 hl.bind(mainMod .. " + U", hl.dsp.exec_cmd("pkill rofi || " .. hyprscripts .. "/rofi-rbw"))
 hl.bind(
@@ -257,8 +283,19 @@ hl.bind(
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true, submap_universal = true })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true, submap_universal = true })
 
+-- resize window to percentage of monitor
+hl.bind(mainMod .. " + CTRL + 1", hl.dsp.exec_cmd(hyprscripts .. "/mvrsw resize-percent 10"))
+hl.bind(mainMod .. " + CTRL + 2", hl.dsp.exec_cmd(hyprscripts .. "/mvrsw resize-percent 20"))
+hl.bind(mainMod .. " + CTRL + 3", hl.dsp.exec_cmd(hyprscripts .. "/mvrsw resize-percent 30"))
+hl.bind(mainMod .. " + CTRL + 4", hl.dsp.exec_cmd(hyprscripts .. "/mvrsw resize-percent 40"))
+hl.bind(mainMod .. " + CTRL + 5", hl.dsp.exec_cmd(hyprscripts .. "/mvrsw resize-percent 50"))
+hl.bind(mainMod .. " + CTRL + 6", hl.dsp.exec_cmd(hyprscripts .. "/mvrsw resize-percent 60"))
+hl.bind(mainMod .. " + CTRL + 7", hl.dsp.exec_cmd(hyprscripts .. "/mvrsw resize-percent 70"))
+hl.bind(mainMod .. " + CTRL + 8", hl.dsp.exec_cmd(hyprscripts .. "/mvrsw resize-percent 80"))
+hl.bind(mainMod .. " + CTRL + 9", hl.dsp.exec_cmd(hyprscripts .. "/mvrsw resize-percent 90"))
+hl.bind(mainMod .. " + CTRL + 0", hl.dsp.exec_cmd(hyprscripts .. "/mvrsw resize-percent 100"))
+
 -- Switch workspaces with mainMod + [0-9]
--- Will always try to switch to a tiling window after switching workspace
 for i = 1, 10 do
 	local key = (i == 10) and "0" or tostring(i)
 	hl.bind(
@@ -287,12 +324,12 @@ hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "e+1" }))
 -- Laptop multimedia keys for volume and LCD brightness
 hl.bind(
 	"XF86AudioRaiseVolume",
-	hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"),
+	hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 2.5%+"),
 	{ repeating = true, locked = true, submap_universal = true }
 )
 hl.bind(
 	"XF86AudioLowerVolume",
-	hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),
+	hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 2.5%-"),
 	{ repeating = true, locked = true, submap_universal = true }
 )
 hl.bind(
@@ -322,10 +359,6 @@ hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = tr
 hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true, submap_universal = true })
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true, submap_universal = true })
 
--- Scrolling layout for hyprscrolling plugin
-hl.bind(mainMod .. " + RIGHT", hl.dsp.layout("move +col"))
-hl.bind(mainMod .. " + LEFT", hl.dsp.layout("move -col"))
-
 ----------------------------------------------------------------
 -- SUBMAPS
 ----------------------------------------------------------------
@@ -340,46 +373,73 @@ hl.bind(
 ----- "MOUSE" submap: keyboard-driven mouse control (used with wl-kbptr / ydotool)
 hl.bind(mainMod .. " + I", hl.dsp.exec_cmd(hyprscripts .. "/submap-handling MOUSE"), { submap_universal = true })
 
+-- change repeat delay and rate when entering the MOUSE submap
+-- and then change back when exiting
+local current_delay = hl.get_config("input.repeat_delay")
+local current_rate = hl.get_config("input.repeat_rate")
+hl.on("keybinds.submap", function(submap_name)
+	if submap_name == "MOUSE" then
+		-- Switched INTO the MOUSE submap: speed things up
+		hl.config({
+			input = {
+				repeat_delay = 100,
+				repeat_rate = 40,
+			},
+		})
+	elseif submap_name == "" then
+		-- Returned to the default/normal state: restore regular speed
+		hl.config({
+			input = {
+				repeat_delay = current_delay,
+				repeat_rate = current_rate,
+			},
+		})
+	end
+end)
+
 hl.define_submap("MOUSE", function()
 	-- reset submap, call wl-kbptr, then enable MOUSE submap again
 	-- f as in find
-	hl.bind(
-		"F",
-		hl.dsp.exec_cmd(
-			"hyprctl dispatch submap reset && wl-kbptr && hyprctl dispatch submap MOUSE && ydotool mousemove -x -1 -y 0 && ydotool mousemove -x +1 -y 0"
-		),
-		{ ignore_mods = true }
-	)
+	hl.bind("F", function()
+		hl.dispatch(hl.dsp.submap("reset"))
+		hl.dispatch(
+			hl.dsp.exec_cmd(
+				"wl-kbptr && hyprctl dispatch \"hl.dsp.submap('MOUSE')\" && ydotool mousemove -x -1 -y 0 && ydotool mousemove -x +1 -y 0 "
+			)
+		)
+	end, { ignore_mods = true })
+
 	-- g as in go-to
-	hl.bind(
-		"G",
-		hl.dsp.exec_cmd(
-			"hyprctl dispatch submap reset && wl-kbptr -o modes=tile && hyprctl dispatch submap MOUSE && ydotool mousemove -x -1 -y 0 && ydotool mousemove -x +1 -y 0"
-		),
-		{ ignore_mods = true }
-	)
+	hl.bind("G", function()
+		hl.dispatch(hl.dsp.submap("reset"))
+		hl.dispatch(
+			hl.dsp.exec_cmd(
+				"wl-kbptr -o modes=tile && hyprctl dispatch \"hl.dsp.submap('MOUSE')\" && ydotool mousemove -x -1 -y 0 && ydotool mousemove -x +1 -y 0 "
+			)
+		)
+	end, { ignore_mods = true })
 	-- the trailing mouse-move nudge works around wl-kbptr's mousemove being a bit buggy
 
 	-- move mouse
 	hl.bind(
 		"H",
 		hl.dsp.exec_cmd("ydotool mousemove -x -10 -y 0"),
-		{ ignore_mods = true, repeating = true, transparent = true }
+		{ ignore_mods = false, repeating = true, transparent = true }
 	)
 	hl.bind(
 		"J",
 		hl.dsp.exec_cmd("ydotool mousemove -x 0 -y +10"),
-		{ ignore_mods = true, repeating = true, transparent = true }
+		{ ignore_mods = false, repeating = true, transparent = true }
 	)
 	hl.bind(
 		"K",
 		hl.dsp.exec_cmd("ydotool mousemove -x 0 -y -10"),
-		{ ignore_mods = true, repeating = true, transparent = true }
+		{ ignore_mods = false, repeating = true, transparent = true }
 	)
 	hl.bind(
 		"L",
 		hl.dsp.exec_cmd("ydotool mousemove -x +10 -y 0"),
-		{ ignore_mods = true, repeating = true, transparent = true }
+		{ ignore_mods = false, repeating = true, transparent = true }
 	)
 
 	hl.bind(
@@ -400,10 +460,26 @@ hl.define_submap("MOUSE", function()
 	hl.bind("apostrophe", hl.dsp.exec_cmd(hyprscripts .. "/mark-cursor move"), { ignore_mods = true })
 
 	-- move further
-	hl.bind("SHIFT + H", hl.dsp.exec_cmd("ydotool mousemove -x -100 -y 0"), { repeating = true })
-	hl.bind("SHIFT + J", hl.dsp.exec_cmd("ydotool mousemove -x 0 -y +100"), { repeating = true })
-	hl.bind("SHIFT + K", hl.dsp.exec_cmd("ydotool mousemove -x 0 -y -100"), { repeating = true })
-	hl.bind("SHIFT + L", hl.dsp.exec_cmd("ydotool mousemove -x +100 -y 0"), { repeating = true })
+	hl.bind(
+		"SHIFT + H",
+		hl.dsp.exec_cmd("ydotool mousemove -x -100 -y 0"),
+		{ repeating = true, non_consuming = false, ignore_mods = false }
+	)
+	hl.bind(
+		"SHIFT + J",
+		hl.dsp.exec_cmd("ydotool mousemove -x 0 -y +100"),
+		{ repeating = true, non_consuming = false, ignore_mods = false }
+	)
+	hl.bind(
+		"SHIFT + K",
+		hl.dsp.exec_cmd("ydotool mousemove -x 0 -y -100"),
+		{ repeating = true, non_consuming = false, ignore_mods = false }
+	)
+	hl.bind(
+		"SHIFT + L",
+		hl.dsp.exec_cmd("ydotool mousemove -x +100 -y 0"),
+		{ repeating = true, non_consuming = false, ignore_mods = false }
+	)
 
 	-- move closer
 	hl.bind("CTRL + H", hl.dsp.exec_cmd("ydotool mousemove -x -1 -y 0"), { repeating = true })
@@ -416,6 +492,7 @@ hl.define_submap("MOUSE", function()
 	-- scrolling behaves like scroll-while-holding-ALT rather than a clean scroll-down), by
 	-- using a genuine submap switch instead of a modifier.
 	hl.bind("TAB", hl.dsp.submap("SCROL"), { ignore_mods = true, transparent = true })
+	hl.bind("TAB", hl.dsp.submap("MOUSE"), { ignore_mods = true, release = true, transparent = true })
 
 	hl.define_submap("SCROL", function()
 		-- even with this workaround, these scrolling binds don't behave very well
@@ -428,43 +505,47 @@ hl.define_submap("MOUSE", function()
 		hl.bind("U", hl.dsp.exec_cmd("ydotool mousemove -w -- 0 1000"), { repeating = true })
 
 		hl.bind("TAB", hl.dsp.submap("MOUSE"), { ignore_mods = true, release = true, transparent = true })
-
-		-- mouse clicks
-		-- to press with left hand
-		hl.bind("A", hl.dsp.exec_cmd("ydotool click 40"))
-		hl.bind("A", hl.dsp.exec_cmd("ydotool click 80"), { release = true, transparent = true })
-		-- to press with right hand
-		hl.bind("B", hl.dsp.exec_cmd("ydotool click 40"))
-		hl.bind("B", hl.dsp.exec_cmd("ydotool click 80"), { release = true, transparent = true })
-		-- to press with thumb, or reset submap automatically
-		hl.bind(
-			"SPACE",
-			hl.dsp.exec_cmd("ydotool click C0 && ydotool mousemove -a 1920 0 && " .. hyprscripts .. "/submap-handling")
-		)
-		-- to toggle instead of having to hold
-		hl.bind("V", hl.dsp.exec_cmd("ydotool click 40"))
-		hl.bind("SHIFT + V", hl.dsp.exec_cmd("ydotool click 80"))
-		-- right click
-		hl.bind("D", hl.dsp.exec_cmd("ydotool click 41"))
-		hl.bind("D", hl.dsp.exec_cmd("ydotool click 81"), { release = true, transparent = true })
-		-- middle/scroll click
-		hl.bind("S", hl.dsp.exec_cmd("ydotool click 42"))
-		hl.bind("S", hl.dsp.exec_cmd("ydotool click 82"), { release = true, transparent = true })
-
-		-- resetting the mouse-downs, in case you forget to mouse-up manually before switching submaps
-		hl.bind("ESCAPE", hl.dsp.exec_cmd("ydotool click 80")) -- just in case you forget to mouse up
-		hl.bind("O", hl.dsp.exec_cmd("ydotool click 80"))
-		hl.bind("CTRL + SPACE", hl.dsp.exec_cmd("ydotool click 80"))
-
-		hl.bind("ESCAPE", hl.dsp.exec_cmd(hyprscripts .. "/submap-handling"))
-
-		-- returns to the MOUSE submap (classic `submap = reset` inside a nested submap)
-		hl.bind("Escape", hl.dsp.submap("MOUSE"))
 	end)
+
+	-- mouse clicks
+	-- to press with left hand
+	hl.bind("A", hl.dsp.exec_cmd("ydotool click 40"))
+	hl.bind("A", hl.dsp.exec_cmd("ydotool click 80"), { release = true, transparent = true })
+	-- to press with right hand
+	hl.bind("B", hl.dsp.exec_cmd("ydotool click 40"))
+	hl.bind("B", hl.dsp.exec_cmd("ydotool click 80"), { release = true, transparent = true })
+	-- to press with thumb, or reset submap automatically
+	hl.bind(
+		"SPACE",
+		hl.dsp.exec_cmd("ydotool click C0 && ydotool mousemove -a 1920 0 && " .. hyprscripts .. "/submap-handling")
+	)
+	-- to toggle instead of having to hold
+	hl.bind("V", hl.dsp.exec_cmd("ydotool click 40"))
+	hl.bind("SHIFT + V", hl.dsp.exec_cmd("ydotool click 80"))
+	-- right click
+	hl.bind("D", hl.dsp.exec_cmd("ydotool click 41"))
+	hl.bind("D", hl.dsp.exec_cmd("ydotool click 81"), { release = true, transparent = true })
+	-- middle/scroll click
+	hl.bind("S", hl.dsp.exec_cmd("ydotool click 42"))
+	hl.bind("S", hl.dsp.exec_cmd("ydotool click 82"), { release = true, transparent = true })
+
+	-- resetting the mouse-downs, in case you forget to mouse-up manually before switching submaps
+	hl.bind("ESCAPE", hl.dsp.exec_cmd("ydotool click 80")) -- just in case you forget to mouse up
+	hl.bind("O", hl.dsp.exec_cmd("ydotool click 80"))
+	hl.bind("CTRL + SPACE", hl.dsp.exec_cmd("ydotool click 80"))
+
+	hl.bind("ESCAPE", hl.dsp.exec_cmd(hyprscripts .. "/submap-handling"))
 end)
 
 ----- "PLCTL" submap: media player control
 hl.bind(mainMod .. " + ALT + P", hl.dsp.exec_cmd(hyprscripts .. "/submap-handling PLCTL"), { submap_universal = true })
+
+hl.on("keybinds.submap", function(submap_name)
+	if submap_name == "PLCTL" then
+		-- show which player selected when changing into the submap
+		hl.exec_cmd(hyprscripts .. "/plctl which")
+	end
+end)
 
 hl.define_submap("PLCTL", function()
 	hl.bind("H", hl.dsp.exec_cmd(hyprscripts .. "/plctl h"), { repeating = true })
@@ -490,7 +571,7 @@ hl.define_submap("PLCTL", function()
 	end
 
 	-- returns to the global submap
-	hl.bind("Escape", hl.dsp.submap("reset"))
+	hl.bind("ESCAPE", hl.dsp.exec_cmd(hyprscripts .. "/submap-handling"))
 end)
 
 ----- "MVRSW" submap: move/resize-window
@@ -533,7 +614,17 @@ hl.define_submap("MVRSW", function()
 	hl.bind("CTRL + K", hl.dsp.window.resize({ x = 0, y = -20, relative = true }), { repeating = true })
 	hl.bind("CTRL + L", hl.dsp.window.resize({ x = 20, y = 0, relative = true }), { repeating = true })
 
-	-- hl.bind("1", hl.dsp.exec_cmd(hyprscripts .. "/mvrsw "))
+	-- resize window to percentage of monitor
+	hl.bind("CTRL + 1", hl.dsp.exec_cmd(hyprscripts .. "/mvrsw resize-percent 10"))
+	hl.bind("CTRL + 2", hl.dsp.exec_cmd(hyprscripts .. "/mvrsw resize-percent 20"))
+	hl.bind("CTRL + 3", hl.dsp.exec_cmd(hyprscripts .. "/mvrsw resize-percent 30"))
+	hl.bind("CTRL + 4", hl.dsp.exec_cmd(hyprscripts .. "/mvrsw resize-percent 40"))
+	hl.bind("CTRL + 5", hl.dsp.exec_cmd(hyprscripts .. "/mvrsw resize-percent 50"))
+	hl.bind("CTRL + 6", hl.dsp.exec_cmd(hyprscripts .. "/mvrsw resize-percent 60"))
+	hl.bind("CTRL + 7", hl.dsp.exec_cmd(hyprscripts .. "/mvrsw resize-percent 70"))
+	hl.bind("CTRL + 8", hl.dsp.exec_cmd(hyprscripts .. "/mvrsw resize-percent 80"))
+	hl.bind("CTRL + 9", hl.dsp.exec_cmd(hyprscripts .. "/mvrsw resize-percent 90"))
+	hl.bind("CTRL + 0", hl.dsp.exec_cmd(hyprscripts .. "/mvrsw resize-percent 100"))
 
 	-- move in same place (resize from one edge while moving to compensate)
 	hl.bind("CTRL + SHIFT + H", hl.dsp.window.resize({ x = -50, y = 0, relative = true }), { repeating = true })
@@ -554,83 +645,292 @@ hl.define_submap("MVRSW", function()
 	end
 
 	-- returns to the global submap
+	hl.bind("ESCAPE", hl.dsp.exec_cmd(hyprscripts .. "/submap-handling"))
+end)
+
+-- obs shortcuts
+hl.bind(mainMod .. " + R", hl.dsp.submap("OBS-R"))
+hl.define_submap("OBS-R", function()
+	hl.bind("SPACE", hl.dsp.exec_cmd("obs-cmd recording toggle"), { ignore_mods = true })
+	hl.bind("SPACE", hl.dsp.submap("reset"), { ignore_mods = true })
+
+	hl.bind("P", hl.dsp.exec_cmd("obs-cmd recording toggle-pause"), { ignore_mods = true })
+	hl.bind("P", hl.dsp.submap("reset"), { ignore_mods = true })
+
+	-- returns to the global submap
 	hl.bind("Escape", hl.dsp.submap("reset"))
 end)
 
------------------------------ DYNAMIC SUBMAP -----------------------------
-hl.bind(
-	"ALT_L",
-	hl.dsp.exec_cmd(hyprscripts .. "/dynamic-submaps"),
-	{ ignore_mods = true, transparent = true, non_consuming = true }
-)
+----------------------------- DYNAMIC BINDS -----------------------------
+local dynamic_classes = {
+	zen = true,
+	vesktop = true,
+	["discord-canary"] = true,
+	["Mullvad Browser"] = true,
+	["brave-browser"] = true,
+	steam = true,
+	firefox = true,
+}
 
-hl.define_submap("DYNAM", function()
-	-- ydotool doesn't work well here (and neither does wlrctl, since it lacks arrow keys),
-	-- so this uses the native sendshortcut dispatcher instead.
+local dynamic_bindings = {
+	"ALT + H",
+	"ALT + J",
+	"ALT + K",
+	"ALT + L",
+
+	"ALT + W",
+	"ALT + B",
+	"ALT + E",
+	"ALT + D",
+	"ALT + X",
+
+	"ALT + 0",
+	"ALT + I",
+	"ALT + SHIFT + 4",
+	"ALT + A",
+
+	"ALT + SHIFT + J",
+	"ALT + SHIFT + K",
+}
+
+local function unbind_dynamic()
+	for _, key in ipairs(dynamic_bindings) do
+		hl.unbind(key)
+	end
+end
+
+local function bind_dynamic()
+	-- Vim-style cursor movement
 	hl.bind("ALT + H", hl.dsp.send_shortcut({ mods = "", key = "LEFT", window = "activewindow" }), { repeating = true })
+
 	hl.bind("ALT + J", hl.dsp.send_shortcut({ mods = "", key = "DOWN", window = "activewindow" }), { repeating = true })
+
 	hl.bind("ALT + K", hl.dsp.send_shortcut({ mods = "", key = "UP", window = "activewindow" }), { repeating = true })
+
 	hl.bind(
 		"ALT + L",
 		hl.dsp.send_shortcut({ mods = "", key = "RIGHT", window = "activewindow" }),
 		{ repeating = true }
 	)
 
+	-- Word movement
 	hl.bind("ALT + W", function()
-		hl.dispatch(hl.dsp.send_shortcut({ mods = "CTRL", key = "RIGHT", window = "activewindow" }))
-		hl.dispatch(hl.dsp.send_shortcut({ mods = "CTRL", key = "RIGHT", window = "activewindow" }))
-		hl.dispatch(hl.dsp.send_shortcut({ mods = "CTRL", key = "LEFT", window = "activewindow" }))
+		hl.dispatch(hl.dsp.send_shortcut({
+			mods = "CTRL",
+			key = "RIGHT",
+			window = "activewindow",
+		}))
+		hl.dispatch(hl.dsp.send_shortcut({
+			mods = "CTRL",
+			key = "RIGHT",
+			window = "activewindow",
+		}))
+		hl.dispatch(hl.dsp.send_shortcut({
+			mods = "CTRL",
+			key = "LEFT",
+			window = "activewindow",
+		}))
 	end, { repeating = true })
+
 	hl.bind(
 		"ALT + B",
-		hl.dsp.send_shortcut({ mods = "CTRL", key = "LEFT", window = "activewindow" }),
+		hl.dsp.send_shortcut({
+			mods = "CTRL",
+			key = "LEFT",
+			window = "activewindow",
+		}),
 		{ repeating = true }
 	)
+
 	hl.bind(
 		"ALT + E",
-		hl.dsp.send_shortcut({ mods = "CTRL", key = "RIGHT", window = "activewindow" }),
+		hl.dsp.send_shortcut({
+			mods = "CTRL",
+			key = "RIGHT",
+			window = "activewindow",
+		}),
 		{ repeating = true }
 	)
+
 	hl.bind(
 		"ALT + D",
-		hl.dsp.send_shortcut({ mods = "CTRL", key = "Delete", window = "activewindow" }),
+		hl.dsp.send_shortcut({
+			mods = "CTRL",
+			key = "Delete",
+			window = "activewindow",
+		}),
 		{ repeating = true }
 	)
+
 	hl.bind(
 		"ALT + X",
-		hl.dsp.send_shortcut({ mods = "", key = "Delete", window = "activewindow" }),
+		hl.dsp.send_shortcut({
+			mods = "",
+			key = "Delete",
+			window = "activewindow",
+		}),
 		{ repeating = true }
 	)
 
-	hl.bind("ALT + 0", hl.dsp.send_shortcut({ mods = "", key = "Home", window = "activewindow" }), { repeating = true })
+	-- Beginning / end of line
 	hl.bind(
-		"ALT + SHIFT + I",
-		hl.dsp.send_shortcut({ mods = "", key = "Home", window = "activewindow" }),
+		"ALT + 0",
+		hl.dsp.send_shortcut({
+			mods = "",
+			key = "Home",
+			window = "activewindow",
+		}),
 		{ repeating = true }
 	)
+
+	hl.bind(
+		"ALT + I",
+		hl.dsp.send_shortcut({
+			mods = "",
+			key = "Home",
+			window = "activewindow",
+		}),
+		{ repeating = true }
+	)
+
 	hl.bind(
 		"ALT + SHIFT + 4",
-		hl.dsp.send_shortcut({ mods = "", key = "End", window = "activewindow" }),
-		{ repeating = true }
-	)
-	hl.bind(
-		"ALT + SHIFT + A",
-		hl.dsp.send_shortcut({ mods = "", key = "End", window = "activewindow" }),
+		hl.dsp.send_shortcut({
+			mods = "",
+			key = "End",
+			window = "activewindow",
+		}),
 		{ repeating = true }
 	)
 
-	-- for switching tabs in a browser (Vimium doesn't work on protected pages)
+	hl.bind(
+		"ALT + A",
+		hl.dsp.send_shortcut({
+			mods = "",
+			key = "End",
+			window = "activewindow",
+		}),
+		{ repeating = true }
+	)
+
+	-- Browser tabs
 	hl.bind(
 		"ALT + SHIFT + J",
-		hl.dsp.send_shortcut({ mods = "CTRL", key = "Page_Down", window = "activewindow" }),
-		{ repeating = true }
-	)
-	hl.bind(
-		"ALT + SHIFT + K",
-		hl.dsp.send_shortcut({ mods = "CTRL", key = "Page_Up", window = "activewindow" }),
+		hl.dsp.send_shortcut({
+			mods = "CTRL",
+			key = "Page_Down",
+			window = "activewindow",
+		}),
 		{ repeating = true }
 	)
 
-	-- use "reset" to go back to the global submap
-	hl.bind("ALT_L", hl.dsp.submap("reset"), { ignore_mods = true, release = true, transparent = true })
+	hl.bind(
+		"ALT + SHIFT + K",
+		hl.dsp.send_shortcut({
+			mods = "CTRL",
+			key = "Page_Up",
+			window = "activewindow",
+		}),
+		{ repeating = true }
+	)
+end
+
+local function update_dynamic_binds(window)
+	-- Always remove the previous set first.
+	unbind_dynamic()
+
+	-- Only install the binds for our special applications.
+	if window ~= nil and dynamic_classes[window.class] then
+		bind_dynamic()
+	end
+end
+
+-- Update whenever the active window changes.
+hl.on("window.active", function(window)
+	update_dynamic_binds(window)
+end)
+
+-- Set the correct state when the Lua config is initially loaded.
+update_dynamic_binds(hl.get_active_window())
+
+----------------------------- DYNAMIC ALT INDICATOR -----------------------------
+local hypr_theme = os.getenv("HOME") .. "/.config/theme/generated/hyprland.lua"
+local hypr_theme = require(hypr_theme)
+
+local alt_down = false
+local alt_indicator_active = false
+
+local function dynamic_context_active()
+	local window = hl.get_active_window()
+
+	if window == nil then
+		return false
+	end
+
+	return dynamic_classes[window.class] == true
+end
+
+local function set_alt_indicator(active)
+	if active == alt_indicator_active then
+		return
+	end
+
+	alt_indicator_active = active
+
+	if active then
+		hl.config({
+			general = {
+				col = {
+					active_border = {
+						colors = { hypr_theme.colors.border_alt },
+					},
+				},
+			},
+		})
+		hl.window_rule({ match = { fullscreen = true }, border_color = hypr_theme.colors.border_alt })
+		hl.window_rule({ match = { pin = true }, border_color = hypr_theme.colors.border_alt })
+	else
+		hl.config({
+			general = {
+				col = {
+					active_border = {
+						colors = { hypr_theme.colors.border, hypr_theme.colors.border_animation },
+						angle = 45,
+					},
+				},
+			},
+		})
+		hl.window_rule({ match = { fullscreen = true }, border_color = hypr_theme.colors.border_maximized })
+		hl.window_rule({ match = { pin = true }, border_color = hypr_theme.colors.border_pin })
+	end
+end
+
+-- Alt pressed.
+-- transparent = true is important here: it allows Alt to continue
+-- behaving normally while we use the bind only as an indicator.
+hl.bind("ALT_L", function()
+	if dynamic_context_active() then
+		set_alt_indicator(true)
+	end
+end, { transparent = true })
+
+-- Alt released.
+-- The modifier is included in the bind so Hyprland recognizes this
+-- as the release of the Alt modifier itself.
+hl.bind("ALT + ALT_L", function()
+	set_alt_indicator(false)
+end, {
+	release = true,
+	transparent = true,
+	ignore_mods = true,
+})
+
+-- If the focused window changes while Alt is held, update the
+-- indicator to match the new context.
+hl.on("window.active", function()
+	if alt_down then
+		set_alt_indicator(dynamic_context_active())
+	else
+		set_alt_indicator(false)
+	end
 end)

@@ -6,10 +6,6 @@ vim.g.mapleader = " "
 -- Use <Esc> to exit terminal mode
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")
 
--- Enable line wrapping
-vim.opt.wrap = true
-vim.opt.linebreak = true
-
 -- Move by visual lines instead of physical lines
 vim.keymap.set("n", "j", "gj")
 vim.keymap.set("n", "k", "gk")
@@ -18,14 +14,28 @@ vim.keymap.set("n", "k", "gk")
 vim.keymap.set("n", "gO", "O<Esc>")
 vim.keymap.set("n", "go", "o<Esc>")
 
+-- move between splits
 vim.keymap.set({ "n" }, "H", "<C-w>h")
 vim.keymap.set({ "n" }, "J", "<C-w>j")
 vim.keymap.set({ "n" }, "K", "<C-w>k")
 vim.keymap.set({ "n" }, "L", "<C-w>l")
 
 -- Window management
-vim.keymap.set("n", "<leader>sv", "<C-w>v", { desc = "Split window vertically" })
-vim.keymap.set("n", "<leader>sh", "<C-w>s", { desc = "Split window horizontally" })
+-- Split right
+vim.keymap.set("n", "<leader>sl", "<C-w>v", { desc = "Split window right" })
+
+-- Split left
+vim.keymap.set("n", "<leader>sh", function()
+	vim.cmd("leftabove vsplit")
+end, { desc = "Split window left" })
+
+-- Split below
+vim.keymap.set("n", "<leader>sj", "<C-w>s", { desc = "Split window below" })
+
+-- Split above
+vim.keymap.set("n", "<leader>sk", function()
+	vim.cmd("leftabove split")
+end, { desc = "Split window above" })
 
 vim.keymap.set(
 	"n",
@@ -56,10 +66,6 @@ vim.keymap.set("n", "<leader>tl", "<cmd>tabn<CR>", { desc = "Go to next tab" })
 vim.keymap.set("n", "<leader>th", "<cmd>tabp<CR>", { desc = "Go to previous tab" })
 vim.keymap.set("n", "<leader>tp", "g<Tab>", { desc = "Go to previously visited tab" })
 
-vim.keymap.set("n", "<A-l>", "<cmd>bnext<CR>", { desc = "Cycle to next buffer" })
-vim.keymap.set("n", "<A-h>", "<cmd>bprev<CR>", { desc = "Cycle to previous buffer" })
-vim.keymap.set("n", "<A-x>", "<cmd>bd<CR>", { desc = "Delete current buffer" })
-
 -- Better navigation in insert mode
 vim.keymap.set("i", "<a-h>", "<Left>")
 vim.keymap.set("i", "<a-j>", "<Down>")
@@ -74,11 +80,39 @@ vim.keymap.set("i", "<a-d>", "<Right><Esc>cw")
 
 vim.keymap.set("i", "<a-0>", "<Home>")
 vim.keymap.set("i", "<a-$>", "<End>")
+vim.keymap.set("i", "<a-i>", "<Home>")
+vim.keymap.set("i", "<a-a>", "<End>")
 
-vim.keymap.set("i", "<C-BS>", "<Esc>ciw")
+vim.keymap.set("i", "<C-BS>", "<C-w>")
 
 -- Select all with Ctrl-a
 vim.keymap.set("n", "<C-a>", "ggVG", { desc = "Select all" })
 
 -- Keep cursor in place after yanking in visual mode
 vim.keymap.set("v", "y", "ygv<Esc>")
+
+-- Keep cursor and selection after pasting in visual mode
+vim.keymap.set("v", "p", "pgv")
+
+-- Don't end of line in blank character when in visual mode
+-- vim.keymap.set("v", "$", "$h")
+
+-- swap ' and ` just cause it's easier on ABNT keyboard
+vim.keymap.set("n", "'", "`")
+
+vim.keymap.set(
+	"v",
+	"<C-r>",
+	[["hy:%s/<C-r>=escape(@h, '/\.')<CR>//gc<Left><Left><Left>]],
+	{ desc = "Search and replace visual selection" }
+)
+
+-- Jump to next/previous misspelled word
+vim.keymap.set("n", "<Leader>sn", "]s", { desc = "Next misspelled word" })
+vim.keymap.set("n", "<Leader>sp", "[s", { desc = "Previous misspelled word" })
+
+-- Fix the word under cursor (opens the suggestion list)
+vim.keymap.set("n", "<Leader>ss", "z=", { desc = "Fix misspelled word" })
+
+-- Add word to personal dictionary ("spell good")
+vim.keymap.set("n", "<Leader>sg", "zg", { desc = "Add word to dictionary" })

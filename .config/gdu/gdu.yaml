@@ -1,38 +1,45 @@
 style:
   footer:
-    text-color: white
-    background-color: transparent
-    number-color: red
+    text-color: '#616a94'
+    background-color: '#161626'
+    number-color: '#cc00fc'
   selected-row:
-    text-color: ""
-    background-color: "#690086"
+    text-color: '#ffffff'
+    background-color: '#290355'
+  marked:
+    text-color: '#e0af68'
+    background-color: '#490375'
   result-row:
-    number-color: purple
-    directory-color: blue
+    number-color: '#8500bc'
+    directory-color: '#303aff'
   header:
-    text-color: white
-    background-color: transparent
+    text-color: '#616a94'
+    background-color: '#161626'
     hidden: false
   progress-modal:
     current-item-path-max-len: 0
-  use-old-size-bar: true
-
+    show-disk-progress-bar: true
+  use-old-size-bar: false
+  show-bar-percentage: false
 sorting:
-  by: ""
-  order: ""
+  by: ''
+  order: ''
 log-file: /dev/null
-input-file: ""
-output-file: ""
-ignore-from-file: ""
-storage-path: /tmp/badger
+input-file: ''
+output-file: ''
+output-attrs: ''
+ignore-from-file: ''
 ignore-dirs:
-  - /proc
-  - /dev
-  - /sys
-  - /run
+- /proc
+- /dev
+- /sys
+- /run
 ignore-dir-patterns: []
+type: []
+exclude-type: []
 max-cores: 12
 top: 0
+depth: 0
 sequential-scanning: false
 show-apparent-size: false
 show-relative-size: false
@@ -42,21 +49,36 @@ show-mtime: false
 no-color: false
 mouse: false
 non-interactive: false
+interactive: false
 no-progress: false
 no-unicode: false
 no-cross: false
 no-hidden: false
 no-delete: false
+no-view-file: false
 no-spawn-shell: false
-follow-symlinks: true
+no-confirm-quit: false
+follow-symlinks: false
 profiling: false
-const-gc: false
-use-storage: false
 read-from-storage: false
+db: ''
 summarize: false
 use-si-prefix: false
 no-prefix: false
+show-in-kib: false
 reverse-sort: false
 change-cwd: false
 delete-in-background: false
 delete-in-parallel: false
+since: ''
+until: ''
+max-age: ''
+min-age: ''
+archive-browsing: false
+collapse-path: false
+show-symlink-target: true
+browse-parent-dirs: false
+web:
+  listen: ''
+  open-browser: true
+  browser: ''

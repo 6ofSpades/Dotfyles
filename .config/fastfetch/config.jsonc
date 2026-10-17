@@ -3,20 +3,27 @@
   "logo": {
     "padding": {
       "top": 2
-    }
+    },
+    "color": {
+      "1": "#303aff",
+      "2": "#303aff"
+    },
+    "source": "~/.config/fastfetch/logos/tarot-sun-moon.txt"
   },
   "display": {
-    "separator": "",
+    "separator": " \u2192 ",
     "color": {
-      "keys": "red",
-      "title": "red"
+      "title": "#cc00fc",
+      "keys": "#8500bc",
+      "separator": "#414a74",
+      "output": "#c0caf5"
     },
     "percent": {
-      "type": 2,         // 1=number, 2=bar, 3=both, 9=colored number
+      "type": 2,
       "color": {
-          "green": "green",
-          "yellow": "blue",
-          "red": "magenta"
+        "green": "#00ffff",
+        "yellow": "#303aff",
+        "red": "#8500bc"
       }
     }
   },
@@ -25,127 +32,91 @@
       "type": "break"
     },
     {
+      "type": "title",
       "color": {
-        "host": "magenta",
-        "user": "magenta"
-      },
-      "keyColor": "magenta",
-      "type": "title"
-    },
-    {
-      "format": " ",
-      "key": "────── OS Info ──────",
-      "keyColor": "blue",
-      "type": "custom"
-    },
-    
-    {
-      "key": "  -> ",
-      "keyColor": "magenta",
-      "type": "os"
-    }, {
-      "key": "  -> ",
-      "keyColor": "magenta",
-      "type": "kernel"
-    },
-    {
-      "key": "  -> ",
-      "keyColor": "magenta",
-      "type": "packages"
-    },
-    {
-      "key": "  -> ",
-      "keyColor": "magenta",
-      "type": "shell"
-    },
-    // {
-    //   "format": " ",
-    //   "key": "────── Software Info ──────",
-    //   "keyColor": "blue",
-    //   "type": "custom"
-    // },
-    {
-      "key": "  -> ",
-      "keyColor": "magenta",
-      "type": "wm"
-    },
-    {
-      "key": "  -> ",
-      "keyColor": "magenta",
-      "type": "terminal"
-    },
-    {
-      "key": "  -> ",
-      "keyColor": "magenta",
-      "type": "terminalfont"
-    },
-    // {
-    //   "key": "  -> ",
-    //   "keyColor": "magenta",
-    //   "type": "font"
-    // },
-    {
-      "format": " ",
-      "key": "────── Hardware Info ──────",
-      "keyColor": "blue",
-      "type": "custom"
-    },
-    {
-      "key": " 󰍹 -> ",
-      "keyColor": "magenta",
-      "type": "display"
-    },
-    {
-      "key": "  -> ",
-      "keyColor": "magenta",
-      "type": "cpu"
-    },
-    {
-      "key": "  -> ",
-      "keyColor": "magenta",
-      "type": "gpu"
-    },
-    {
-      "key": "  -> ",
-      "keyColor": "magenta",
-      "type": "memory",
-      "percent": {
-          // "type": 2     // Show both percentage number and bar
+        "user": "#8500bc",
+        "at": "#00ffff",
+        "host": "#8500bc"
       }
     },
     {
-      "key": "  -> ",
-      "keyColor": "magenta",
-      "type": "disk"
+      "type": "custom",
+      "format": "\u2500\u2500\u2500\u2500\u2500\u2500 OS Info \u2500\u2500\u2500\u2500\u2500\u2500",
+      "outputColor": "#303aff"
     },
     {
-      "format": " ",
-      // "key": "────── Misc Info ──────",
+      "type": "os",
+      "key": " \uf303 "
+    },
+    {
+      "type": "kernel",
+      "key": " \uebc6 "
+    },
+    {
+      "type": "packages",
+      "key": " \uf487 "
+    },
+    {
+      "type": "shell",
+      "key": " \uf120 "
+    },
+    {
+      "type": "wm",
+      "key": " \uf488 "
+    },
+    {
+      "type": "terminal",
+      "key": " \uf489 "
+    },
+    {
+      "type": "terminalfont",
+      "key": " \uf031 "
+    },
+    {
+      "type": "custom",
+      "format": "\u2500\u2500\u2500\u2500\u2500\u2500 Hardware Info \u2500\u2500\u2500\u2500\u2500\u2500",
+      "outputColor": "#303aff"
+    },
+    {
+      "type": "display",
+      "key": " \udb80\udf79 "
+    },
+    {
+      "type": "cpu",
+      "key": " \uf4bc "
+    },
+    {
+      "type": "gpu",
+      "key": " \uf4bc "
+    },
+    {
+      "type": "memory",
+      "key": " \uefc5 "
+    },
+    {
+      "type": "disk",
+      "key": " \uf0a0 "
+    },
+    {
+      "type": "custom",
       "key": " ",
-      "keyColor": "blue",
-      "type": "custom"
+      "format": " "
     },
     {
-      "key": "  -> ",
-      "keyColor": "magenta",
-      "type": "localip"
+      "type": "localip",
+      "key": " \uef09 "
     },
     {
-      "key": "  -> ",
-      "keyColor": "magenta",
-      "type": "uptime"
+      "type": "uptime",
+      "key": " \uf017 "
     },
     {
-      "format": " ",
-      "key": " ",
-      "keyColor": "blue",
-      "type": "custom"
+      "type": "break"
     },
     {
-      "key": " \u001b[90m   \u001b[31m   \u001b[32m   \u001b[33m   \u001b[34m   \u001b[35m   \u001b[36m   \u001b[37m ",
-      "type": "custom"
+      "type": "custom",
+      "format": " \u001b[90m\uf192   \u001b[31m\uf192   \u001b[32m\uf192   \u001b[33m\uf192   \u001b[34m\uf192   \u001b[35m\uf192   \u001b[36m\uf192   \u001b[37m\uf192 "
     },
-    
     "break"
   ]
 }

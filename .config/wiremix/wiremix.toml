@@ -101,6 +101,9 @@ keybindings = [
  # Select the previous tab
  { key = { Char = "H" }, action = "TabLeft" },
  { key = "BackTab", modifiers = "SHIFT", action = "TabLeft" },
+
+ { key = { Char = "h" }, modifiers = "ALT", action = "TabLeft" },
+ { key = { Char = "l" }, modifiers = "ALT", action = "TabRight" },
  # Set the volume of the selected item in 10% increments from 0% to 100%
  { key = { Char = "`" }, action = { SetAbsoluteVolume = 0.00 } },
  { key = { Char = "1" }, action = { SetAbsoluteVolume = 0.10 } },
@@ -243,15 +246,15 @@ default_device = { }
 # The symbol marking the default endpoint on the Playback/Recording tabs
 default_stream = { }
 # The selection indicator in a tab
-selector = { fg = "Cyan" }
+selector = { fg = "#00ffff" }
 # The name of a tab in the tab menu
 tab = { }
 # The name of the selected tab in the tab menu
-tab_selected = { bg = "Magenta" }
+tab_selected = { fg = "#6910a5" }
 # The symbols surrounding the selected tab in the tab menu
-tab_marker = { fg = "Cyan" }
+tab_marker = { fg = "#303aff" }
 # The symbol at the top/bottom of a tab indicating that there are more items
-list_more = { fg = "DarkGray" }
+list_more = { fg = "#414a74" }
 # The name of a PipeWire node
 node_title = { }
 # The name of the selected target for a node
@@ -259,15 +262,15 @@ node_target = { }
 # The volume percentage label
 volume = { }
 # Volume bar
-volume_empty = { fg = "DarkGray" }
-volume_filled = { fg = "Blue" }
+volume_empty = { fg = "#414a74" }
+volume_filled = { fg = "#6910a5" }
 # Peak meter. Inactive = unlit, active = lit, overload = greater than 0.0 dB
-meter_inactive = { fg = "DarkGray" }
-meter_active = { fg = "LightGreen" }
-meter_overload = { fg = "Red" }
+meter_inactive = { fg = "#414a74" }
+meter_active = { fg = "#00bf97" }
+meter_overload = { fg = "#cc00fc" }
 # The "live" indicator in the center of the meter
-meter_center_inactive = { fg = "DarkGray" }
-meter_center_active = { fg = "LightGreen" }
+meter_center_inactive = { fg = "#414a74" }
+meter_center_active = { fg = "#00bf97" }
 # The name of a device in the Configuration tab
 config_device = { }
 # The name of the selected profile in the Configuration tab
@@ -275,21 +278,21 @@ config_profile = { }
 # Dropdown marker next to the profiles in the Configuration tab
 dropdown_icon = { }
 # Border around dropdowns
-dropdown_border = { }
+dropdown_border = { fg = "#6910a5" }
 # The name of an item in a dropdown
 dropdown_item = { }
 # The name of the currently-selected item in a dropdown
-dropdown_selected = { fg = "LightMagenta", add_modifier = "REVERSED" }
+dropdown_selected = { bg = "#290355" }
 # The symbol at the top/bottom of a dropdown indicating that there are more
 # items
-dropdown_more = { fg = "DarkGray" }
+dropdown_more = { fg = "#414a74" }
 # Border around help menu
 help_border = { }
 # The name of an item in a the help menu
 help_item = { }
 # The symbol at the top/bottom of the help menu indicating that there are more
 # items
-help_more = { fg = "DarkGray" }
+help_more = { fg = "#414a74" }
 
 
 # Character Sets

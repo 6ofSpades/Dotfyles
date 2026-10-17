@@ -3,10 +3,9 @@
 TEMP="/tmp/plctl"
 
 # Create temporary file if it doesn't exist
-if [[ ! -e $TEMP ]]; then 
+if [[ ! -e $TEMP ]]; then
   touch $TEMP
 fi
-
 
 # rofi selection menu
 if [[ $1 == select ]]; then
@@ -17,7 +16,7 @@ if [[ $1 == select ]]; then
   selected=$(playerctl -l | rofi -dmenu -p "PLCTL" -mesg "Current: ${current:-none}" -theme-str 'window {width: 21%;}')
 
   # Don't save to file if none was selected on the rofi menu
-  [[ -n $selected ]] && echo $selected > $TEMP
+  [[ -n $selected ]] && echo $selected >$TEMP
 
   exit 0
 fi
@@ -30,7 +29,7 @@ if [[ $1 == tab ]]; then
 
   for i in "${!list[@]}"; do
     if [[ "${list[i]}" == "$current" ]]; then
-      selected="${list[i+1]}"
+      selected="${list[i + 1]}"
       break
     fi
   done
@@ -39,7 +38,20 @@ if [[ $1 == tab ]]; then
 
   echo "Selected: $selected"
   notify-send -a PLCTL-SELECTED "$selected" -t 2000 -i text-x-script -u low -r 2426
-  echo "$selected" > "$TEMP"
+  echo "$selected" >"$TEMP"
+
+  exit 0
+fi
+
+# get which one selected
+if [[ $1 == which ]]; then
+  current="$(<"$TEMP")"
+
+  # if none is selected just echo None
+  [[ -z $current ]] && current='None'
+
+  echo "Currently selected: $current"
+  notify-send -a PLCTL-SELECTED "$current" -t 2000 -i text-x-script -u low -r 2426
 
   exit 0
 fi
@@ -61,18 +73,17 @@ function pos_percentage() {
 }
 
 case "$1" in
-  h)  cmd="position 10-" ;;
-  l)  cmd="position 10+" ;;
-  j)  cmd="volume 0.1-" ;;
-  k)  cmd="volume 0.1+" ;;
-  next|previous|play-pause) cmd="$1" ;;
+h) cmd="position 10-" ;;
+l) cmd="position 10+" ;;
+j) cmd="volume 0.1-" ;;
+k) cmd="volume 0.1+" ;;
+next | previous | play-pause) cmd="$1" ;;
 
-  *%) pos_percentage "$1" ;;  # function to control the player in percentage
+*%) pos_percentage "$1" ;; # function to control the player in percentage
 
-  clear) echo '' > $TEMP && exit 0 ;; # clear selection so it defaults back to last active player
-  *) echo "???" && exit 0 ;;
+clear) echo '' >$TEMP && exit 0 ;; # clear selection so it defaults back to last active player
+*) echo "???" && exit 0 ;;
 esac
-
 
 if $(playerctl --player="$(<$TEMP)" $cmd); then
   # confirmation if command succeeds
@@ -81,4 +92,3 @@ else
   # notification for 2 seconds if command fails
   notify-send -a PLCTL "Some error happened :(" -t 2000 -i script-error
 fi
-

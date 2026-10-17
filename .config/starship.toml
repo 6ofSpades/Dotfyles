@@ -1,94 +1,148 @@
-# Don't print a new line at the start of the prompt
+
+# Print or don't print a new line at the start of the prompt
 add_newline = true
+
 # Pipes ╰─ ╭─
 # Powerline symbols                                     
 # Wedges 🭧🭒 🭣🭧🭓  🭈🭆🭂  🭞🭜🭘
 # Random noise 🬖🬥🬔🬗
 # Cool stuff 󰜥   
 
-# format = """
-# $cmd_duration$username$hostname $directory $git_branch
-# $character
-# """
 format = """
-$username$hostname$directory $git_branch $git_commit $git_state $git_status $fill $character
+$username$hostname$directory$python$git_branch$git_commit$git_status $fill ${custom.pixel1}$status$cmd_duration${custom.pixel2}
 [🭧🭒](bold fg:#3d0861)[ ➜ ](bold bg:#3d0861 fg:white)[](bold fg:#3d0861)
 """
 
 # move the rest of the prompt to the right
-right_format = """$cmd_duration"""
-
-# Replace the "❯" symbol in the prompt with "➜"
-[character]                            # The name of the module we are configuring is "character"
-success_symbol = "[🬳🬥🬖🬶](bold fg:#5f00d7)[ ✔ ](bold bg:#5f00d7 fg:green)[🬥🬖🬧🬤](bold fg:#5f00d7)"
-error_symbol = "[🬳🬥🬖🬶](bold fg:#5f00d7)[ ✘ ](bold bg:#5f00d7 fg:#ff0000)[🬥🬖🬧🬤](bold fg:#5f00d7)"
-vimcmd_symbol = "[🬳🬥🬖🬶](bold fg:blue)[ VI ](bold italic bg:blue fg:white)[🬥🬖🬧🬤](bold fg:blue)"
+right_format = """
+${custom.vin}${custom.vii}${custom.viv}${custom.vivl}${custom.vir}
+"""
 
 # Disable the package module, hiding it from the prompt completely
 [package]
 disabled = true
 
 [username]
-style_root = "red bold"
-format = "[🭃](bold fg:#3d0861)[$user](bold italic fg:white bg:#3d0861)[🭞🭜🭘](bold fg:#3d0861 bg:#55007c)"
 disabled = false
 show_always = true
+format = "[🭃](bold fg:#3d0861)[$user](bold italic fg:white bg:#3d0861)[🭞🭜🭘](bold fg:#3d0861 bg:#55007c)"
 
 [hostname]
 ssh_only = false
-format =  "[$hostname](bg:#55007c bold italic fg:white)[🭞🭜🭘](bold fg:#55007c bg:#6f00a2)"
 trim_at = ".companyname.com"
+format =  "[$hostname](bg:#55007c bold italic fg:white)[🭞🭜🭘](bold fg:#55007c bg:#6f00a2)"
 disabled = false
 
 [directory]
-home_symbol = " ~"
+home_symbol = " "
 read_only = " "
 truncation_length = 4
-truncation_symbol = "•/"
+truncation_symbol = "…/"
 format = '[$path](bg:#6f00a2 bold italic fg:white)[🭞](bg:black bold fg:#6f00a2)'
 
 [directory.substitutions]
 "Desktop" = " "
-"Documents" = " "
+"Documents" = " "
 "Downloads" = " "
-"Music" = "󰎈 "
-"Pictures" = " "
+"Music" = " "
+"Pictures" = " "
 "Videos" = " "
 "GitHub" = "󰊤 "
 "Games" = "󰺷 "
+"Books" = " "
+
+[custom.pixel1]
+when = true
+symbol = "🬳🬥🬖🬶"
+style = 'bold italic fg:blue' 
+format = '[$symbol]($style)'
+[status]                            # The name of the module we are configuring is "character"
+success_symbol = "[ ✔ ](bold bg:blue fg:green)"
+symbol = "[ ✘ ](bold bg:blue fg:red)"
+format = '[$symbol]($style)'
+disabled = false
+[custom.pixel2]
+when = true
+symbol = "🬥🬖🬧🬤"
+style = 'bold italic fg:blue' 
+format = '[$symbol]($style)'
+
+[cmd_duration]
+min_time = 1
+style = 'bold italic bg:blue fg:white' 
+format = '[$duration ]($style)'
+
+[custom.vin]
+command = 'echo NORMAL'
+when = '[[ "$ZVM_MODE" == "n" ]]'
+symbol = "$output"
+style = 'bold italic fg:blue'
+format = '[$symbol]($style)'
+[custom.vii]
+command = 'echo INSERT'
+when = '[[ "$ZVM_MODE" == "i" ]]'
+symbol = "$output"
+style = 'bold italic fg:green'
+format = '[$symbol]($style)'
+[custom.viv]
+command = 'echo VISUAL'
+when = '[[ "$ZVM_MODE" == "v" ]]'
+symbol = "$output"
+style = 'bold italic fg:purple'
+format = '[$symbol]($style)'
+[custom.vivl]
+command = 'echo V-LINE'
+when = '[[ "$ZVM_MODE" == "vl" ]]'
+symbol = "$output"
+style = 'bold italic fg:purple'
+format = '[$symbol]($style)'
+[custom.vir]
+command = 'echo REPLACE'
+when = '[[ "$ZVM_MODE" == "r" ]]'
+symbol = "$output"
+style = 'bold italic fg:red'
+format = '[$symbol]($style)'
+
+[time]
+disabled = true
+format = '🕙[\[ $time \]]($style) '
+time_format = "%T"
+
+[python]
+# Custom format displaying the virtualenv in parentheses
+symbol = " "
+format = ' [${symbol}${pyenv_prefix}(${version})( \($virtualenv\))](fg:green)'
 
 [git_branch]
-style = "bg: cyan"
-symbol = "󰘬"
 truncation_length = 12
-truncation_symbol = ""
-format = "[$symbol $branch(:$remote_branch)](fg:green)"
+truncation_symbol = "…"
+symbol = "󰘬 "
+style = "fg:cyan"
+format = " [$symbol$branch(:$remote_branch)]($style)"
 
 [git_commit]
+only_detached = false
 commit_hash_length = 4
 tag_symbol = " "
+style = "fg:blue"
+format = ' [\($hash$tag\)]($style)'
 
 [git_state]
-format = '[\($state($progress_current of $progress_total)\)]($style)'
+format = ' [\($state($progress_current of $progress_total)\)]($style)'
 cherry_pick = "[🍒 PICKING](bold red)"
 
 [git_status]
 conflicted = " 🏳"
-ahead = " 🏎💨"
-behind = " 😰"
-diverged = " 😵"
-untracked = " 🤷"
-stashed = " 📦"
-modified = "  "
-staged = '[++\($count\)](green)'
-renamed = " ✍️"
-deleted = "  "
+ahead = " [↑](cyan)"
+behind = " [↓](blue)"
+diverged = " [diverged](purple)"
+untracked = " [U](purple)"
+stashed = " [stashed](purple)"
+modified = " [M](yellow)"
+staged = ' [++\($count\)](green)'
+renamed = " [R](yellow)"
+deleted = " [D](red)"
 format = "[$all_status$ahead_behind](fg:yellow)"
-
-
-[cmd_duration]
-# min_time = 1
-format = '[▞🬳🬖🬶](bold fg:#5f00d7)[  $duration ](bold bg:#5f00d7 fg:white)[🬥🬖▓▒](bold fg:#5f00d7)'
 
 [line_break]
 disabled = false
@@ -98,9 +152,3 @@ disabled = true
 threshold = -1
 symbol = " "
 style = "bold dimmed green"
-
-[time]
-disabled = true
-format = '🕙[\[ $time \]]($style) '
-time_format = "%T"
-

@@ -4,12 +4,12 @@ if [[ ! $(ps -el | grep rofi) ]]; then # don't activate if rofi is open
   activeclass=$(hyprctl -j activewindow | jq -r '.class')
 
   case $activeclass in
-  zen) hyprctl dispatch submap DYNAM ;;
-  vesktop) hyprctl dispatch submap DYNAM ;;
-  discord-canary) hyprctl dispatch submap DYNAM ;;
-  "Mullvad Browser") hyprctl dispatch submap DYNAM ;;
-  brave-browser) hyprctl dispatch submap DYNAM ;;
-  steam) hyprctl dispatch submap DYNAM ;;
-  firefox) hyprctl dispatch submap DYNAM ;;
+  zen) hyprctl dispatch "hl.dsp.submap('DYNAM')" ;;
+  vesktop) hyprctl dispatch "hl.dsp.submap('DYNAM')" ;;
+  discord-canary) hyprctl dispatch "hl.dsp.submap('DYNAM')" ;;
+  "Mullvad Browser") hyprctl dispatch "hl.dsp.submap('DYNAM')" ;;
+  brave-browser) hyprctl dispatch "hl.dsp.submap('DYNAM')" ;;
+  steam) hyprctl dispatch "hl.dsp.submap('DYNAM')" ;;
+  firefox) hyprctl dispatch "hl.dsp.submap('DYNAM')" ;;
   esac
 fi

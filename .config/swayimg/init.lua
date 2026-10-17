@@ -52,7 +52,7 @@ swayimg.text.status_timeout = 0
 swayimg.viewer.default_scale = "optimal"
 swayimg.viewer.default_position = "center"
 
-swayimg.viewer.set_window_background(0x80000000)
+swayimg.viewer.set_window_background(0x99000000)
 
 -- transparency = grid
 swayimg.viewer.set_image_chessboard(20, 0x99333333, 0x994c4c4c)
@@ -63,26 +63,25 @@ swayimg.viewer.history = 1
 swayimg.viewer.preload = 1
 
 -- Info overlays
-swayimg.viewer.set_text("topleft", {
-	"{name}",
-	"{format}",
-	"{sizehr}",
-	"{frame.width}x{frame.height}",
-	"{meta.Exif.Image.Model}",
-})
-
-swayimg.viewer.set_text("topright", {
-	"{list.index}/{list.total}",
-})
-
-swayimg.viewer.set_text("bottomleft", {
-	"{scale}",
-	"{frame.index}/{frame.total}",
-})
-
-swayimg.viewer.set_text("bottomright", {
-	"{status}",
-})
+swayimg.viewer.text = {
+	topleft = {
+		"{name}",
+		"{format}",
+		"{sizehr}",
+		"{frame.width}x{frame.height}",
+		"{meta.Exif.Image.Model}",
+	},
+	topright = {
+		"{list.index}/{list.total}",
+	},
+	bottomleft = {
+		"{scale}",
+		"{frame.index}/{frame.total}",
+	},
+	bottomright = {
+		"{status}",
+	},
+}
 
 --------------------------------------------------------------------------------
 -- Slideshow mode
@@ -95,10 +94,12 @@ swayimg.slideshow.default_position = "center"
 
 swayimg.slideshow.set_window_background("auto")
 
-swayimg.slideshow.set_text("bottomright", {
-	"{dir}",
-	"{status}",
-})
+swayimg.slideshow.text = {
+	bottomright = {
+		"{dir}",
+		"{status}",
+	},
+}
 
 --------------------------------------------------------------------------------
 -- Gallery mode
@@ -113,7 +114,7 @@ swayimg.gallery.pstore = false
 -- fill = yes
 swayimg.gallery.aspect = "fill"
 
-swayimg.gallery.window_color = 0x80000000
+swayimg.gallery.window_color = 0x99000000
 
 -- background color of images with transparent background
 -- on gallery mode
@@ -123,14 +124,15 @@ swayimg.gallery.selected_color = 0xb2000000
 swayimg.gallery.border_color = 0xffffffff
 
 -- Gallery text
-swayimg.gallery.set_text("topright", {
-	"{list.index}/{list.total}",
-})
-
-swayimg.gallery.set_text("bottomleft", {
-	"{name}",
-	"{status}",
-})
+swayimg.gallery.text = {
+	topright = {
+		"{list.index}/{list.total}",
+	},
+	bottomleft = {
+		"{name}",
+		"{status}",
+	},
+}
 
 --------------------------------------------------------------------------------
 -- Viewer keybinds
@@ -170,12 +172,12 @@ end)
 
 -- zooming
 swayimg.viewer.on_key("Equal", function()
-	local scale = swayimg.viewer.get_scale()
+	local scale = swayimg.viewer.scale
 	swayimg.viewer.set_abs_scale(scale * 1.1)
 end)
 
 swayimg.viewer.on_key("Minus", function()
-	local scale = swayimg.viewer.get_scale()
+	local scale = swayimg.viewer.scale
 	swayimg.viewer.set_abs_scale(scale / 1.1)
 end)
 

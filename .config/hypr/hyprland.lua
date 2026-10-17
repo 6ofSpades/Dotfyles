@@ -20,10 +20,6 @@
 ]]
 
 -- Variables (classic $vars become Lua locals)
-local terminal = "kitty"
-local browser = "zen-browser"
-local fileManager = terminal .. " yazi"
-local printCmd = "flameshot gui"
 local hyprscripts = os.getenv("HOME") .. "/.config/hypr/scripts"
 
 ----------------------------------------------------------------
@@ -41,35 +37,41 @@ hl.monitor({ output = "HDMI-A-1", mode = "preferred", position = "auto", scale =
 
 hl.on("hyprland.start", function()
 	-- hl.exec_cmd("nm-applet &")
-	hl.exec_cmd("protonvpn-app")
+	hl.exec_cmd("protonvpn connect")
 	hl.exec_cmd("awww-daemon")
-	hl.exec_cmd("foot --server")
-	hl.exec_cmd("kitty --start-as=hidden -1 --instance-group=tui")
 	hl.exec_cmd("waybar & dunst & hyprsunset & hypridle & hyprpm reload")
 	hl.exec_cmd("systemctl --user start hyprpolkitagent")
+	hl.exec_cmd("kitty --start-as=hidden -1 --instance-group=tui")
 	-- stores text, image and any other binary data
-	hl.exec_cmd("wl-paste --watch clipvault store --max-entries 200 --max-entry-age 2d")
-	hl.exec_cmd("wl-paste --type image --watch clipvault store --max-entries 200 --max-entry-age 2d")
-	-- you can use --start-minimized for vesktop
-	hl.exec_cmd("signal-desktop --start-in-tray & vesktop --ozone-platform-hint=auto & flameshot & solaar -w hide")
+	-- hl.exec_cmd("wl-paste --watch clipvault store --max-entries 200 --max-entry-age 2d")
+	-- hl.exec_cmd("wl-paste --type image --watch clipvault store --max-entries 200 --max-entry-age 2d")
+	hl.exec_cmd("clipse -listen")
+	hl.exec_cmd("flameshot & solaar -w hide")
 	-- If playerctld is running, Playerctl will act on players in order of their last activity
 	hl.exec_cmd("playerctld")
-	hl.exec_cmd("waydroid session start") -- start waydroid session
+	-- hl.exec_cmd("waydroid session start") -- start waydroid session
 	-- portmaster is running on startup with the service, this is just the ui
 	hl.exec_cmd("portmaster")
-	hl.exec_cmd("sleep 10 && youtube-music") -- wait a bit so the VPN connects first
 
 	-- Scripts:
 	-- hl.exec_cmd(os.getenv("HOME") .. "/.local/bin/dolphin-context-fix")
-	hl.exec_cmd(hyprscripts .. "/startup")
 
-	-- open the browser on workspace 2, silently
-	hl.exec_cmd(browser, { workspace = "2 silent" })
+	-- open kitty on workspace 1, silently
+	hl.exec_cmd("kitty", { workspace = "1 silent" })
+	hl.exec_cmd("zen-browser", { workspace = "2 silent" })
+
+	-- only start these if there's internet connection, otherwise don't start
+	hl.exec_cmd(hyprscripts .. "/wait-for-internet && signal-desktop --start-in-tray")
+	hl.exec_cmd(hyprscripts .. "/wait-for-internet && vesktop") -- you can use --start-minimized for vesktop
+	hl.exec_cmd(hyprscripts .. "/wait-for-internet && kitty --class cava -o 'background_opacity=0.0' cava")
+	hl.exec_cmd(hyprscripts .. "/wait-for-internet && sleep 1 && youtube-music")
+	hl.exec_cmd("audio-ducking")
 end)
 
 -- For the annoying theme things (runs on every reload, like classic `exec =`)
 hl.exec_cmd('gsettings set org.gnome.desktop.interface color-scheme "prefer-dark"') -- for GTK4 apps
 hl.exec_cmd('gsettings set org.gnome.desktop.interface gtk-theme "Breeze-Dark"') -- for GTK3 apps
+hl.exec_cmd('gsettings set org.gnome.desktop.wm.preferences theme "Breeze-Dark"') -- for GTK3 apps
 
 ----------------------------------------------------------------
 -- ENVIRONMENT VARIABLES
@@ -140,15 +142,21 @@ hl.window_rule({ match = { class = "quick-notes" }, no_screen_share = true })
 
 -- Theme colors, previously pulled in via `source = ~/.config/theme/generated/hyprland.conf`
 -- See note (1) above.
-local theme = os.getenv("HOME") .. "/.config/theme/generated/hyprland.lua"
+local theme = os.getenv("HOME") .. "/.config/theme/generated/theme.lua"
+local hypr_theme = os.getenv("HOME") .. "/.config/theme/generated/hyprland.lua"
 local theme = require(theme)
-local border = theme.colors.border
-local borderMaximized = theme.colors.border_maximized
-local borderPin = theme.colors.border_pin
+local hypr_theme = require(hypr_theme)
+
+-- Make floating windows have different border
+hl.window_rule({ match = { float = true }, border_color = hypr_theme.colors.border_float })
+-- Make maximized windows visually perceptible
+hl.window_rule({ match = { fullscreen = true }, border_color = hypr_theme.colors.border_maximized })
+-- Make pinned windows visually perceptible
+hl.window_rule({ match = { pin = true }, border_color = hypr_theme.colors.border_pin })
 
 hl.config({
 	general = {
-		gaps_in = 5,
+		gaps_in = 7,
 		gaps_out = 12,
 
 		border_size = 2,
@@ -159,23 +167,63 @@ hl.config({
 		-- Please see https://wiki.hypr.land/Configuring/Tearing/ before you turn this on
 		allow_tearing = true,
 
+		-- for custom layout, do `lua:layout_name`
 		layout = "dwindle",
 
-		-- ["col.active_border"] = "rgba(aa00ffee) rgba(aa00ffee) rgba(00f7ffee) 90deg",
-		["col.active_border"] = border,
-		["col.inactive_border"] = "rgba(595959aa)",
+		col = {
+			active_border = { colors = { hypr_theme.colors.border, hypr_theme.colors.border_animation }, angle = 45 },
+			inactive_border = hypr_theme.colors.border_inactive,
+		},
+	},
+
+	group = {
+		col = {
+			border_active = { colors = { hypr_theme.colors.border_group_active } },
+			border_inactive = hypr_theme.colors.border_inactive,
+
+			border_locked_active = {
+				colors = { hypr_theme.colors.border_group_active, hypr_theme.colors.border_group_locked_active },
+				angle = 270,
+			},
+			border_locked_inactive = hypr_theme.colors.border_group_inactive,
+		},
+
+		drag_into_group = 2,
+
+		groupbar = {
+			col = {
+				active = { colors = { hypr_theme.colors.groupbar_active } },
+				inactive = hypr_theme.colors.groupbar_inactive,
+
+				locked_active = hypr_theme.colors.groupbar_active,
+				locked_inactive = hypr_theme.colors.groupbar_inactive,
+			},
+
+			blur = true,
+			gradients = false,
+
+			rounding = 10,
+			rounding_power = 1,
+			round_only_edges = true,
+
+			indicator_height = 15,
+			text_offset = -8,
+			height = 1,
+
+			text_color = theme.colors.white,
+			text_color_inactive = theme.colors.fg,
+			font_size = 11,
+			font_family = "JetBrainsMono Nerd Font",
+			font_weight_active = "bold",
+			font_weight_inactive = "normal",
+		},
 	},
 })
-
--- Make maximized windows visually perceptible
-hl.window_rule({ match = { fullscreen = true }, border_color = borderMaximized })
--- Make pinned windows visually perceptible
-hl.window_rule({ match = { pin = true }, border_color = borderPin })
 
 hl.config({
 	decoration = {
 		rounding = 10,
-		rounding_power = 2,
+		rounding_power = 1,
 
 		-- Change transparency of focused and unfocused windows
 		active_opacity = 1.0,
@@ -183,20 +231,22 @@ hl.config({
 
 		shadow = {
 			enabled = true,
-			range = 4,
+			range = 5,
 			render_power = 3,
-			color = "rgba(1a1a1aee)",
+			color = "rgba(0000004c)",
 		},
 
 		blur = {
 			enabled = true,
-			size = 6,
+			size = 4,
 			passes = 3,
 
 			vibrancy = 0.1696,
 
 			popups = true,
 			input_methods = true,
+			popups_ignorealpha = 0.3,
+			input_methods_ignorealpha = 0.3,
 		},
 	},
 })
@@ -216,26 +266,45 @@ hl.curve("nelson", { type = "bezier", points = { { 0.05, 0.9 }, { 0.1, 1.05 } } 
 -- Default animations, see https://wiki.hypr.land/Configuring/Animations/
 --                    NAME                 ONOFF  SPEED  CURVE          STYLE
 hl.animation({ leaf = "global", enabled = true, speed = 3, bezier = "default" })
-hl.animation({ leaf = "border", enabled = true, speed = 5, bezier = "easeOutQuint" })
 
-hl.animation({ leaf = "windows", enabled = true, speed = 5, bezier = "easeOutQuint", style = "slide" })
-hl.animation({ leaf = "windowsIn", enabled = true, speed = 5, bezier = "easeOutQuint", style = "slide" })
+hl.animation({ leaf = "border", enabled = true, speed = 5, bezier = "easeOutQuint" })
+hl.animation({ leaf = "borderangle", enabled = false, speed = 15, bezier = "linear", style = "loop" })
+
 hl.animation({
-	leaf = "windowsOut",
+	leaf = "windows",
 	enabled = true,
-	speed = 10,
+	speed = 5,
+	bezier = "easeOutQuint",
+	style = "slide",
+})
+hl.animation({
+	leaf = "windowsIn",
+	enabled = true,
+	speed = 5,
 	bezier = "easeOutQuint",
 	style = "popin",
 })
-hl.animation({ leaf = "windowsMove", enabled = true, speed = 3, bezier = "quick" })
+hl.animation({
+	leaf = "windowsOut",
+	enabled = true,
+	speed = 7,
+	bezier = "easeOutQuint",
+	style = "popin",
+})
+hl.animation({
+	leaf = "windowsMove",
+	enabled = true,
+	speed = 3,
+	bezier = "easeOutQuint",
+})
 
 hl.animation({ leaf = "fade", enabled = true, speed = 3.03, bezier = "quick" })
 hl.animation({ leaf = "fadeIn", enabled = true, speed = 1.73, bezier = "almostLinear" })
 hl.animation({ leaf = "fadeOut", enabled = true, speed = 1.46, bezier = "almostLinear" })
 
-hl.animation({ leaf = "layers", enabled = true, speed = 3.81, bezier = "easeOutQuint", style = "slide" })
-hl.animation({ leaf = "layersIn", enabled = true, speed = 4.5, bezier = "nelson", style = "popin" })
-hl.animation({ leaf = "layersOut", enabled = true, speed = 3, bezier = "nelson", style = "popin" })
+hl.animation({ leaf = "layers", enabled = true, speed = 3, bezier = "easeOutQuint", style = "slide" })
+hl.animation({ leaf = "layersIn", enabled = true, speed = 3, bezier = "easeOutQuint", style = "popin" })
+hl.animation({ leaf = "layersOut", enabled = true, speed = 3, bezier = "easeOutQuint", style = "popin" })
 hl.animation({ leaf = "fadeLayersIn", enabled = true, speed = 1.79, bezier = "almostLinear" })
 hl.animation({ leaf = "fadeLayersOut", enabled = true, speed = 1.39, bezier = "almostLinear" })
 
@@ -246,6 +315,9 @@ hl.animation({ leaf = "specialWorkspaceIn", enabled = true, speed = 3, bezier = 
 hl.animation({ leaf = "specialWorkspaceOut", enabled = true, speed = 3, bezier = "default", style = "fade" })
 
 hl.animation({ leaf = "zoomFactor", enabled = true, speed = 7, bezier = "quick" })
+
+animation = hyprfocusIn, 1, 1.7, quick
+animation = hyprfocusOut, 1, 1.7, quick
 
 -- https://wiki.hypr.land/Configuring/Dwindle-Layout/
 hl.config({
@@ -299,7 +371,8 @@ hl.config({
 	cursor = {
 		-- hide the cursor after 10 seconds of inactivity
 		inactive_timeout = 10,
-		warp_on_change_workspace = 2,
+		-- warp_on_change_workspace = 2,
+		no_warps = true,
 	},
 })
 
@@ -318,6 +391,7 @@ hl.config({
 
 		-- The repeat rate for held-down keys, in repeats per second.
 		repeat_delay = 300,
+		repeat_rate = 30,
 
 		numlock_by_default = true,
 
@@ -367,11 +441,22 @@ require("modules.windowrules")
 ----------------------------------------------------------------
 -- PLUGINS
 ----------------------------------------------------------------
+require("modules.plugins")
 
--- hl.config({
--- 	plugin = {
--- 		hyprtrails = {
--- 			color = "rgba(69008580)",
--- 		},
--- 	},
--- })
+-- flashfocus windows
+-- attempting to replace the old plugin T-T
+hl.on("window.active", function(window)
+	if not window or not window.mapped then
+		return
+	end
+	if window.fullscreen ~= 0 then
+		return
+	end
+
+	hl.exec_cmd(hyprscripts .. "/flashfocus.sh " .. window.address)
+end)
+
+----------------------------------------------------------------
+-- CUSTOM LAYOUTS
+----------------------------------------------------------------
+require("layouts.manual")

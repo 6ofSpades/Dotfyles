@@ -1,0 +1,8 @@
+[color "diff"]
+commit="#303aff"
+[color "decorate"]
+HEAD="#00bf97"
+branch="#303aff"
+[color "status"]
+untracked="#8500bc"
+changed="#e0af68"

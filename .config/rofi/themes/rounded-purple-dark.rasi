@@ -104,6 +104,8 @@ element selected normal, element selected active {
     background-color:   @selected-bg;
     text-color:         @white;
     border-radius:      10px;
+    border:             1px;
+    border-color:       @rofi-border;
 }
 
 element-icon {

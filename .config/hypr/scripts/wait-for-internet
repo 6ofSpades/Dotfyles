@@ -1,0 +1,22 @@
+#!/bin/bash
+
+TIMEOUT=60
+INTERVAL=2
+ELAPSED=0
+
+sleep 4
+
+echo "Waiting for internet connection..."
+
+while [ "$ELAPSED" -lt "$TIMEOUT" ]; do
+  if curl -fsS --max-time 2 https://connectivitycheck.gstatic.com/generate_204 >/dev/null 2>&1; then
+    echo "Internet connection available."
+    exit 0
+  fi
+
+  sleep "$INTERVAL"
+  ELAPSED=$((ELAPSED + INTERVAL))
+done
+
+echo "No internet connection after ${TIMEOUT}s. Giving up."
+exit 1

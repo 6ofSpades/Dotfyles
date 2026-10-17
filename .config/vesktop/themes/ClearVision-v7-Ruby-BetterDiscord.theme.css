@@ -15,10 +15,10 @@
 /* SETTINGS */
 :root {
   /* ACCENT COLORS */
-  --main-color: rgb(from var(--accent) r g b / 0.9); /* #55007C #8325AF */
-  --hover-color: rgb(from var(--accent) r g b / 0.5);
-  --success-color: var(--green);
-  --danger-color: var(--red);
+  --main-color: rgb(from var(--themeaccent) r g b / 1); /* #55007C #8325AF */
+  --hover-color: rgb(from var(--themecursor_line) r g b / 0.5);
+  --success-color: var(--themegreen);
+  --danger-color: var(--themered);
   /* STATUS COLORS */
   --online-color: #00d787;
   --idle-color: #faa61a;
@@ -26,7 +26,7 @@
   --streaming-color: #593695;
   --offline-color: #808080;
   /* APP BACKGROUND */
-  --background-shading-percent: 99%;
+  --background-shading-percent: 120%;
   --background-image: url("");
   --background-attachment: fixed;
   --background-filter: saturate(calc(var(--saturation-factor, 1) * 1));
@@ -96,14 +96,25 @@
 
 /* selection of text */
 ::selection {
-  background-color: rgb(from var(--selection_bg) r g b / 0.6);
-  color: var(--white);
+  background-color: rgb(from var(--themeselection_bg) r g b / 0.6);
+  color: var(--themewhite);
+}
+
+:root {
+  --message-background-hover: rgb(from var(--themecursor_line) r g b / 0.2);
+}
+
+.replying__5126c {
+  --background-mentioned: rgb(from var(--themeselection_bg) r g b / 0.2);
 }
 
 /*profiles popups*/
 .c0bea05627c5dc35-outer:not(.custom-user-profile-theme)
   .c0bea05627c5dc35-inner {
-  backdrop-filter: blur(6px) brightness(0.3) !important;
+  backdrop-filter: blur(6px) brightness(0.8) !important;
+}
+.outer_c0bea0:not(.custom-user-profile-theme) .inner_c0bea0 {
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
 /*Vencord themes config page*/
@@ -122,5 +133,11 @@
   .theme-dark
 ) {
   /* Mix 85% of accent with 25% white to make it brighter */
-  --text-link: color-mix(in srgb, var(--accent) 75%, white);
+  --text-link: color-mix(in srgb, var(--themeaccent) 75%, white);
+}
+
+/* chat selection, breeze theme style */
+.interactive__972a0.interactiveSelected__972a0::before {
+  background: rgb(from var(--themecursor_line) r g b / 0.5);
+  border: 1px solid var(--themeaccent);
 }

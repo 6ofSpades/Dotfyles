@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Cemu
+GenericName=Wii U Emulator
+Comment=Cemu Wii U Emulator
+Exec=/usr/local/bin/Cemu.AppImage
+TryExec=/usr/local/bin/Cemu.AppImage
+Icon=cemu

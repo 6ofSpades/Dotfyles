@@ -106,6 +106,13 @@ keymap = [
 	{ on = "z",         run = "plugin zoxide",               desc = "Jump to a file/directory via fzf" },
 	{ on = "Z",         run = "plugin fzf",                  desc = "Jump to a directory via zoxide" },
 
+  # cant remember if this was different before but yazi seems to try resolving yanked symlinks
+  # sometimes I just want to yank the symlink exactly as it is, even if it breaks
+  # this should do it
+  # careful, it will automatically overwrite
+  { on = [ "e", "y" ], run = "shell 'printf \"%%s\\n\" %s > /tmp/yazi-rawyank'", desc = "Raw yank (selected files)" },
+	{ on = [ "e", "p" ], run = 'shell -- xargs -d "\n" -a /tmp/yazi-rawyank cp -a -t .', desc = "Raw paste (keeps symlinks exactly as they are)" },
+
 	# Linemode
 	{ on = [ "m", "s" ], run = "linemode size",        desc = "Linemode: size" },
 	{ on = [ "m", "p" ], run = "linemode permissions", desc = "Linemode: permissions" },
@@ -152,8 +159,9 @@ keymap = [
 	{ on = [ "g", "f" ],       run = "follow",           desc = "Follow hovered symlink" },
 
 	# Tabs
-	{ on = [ "t", "o" ], run = "tab_create --current", desc = "Create a new tab with CWD" },
-	{ on = [ "t", "k" ], run = "close",                desc = "Close the current tab, or quit if it's last" },
+	{ on = [ "t", "o" ], run = "tab_create --current",                desc = "Create a new tab with CWD" },
+	{ on = [ "t", "k" ], run = "close",                               desc = "Close the current tab, or quit if it's last" },
+	{ on = [ "t", "u" ], run = "plugin close-and-restore-tab restore",desc = "Restore the previously closed tab" },
 
 	{ on = "1", run = "tab_switch 0", desc = "Switch to first tab" },
 	{ on = "2", run = "tab_switch 1", desc = "Switch to second tab" },
@@ -287,6 +295,64 @@ keymap = [
   #   -> { on = [ "m", "a" ], run = [ "plugin yamb -- save", "plugin gvfs -- automount-when-cd" ], desc = "Add bookmark and enable automount when cd"}
   { on = [ "M", "t" ], run = "plugin gvfs -- automount-when-cd", desc = "Enable automount when cd to device under cwd" },
   { on = [ "M", "T" ], run = "plugin gvfs -- automount-when-cd --disabled", desc = "Disable automount when cd to device under cwd" },
+
+  #### Simple tag plugin
+  #─────────────────────────── ADD TAG(S) ───────────────────────────────
+  # Add a tag (press any tag key)
+  # A tag hint window will show up.
+  # Simply press any new tag key to add to selected or hovered files/folders.
+  { on = [ "t", "a", "a" ], run = "plugin simple-tag -- add-tag", desc = "Add a tag (press any key)" },
+
+  # Fast Add tag(s) with fixed keys=!1q. key=!1q tag=!1q or tags=!1q also work
+  { on = [ "t", "a", "p" ], run = "plugin simple-tag -- add-tag --key=!", desc = "Add tag(s) with fixed tag keys = (!)" },
+
+  #─────────────────────────── REMOVE/DELETE TAG(S) ───────────────────────────
+  # Remove a tag (press any tag key)
+  # A tag hint window will show up.
+  # Simply press any tag key to be removed from selected or hovered files/folders.
+  { on = [ "t", "d" ], run = "plugin simple-tag -- remove-tag", desc = "Remove a tag (press any key)" },
+
+  # Fast Remove tag(s) with fixed keys=!1q. key=!1q tag=!1q or tags=!1q also work
+  # { on = [ "t", "d", "f" ], run = "plugin simple-tag -- remove-tag --keys=!1q", desc = "Remove tag(s) with fixed tag keys = (! and 1 and q)" },
+
+  #─────────────────────────── REPLACE ALL OLD TAG(S) WITH NEW TAG(S) ───────────────────────────
+  # Replace a tag (press any tag key)
+  # A tag hint window will show up.
+  # Simply press any new tag key for selected or hovered files/folders.
+  # { on = [ "t", "r", "k" ], run = "plugin simple-tag -- replace-tag", desc = "Replace with a new tag (press any key)" },
+
+  # Fast Replace tag(s) with fixed keys=!1q. key=!1q tag=!1q or tags=!1q also work
+  # { on = [ "t", "r", "f" ], run = "plugin simple-tag -- replace-tag --keys=!1q", desc = "Replace tag(s) with fixed tag keys = (! and 1 and q)" },
+
+  #  ───────────────────────────── CLEAR TAG(S) ─────────────────────────────
+  # Clear all tags from selected or hovered files/folders
+  { on = [ "t", "c" ], run = "plugin simple-tag -- clear", desc = "Clear all tags from selected or hovered files" },
+
+  #  ───────────────────────────── CHANGE UI ─────────────────────────────
+  # Switch tag indicator between icon > tag key > hidden.
+  # Useful when u don't remember the tag key
+  { on = [ "t", "i", "s" ], run = "plugin simple-tag -- toggle-ui", desc = "Toggle tag indicator (icon > tag key > hidden)" },
+  # Fixed tag indicator mode = hidden (Available modes: hidden|icon|text)
+  { on = [ "t", "i", "h" ], run = "plugin simple-tag -- toggle-ui --mode=hidden", desc = "Hide all tags indicator" },
+
+  #  ─────────────────────── FILTER FILES/FOLDERS BY TAGS: ───────────────────────
+  # Available filter modes:
+  # and → Show files that contain all selected tags. (Default if mode isn't specified).
+  # or → Show files that contain at least one of the selected tags.
+
+  # nand → ("not and") Hide files that contain all selected tags. Inverse of the "and" mode.
+  # nor → ("not or") Hide files that contain at least one of the selected tags. Inverse of the "or" mode.
+  # not → Show only files that have no tags.
+
+  # NOTE: Not available in vfs mode (Remote Virtual Filesystem)
+
+  # Filter files/folders by tags
+
+  # Filter files/folders by a tag (press any tag key)
+  # A tag hint window will show up.
+  # Simply press any new tag key to filter files/folders containing that tag in current directory.
+  { on = [ "t", "f" ], run = "plugin simple-tag -- filter", desc = "Filter files/folders by a tag (press any key)" },
+
 ]
 
 [tasks]

@@ -8,6 +8,8 @@
 		"custom/left_div#5",
 		"hyprland/workspaces",
 		"custom/right_div#5",
+		"custom/privacydot_cam",
+		"custom/privacydot_loc",
 		"hyprland/window"
 	],
 
@@ -39,11 +41,15 @@
 	],
 
 	"modules-right": [
+    "mpris",
 		"custom/scrolling_mpris",
+		"wireplumber#output",
+		"custom/mic_status",
     "custom/left_div#4",
     "tray",
 		"custom/left_div#3",
-		"group/wireplumber",
+    "custom/recording",
+    "custom/protonvpn",
 		"custom/left_div#7",
 		"backlight",
 		"battery",
@@ -58,7 +64,7 @@
 	"layer": "top",
 	"position": "top",
 	"height": 0,
-	"width": 0,
+	// "width": 199,
 	"margin": 0,
 	"margin-top": 0,
 	"spacing": 0,
@@ -76,11 +82,11 @@
     "max-length": 7,
     "tooltip": false,
     "always-on": true,
-    "default-submap": "MAIN"
+    "default-submap": "MAINS"
   },
 
   "hyprland/workspaces": {
-		"format": "{icon}",
+		"format": "{id}",
 		"format-icons": {
 			"active": "",
 			"default": ""
@@ -88,8 +94,8 @@
 		"persistent-workspaces": {
 			"*": 6
 		},
-		"on-scroll-up": "hyprctl dispatch workspace -1",
-		"on-scroll-down": "hyprctl dispatch workspace +1",
+		"on-scroll-up": "hyprctl dispatch \"hl.dsp.focus({ workspace = '-1' })\"",
+		"on-scroll-down": "hyprctl dispatch \"hl.dsp.focus({ workspace = '+1' })\"",
 		"cursor": true
 	},
 
@@ -109,8 +115,8 @@
 	"hyprland/windowcount": {
 		"format": "[{}]",
 		"swap-icon-label": false,
-    "min-length": 4,
-    "max-length": 4
+    "min-length": 3,
+    "max-length": 3
 	},
 
   "temperature": {
@@ -132,7 +138,8 @@
     "unit": "GiB",
     "path": "/",
     "min-length": 14,
-    "max-length": 14
+    "max-length": 14,
+    "justify": "right"
   },
 
   "memory": {
@@ -172,7 +179,9 @@
 		"format": "   {:%H:%M}",
 		"min-length": 9,
 		"max-length": 9,
-		"tooltip-format": "Standard Time: {:%I:%M %p}"
+		"tooltip-format": "Standard Time: {:%I:%M %p}",
+    "justify": "left",
+    "align": "0"
 	},
 
   "clock#date": {
@@ -198,13 +207,14 @@
 	},
 
   "network": {
-		"interface": "enp*",
+		"interface": "enp3s0",
 		"interval": 30,
 		"format": "󰛳 {ipaddr}",
 		"format-ethernet": "󰈀 {ipaddr}",
 		"format-wifi": "{icon} {essid}",
 		"format-disconnected": "󰤯 ",
 		"format-disabled": "󰤮 ",
+    "format-linked": "󰌘 {ifname} (No IP)",
 		"format-icons": ["󰤟 ", "󰤢 ", "󰤥 ", "󰤨 "],
 		"on-click": "kitty -e ~/.config/waybar/scripts/network.sh",
 		"on-click-right": "nmcli radio wifi off && notify-send 'Wi-Fi Disabled' -i 'network-wireless-off' -r 1125",
@@ -239,29 +249,89 @@
 
   "custom/virtual_keyboard": {
 		"format": "",
-		"min-length": 2,
-		"max-length": 2,
-		"on-click": "( pkill wvkbd-deskintl && hyprctl keyword input:follow_mouse 1 ) || ( wvkbd-deskintl --bg 00000088 --fg 000000b3 --fg-sp 000000cc --press 64009680 --press-sp 50008280 & hyprctl keyword input:follow_mouse 2 )",
-		"on-click-right": "( pkill wvkbd-deskintl && hyprctl keyword input:follow_mouse 1 ) || ( wvkbd-deskintl --bg 00000088 --fg 000000b3 --fg-sp 000000cc --press 64009680 --press-sp 50008280 --non-exclusive & hyprctl keyword input:follow_mouse 2 )",
+		"min-length": 1,
+		"max-length": 1,
+		"on-click": "( pkill wvkbd-deskintl && hyprctl eval 'hl.config({ input = { follow_mouse = 1 } })') || ( xargs -a ~/.config/wvkbd/config wvkbd-deskintl & hyprctl eval 'hl.config({ input = { follow_mouse = 2 } })' )",
+		"on-click-right": "( pkill wvkbd-deskintl && hyprctl eval 'hl.config({ input = { follow_mouse = 1 } })') || ( xargs -a ~/.config/wvkbd/config wvkbd-deskintl --non-exclusive & hyprctl eval 'hl.config({ input = { follow_mouse = 2 } })' )",
 		"tooltip-format": "Left-click to open/close virtual keyboard\nRigth-click to open/close in non-exclusive mode"
 	},
 
+  "mpris": {
+    "format-playing": "{player_icon}",
+    "format-paused": "{status_icon}",
+    "format-stopped": "{status_icon}",
+    "player-icons": {
+      "default": " ",
+      "YoutubeMusic": " ",
+      "firefox": "󰈹 ",
+      "mpv": " "
+    },
+    "status-icons": {
+      "playing": " ",
+      "paused": " ",
+      "stopped": " ",
+    },
+		"on-click": "playerctl play-pause",
+    // "ignored-players": ["firefox"]
+    "justify": "left",
+    "align": 0
+  },
+
   "custom/scrolling_mpris": {
 		"exec": "python3 -u ~/.config/waybar/scripts/scrolling-mpris.py",
-		"format": "{text}",
 		"return-type": "json",
-		"on-click": "playerctl play-pause",
-    "max-length": 100
+		"format": "{text}",
+    "justify": "left",
+    "max-length": 100,
+    "tooltip": false, // this is very important, all other module tooltips break if this is true
+    "escape": false,
+    "markup": "pango"
 	},
 
+  "custom/privacydot_cam": {
+    "exec": "~/.config/waybar/scripts/privacydots.sh cam",
+    "return-type": "json",
+    "interval": 3,
+    "format": "{text}",
+    "tooltip": true,
+    "escape": false,
+    "markup": "pango"
+  },
+  "custom/privacydot_loc": {
+    "exec": "~/.config/waybar/scripts/privacydots.sh loc",
+    "return-type": "json",
+    "interval": 3,
+    "format": "{text}",
+    "tooltip": true,
+    "escape": false,
+    "markup": "pango"
+  },
+
+  "custom/recording": {
+    "format": "{}",
+    "exec-if": "pgrep -x obs",
+    "exec": "~/.config/waybar/scripts/obs-status.sh",
+    "return-type": "json",
+    "interval": 3,
+    "hide-empty-text": true,
+  },
+
+  "custom/protonvpn": {
+    "format": "{}",
+    "exec": "~/.config/waybar/scripts/vpn-status.sh",
+    "return-type": "json",
+    "interval": 5,
+    "hide-empty-text": true
+  },
+
   "tray": {
-    "spacing": 9,
-    "icon-size": 15,
+    "spacing": 6,
+    "icon-size": 14,
+    "show-passive-items": true,
     "icons": {
       "flameshot": "/usr/share/icons/candy-icons/apps/scalable/flameshot.svg",
       "qBittorrent": "/usr/share/icons/candy-icons/apps/scalable/qbittorrent.svg",
       "protonvpn-gui": "/usr/share/icons/candy-icons/apps/scalable/protonvpn-gui.svg",
-      "obs": "/usr/share/icons/candy-icons/apps/scalable/obs.svg",
       "spotify-client": "/usr/share/icons/candy-icons/apps/scalable/spotify-client.svg",
       "steam": "/usr/share/icons/candy-icons/apps/scalable/steam.svg",
       "virt-manager": "/usr/share/icons/candy-icons/apps/scalable/virt-manager.svg",
@@ -279,35 +349,46 @@
 		],
 		"drawer": {
 			"transition-left-to-right": false
-		}
+		},
+    "justify": "right",
+    "align": "1",
 	},
 
 	"wireplumber#output": {
 		"format": "{icon} {volume}%",
-		"format-muted": "{icon} {volume}%",
+		"format-muted": "󰝟 {volume}%",
 		"format-icons": {
 			"default": [ "󰕿", "󰖀", "󰕾" ],
-			"default-muted": "󰝟",
-			"headphone": "󰋋",
-			"headphone-muted": "󰟎",
-			"headset": "󰋎",
-			"headset-muted": "󰋐"
 		},
-		"min-length": 7,
-		"max-length": 7,
-		"on-click": "~/.config/waybar/scripts/volume.sh output mute",
-		"on-scroll-up": "~/.config/waybar/scripts/volume.sh output raise",
-		"on-scroll-down": "~/.config/waybar/scripts/volume.sh output lower",
+		"min-length": 6,
+		"max-length": 6,
+		"on-click": "kitty --class wiremix wiremix",
+		"on-right-click": "~/.config/waybar/scripts/volume.sh output mute",
+		"on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2.5%+",
+		"on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2.5%-",
     "tooltip": true,
 		"tooltip-format": "Output Device: {desc}"
 	},
+
+  "custom/mic_status": {
+    "exec": "~/.config/waybar/scripts/mic-status.py",
+    // you should define which apps should be ignored directly in the script
+    "return-type": "json",
+    "format": "{text}",
+		"on-click": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle 2>/dev/null",
+    "hide-empty-text": true,
+    "interval": 3,
+    "tooltip": true,
+    "escape": false,
+    "markup": "pango"
+  },
 
 	"wireplumber#input": {
 		"format": "{format_source}",
 		"format-source": "󰍬 {volume}%",
 		"format-source-muted": "󰍭 {volume}%",
-		"min-length": 7,
-		"max-length": 7,
+		"min-length": 6,
+		"max-length": 6,
 		"on-click": "~/.config/waybar/scripts/volume.sh input mute",
 		"on-scroll-up": "~/.config/waybar/scripts/volume.sh input raise",
 		"on-scroll-down": "~/.config/waybar/scripts/volume.sh input lower",
@@ -316,12 +397,12 @@
   
 	"backlight": {
 		// "interval":
-		"format": "{icon} {percent}%",
+		"format": "{icon}",
 		"format-icons": [
 			"", "", "", "", "", "", "", "", ""
 		],
-		"min-length": 7,
-		"max-length": 7,
+		"min-length": 2,
+		"max-length": 2,
 		// "rotate":
 		// "states":
 		// "on-click":
@@ -353,8 +434,8 @@
 			"󰂎", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"
 		],
 		"format-charging": "󰉁 {capacity}%",
-		"min-length": 7,
-		"max-length": 7,
+		"min-length": 2,
+		"max-length": 2,
 		// "rotate":
 		// "on-click":
 		// "on-click-middle":

@@ -141,6 +141,7 @@ hypridle
 hyprlock
 hyprpicker
 hyprsunset
+hyprpm
 qt5-wayland
 qt6-wayland
 kitty
@@ -168,7 +169,7 @@ wl-ime-type
 wtype
 ydotool
 candy-icons-git
-neo-candy-icons
+neo-candy-icons-git
 kvantum
 breeze
 breeze-gtk
@@ -201,9 +202,14 @@ grim
 flameshot
 swayimg
 clipvault
+clipse
 wl-clipboard
+playerctl
 mpv
 mpv-modernz
+mpv-mpris
+obs-studio
+obs-cmd
 resvg
 poppler
 zathura
@@ -212,6 +218,7 @@ zathura-cb
 ffmpeg
 imagemagick
 mediainfo
+perl-image-exiftool
 autotrash
 "
 # Prompt selection
@@ -320,22 +327,20 @@ if [[ "$scripts" == "y" ]]; then
     mkdir -p "$HOME/Pictures/flameshot"
     sed -i "s/user/$USER/g" "$HOME/.config/flameshot/flameshot.ini"
   fi
-
   # termfilechooser config for fzf
-  sed -i "s/user/$USER/g" "$HOME/.config/xdg-desktop-portal-termfilechooser/config"
-
+  if [[ $(yay -Qs xdg-desktop-portal-termfilechooser) ]]; then
+    sed -i "s/user/$USER/g" "$HOME/.config/xdg-desktop-portal-termfilechooser/config"
+  fi
+  # pear-desktop
   if [[ $(yay -Qs pear-desktop) ]]; then
-    cd "$DOTFILES_DIR/scripts/theme-fixes/pear-desktop"
-    ./patch
+    sed -i "s|/home/user|/home/$USER|g" "$HOME/.config/YouTube Music/config.json"
   fi
-  if [[ $(yay -Qs proton-vpn) ]]; then
-    cd "$DOTFILES_DIR/scripts/theme-fixes/protonvpn-trayicon"
-    ./patch
-  fi
-  if [[ $(yay -Qs signal-desktop) ]]; then
-    cd "$DOTFILES_DIR/scripts/theme-fixes/signal-themer"
-    ./patch.sh
-  fi
+
+  # this thing was moved
+  # if [[ $(yay -Qs signal-desktop) ]]; then
+  #   cd "$DOTFILES_DIR/scripts/theme-fixes/signal-themer"
+  #   ./patch.sh
+  # fi
 
   cd
 fi

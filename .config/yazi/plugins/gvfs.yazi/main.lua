@@ -1,4 +1,4 @@
---- @since 25.5.31
+--- @since 26.5.6
 
 local M = {}
 local SHELL = os.getenv("SHELL") or ""
@@ -444,9 +444,9 @@ local function path_quote(path)
 end
 
 local get_hovered_path = ya.sync(function()
-	local h = cx.active.current.hovered.path or cx.active.current.hovered
+	local h = cx.active.current.hovered
 	if h then
-		return tostring(h.url)
+		return h.url
 	end
 end)
 
@@ -2297,11 +2297,12 @@ end
 ---@param enabled boolean?
 local function toggle_automount_when_cd_action(enabled)
 	local hovered_path = get_hovered_path()
-	local is_virtual = (Url(hovered_path).spec and Url(hovered_path).spec.is_virtual)
-		or (not Url(hovered_path).spec and Url(hovered_path).scheme.is_virtual)
+	local is_virtual = (hovered_path.spec and hovered_path.spec.is_virtual)
+		or (not hovered_path.spec and hovered_path.scheme.is_virtual)
 	if is_virtual then
 		return
 	end
+	hovered_path = tostring(hovered_path)
 	local local_path = hovered_path:match("^" .. is_literal_string(get_state(STATE_KEY.ROOT_MOUNTPOINT)) .. "/[^/]+")
 		or hovered_path:match("^" .. is_literal_string(GVFS_ROOT_MOUNTPOINT_FILE) .. "/[^/]+")
 	if local_path then

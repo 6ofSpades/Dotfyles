@@ -105,7 +105,6 @@ menu() {
   done
 }
 
-
 # Apply Image Wallpaper
 apply_image_wallpaper() {
   local image_path="$1"
@@ -169,6 +168,10 @@ main() {
   # **CHECK FIRST** if it's a video or an image **before calling any function**
   if [[ "$selected_file" =~ \.(mp4|mkv|mov|webm|MP4|MKV|MOV|WEBM)$ ]]; then
     apply_video_wallpaper "$selected_file"
+    # convert video into single image
+    magick "$selected_file[0]" "$wallpaper_current.png" # [0] to take only first frame
+    magick "$wallpaper_current.png" -resize 1920x1080 "$wallpaper_current"
+    rm -rf "$wallpaper_current.png"
   else
     apply_image_wallpaper "$selected_file"
     if [[ $selected_file == *'.gif' ]]; then

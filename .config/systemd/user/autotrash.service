@@ -4,4 +4,4 @@ Documentation=https://github.com/bneijt/autotrash
 
 [Service]
 Type=oneshot
-ExecStart="/usr/bin/autotrash" -d 30
+ExecStart="/usr/bin/autotrash" -d 15

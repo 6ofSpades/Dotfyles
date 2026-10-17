@@ -1,0 +1,25 @@
+/* make backgrounds fully black */
+body {
+  background-color: #000000 !important;
+}
+ytmusic-player-bar {
+  background-color: #000000 !important;
+}
+/* transparent background color when using the transparency plugin */
+:root {
+  --ytmd-transparent-player-transparency-color: #000000 !important;
+}
+
+/* progress bar color */
+#progress-bar.ytmusic-player-bar {
+  --paper-slider-active-color: linear-gradient(
+    90deg,
+    #8500bc 80%,
+    #cc00fc
+  ) !important;
+}
+/* knob color */
+#progress-bar.ytmusic-player-bar[focused],
+ytmusic-player-bar:hover #progress-bar.ytmusic-player-bar {
+  --paper-slider-knob-color: #6910a5 !important;
+}

@@ -1,0 +1,867 @@
+#!/usr/bin/env python3
+
+import os
+import re
+import select
+import signal
+import subprocess
+import sys
+import time
+from datetime import datetime
+from pathlib import Path
+
+import numpy as np
+
+# ============================================================
+# Configuration
+# ============================================================
+
+# Applications whose audio should NOT trigger ducking.
+#
+# These are matched case-insensitively.
+MUSIC_APPS = {
+    "Chromium",
+}
+
+MUSIC_PLAYER = "YoutubeMusic"
+
+# PipeWire nodes that we don't want to monitor.
+IGNORED_APPS = {
+    "cava",
+    "wiremix",
+    "wiremix-capture",
+    "audio ducking detector",
+}
+
+# How often we rediscover active application streams.
+CHECK_INTERVAL = 0.5
+
+# Audio capture settings.
+SAMPLE_RATE = 48000
+CHANNELS = 2
+
+# RMS level above which we consider there to be actual audio.
+#
+# Start low. maybe tune this later.
+SOUND_THRESHOLD = 0.005
+
+# How long audio must remain present before pausing music.
+PAUSE_DELAY = 0.35
+
+# How long the detector must remain quiet before resuming music.
+RESUME_DELAY = 30.0
+
+# How quickly music fades out when other audio starts.
+FADE_OUT_DURATION = 0.4
+
+# How quickly music fades back in after other audio stops.
+FADE_IN_DURATION = 5.0
+
+# Number of volume changes used during a fade.
+FADE_STEPS = 50
+
+# Name of the node.
+DETECTOR_NAME = "audio_ducking_detector"
+
+LOG_FILE = Path.home() / ".local" / "state" / "audio-ducking.log"
+
+
+# ============================================================
+# Global state
+# ============================================================
+
+record_process = None
+
+# output port -> detector input port
+connected_ports = {}
+connected_port_info = {}
+
+music_paused_manually = False
+
+
+# ============================================================
+# Utilities
+# ============================================================
+
+
+def run(command, check=True):
+    return subprocess.run(
+        command,
+        capture_output=True,
+        text=True,
+        check=check,
+    )
+
+
+def normalize_name(name):
+    return name.strip().lower()
+
+
+def initialize_logging():
+    """
+    Create the log directory and start a fresh log file.
+
+    The previous log is intentionally discarded whenever
+    the script starts.
+    """
+
+    LOG_FILE.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    LOG_FILE.write_text(
+        "",
+        encoding="utf-8",
+    )
+
+
+def log(message):
+    """
+    Print a message to the terminal and write it to the log file.
+    """
+
+    timestamp = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+
+    line = f"[{timestamp}] {message}"
+
+    # Terminal
+    print(
+        line,
+        flush=True,
+    )
+
+    # Log file
+    try:
+        with LOG_FILE.open(
+            "a",
+            encoding="utf-8",
+        ) as file:
+            file.write(line + "\n")
+
+    except OSError as error:
+        print(
+            f"[{timestamp}] WARNING: could not write log: {error}",
+            flush=True,
+        )
+
+
+# ============================================================
+# PipeWire stream discovery
+# ============================================================
+
+
+def get_wpctl_status():
+    result = run(["wpctl", "status"])
+    return result.stdout
+
+
+def get_active_streams():
+    """
+    Return application streams that currently have active
+    output ports.
+
+    Result:
+
+        {
+            "Zen": [
+                ("123", "output_FL"),
+                ("124", "output_FR"),
+            ],
+            ...
+        }
+    """
+
+    output = get_wpctl_status()
+
+    in_audio = False
+    in_streams = False
+
+    current_app = None
+
+    streams = {}
+
+    ignored_apps = {normalize_name(x) for x in IGNORED_APPS}
+
+    music_apps = {normalize_name(x) for x in MUSIC_APPS}
+
+    for line in output.splitlines():
+        stripped = line.strip()
+
+        if stripped == "Audio":
+            in_audio = True
+            continue
+
+        if in_audio and stripped == "Video":
+            break
+
+        if not in_audio:
+            continue
+
+        if stripped == "└─ Streams:":
+            in_streams = True
+            continue
+
+        if not in_streams:
+            continue
+
+        # ----------------------------------------------------
+        # Connection line
+        # ----------------------------------------------------
+        #
+        # These MUST be checked before stream headers because
+        # connection lines also contain "<number>."
+        #
+        # Example:
+        #
+        #     60. output_FL > sink [active]
+        #
+        connection_match = re.match(
+            r"^\s*(\d+)\.\s+(output_|input_|monitor_)(\S*)",
+            line,
+        )
+
+        if connection_match:
+
+            port_id = connection_match.group(1)
+
+            port_name = connection_match.group(2) + connection_match.group(3)
+
+            # We only care about application OUTPUT ports.
+            if not port_name.startswith("output_"):
+                continue
+
+            # Only monitor streams that PipeWire considers active.
+            if "[active]" not in line:
+                continue
+
+            if current_app is None:
+                continue
+
+            app_normalized = normalize_name(current_app)
+
+            if app_normalized in ignored_apps:
+                continue
+
+            if app_normalized in music_apps:
+                continue
+
+            streams.setdefault(
+                current_app,
+                [],
+            ).append((port_id, port_name))
+
+            continue
+
+        # ----------------------------------------------------
+        # Stream header
+        # ----------------------------------------------------
+
+        stream_match = re.match(
+            r"^\s*(\d+)\.\s+(.+?)\s*$",
+            line,
+        )
+
+        if stream_match:
+            current_app = stream_match.group(2).strip()
+
+    return streams
+
+
+# ============================================================
+# Detector ports
+# ============================================================
+
+
+def get_record_input_ports():
+    """
+    Find pw-record's input ports.
+
+    Returns:
+
+        {
+            "input_FL": "123",
+            "input_FR": "124",
+        }
+    """
+
+    result = run(["pw-link", "-iI"])
+
+    ports = {}
+
+    for line in result.stdout.splitlines():
+
+        match = re.match(
+            r"^\s*(\d+)\s+(.+)$",
+            line,
+        )
+
+        if not match:
+            continue
+
+        port_id = match.group(1)
+        port_name = match.group(2)
+
+        if port_name == f"{DETECTOR_NAME}:input_FL":
+            ports["input_FL"] = port_id
+
+        elif port_name == f"{DETECTOR_NAME}:input_FR":
+            ports["input_FR"] = port_id
+
+    return ports
+
+
+# ============================================================
+# Dynamic linking
+# ============================================================
+
+
+def update_links():
+    """
+    Discover active applications and make sure their audio
+    outputs are connected to our detector.
+
+    Existing links are kept.
+    """
+
+    global connected_ports
+    global connected_port_info
+
+    streams = get_active_streams()
+    record_ports = get_record_input_ports()
+    # log(f"DEBUG: discovered streams: {streams}")
+    # log(f"DEBUG: detector ports: {record_ports}")
+
+    if not record_ports:
+        log("WARNING: detector input ports not found.")
+        return
+
+    desired = {}
+
+    for app, ports in streams.items():
+
+        for port_id, port_name in ports:
+
+            if port_name.endswith("_FL"):
+                detector_port = record_ports.get("input_FL")
+
+            elif port_name.endswith("_FR"):
+                detector_port = record_ports.get("input_FR")
+
+            else:
+                continue
+
+            if detector_port is None:
+                continue
+
+            desired[port_id] = detector_port
+
+            # Remember the application and port name so we can
+            # include them in the log if this link later disappears.
+            connected_port_info.setdefault(
+                port_id,
+                (app, port_name),
+            )
+
+    # Remove links that no longer correspond to active streams.
+    for output_port, input_port in list(connected_ports.items()):
+
+        if output_port in desired:
+            continue
+
+        app, port_name = connected_port_info.get(
+            output_port,
+            ("Unknown", "Unknown"),
+        )
+
+        log(
+            f"Removing stale link | "
+            f"{app}: {port_name} ({output_port}) "
+            f"-/> {input_port}"
+        )
+
+        run(
+            [
+                "pw-link",
+                "-d",
+                output_port,
+                input_port,
+            ],
+            check=False,
+        )
+
+        del connected_ports[output_port]
+        connected_port_info.pop(output_port, None)
+
+    # Create new links.
+    for output_port, input_port in desired.items():
+
+        if output_port in connected_ports:
+            continue
+
+        app, port_name = connected_port_info[output_port]
+
+        result = run(
+            [
+                "pw-link",
+                output_port,
+                input_port,
+            ],
+            check=False,
+        )
+
+        if result.returncode == 0:
+            connected_ports[output_port] = input_port
+
+            log(
+                f"Connected {app}: "
+                f"{port_name} ({output_port}) "
+                f"-> detector {input_port}"
+            )
+
+        else:
+            log(
+                f"WARNING: failed to connect "
+                f"{app}: {port_name} ({output_port}) "
+                f"-> detector {input_port}"
+            )
+
+
+# ============================================================
+# Audio capture
+# ============================================================
+
+
+def start_audio_capture():
+    global record_process
+
+    log("Starting PipeWire audio capture...")
+
+    command = [
+        "pw-record",
+        "--target",
+        "0",  # 0 means don't link this node to anything
+        "--properties",
+        (
+            '{"stream.capture.sink":true,'
+            f'"application.name":"{DETECTOR_NAME}",'
+            f'"node.name":"{DETECTOR_NAME}"'
+            "}"
+        ),
+        "--format",
+        "f32",
+        "--rate",
+        str(SAMPLE_RATE),
+        "--channels",
+        str(CHANNELS),
+        "-",
+    ]
+
+    record_process = subprocess.Popen(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+    )
+
+    time.sleep(1)
+
+    log(f"PipeWire audio capture started " f"(PID {record_process.pid})")
+
+    return record_process
+
+
+def read_audio_chunk(process, frames=1024):
+    """
+    Read one chunk of float32 stereo PCM data.
+
+    Returns an empty array if no audio data is currently available.
+    Returns None if the capture process has ended.
+    """
+
+    bytes_needed = frames * CHANNELS * 4
+
+    ready, _, _ = select.select(
+        [process.stdout],
+        [],
+        [],
+        0.1,
+    )
+
+    if not ready:
+        return np.array([], dtype=np.float32)
+
+    data = os.read(
+        process.stdout.fileno(),
+        bytes_needed,
+    )
+
+    if not data:
+        return None
+
+    samples = np.frombuffer(
+        data,
+        dtype=np.float32,
+    )
+
+    return samples
+
+
+# ============================================================
+# Audio analysis
+# ============================================================
+
+
+def calculate_rms(samples):
+    if samples is None or len(samples) == 0:
+        return 0.0
+
+    return float(np.sqrt(np.mean(np.square(samples))))
+
+
+# ============================================================
+# Music control
+# ============================================================
+
+
+def playerctl(*args):
+    return run(
+        [
+            "playerctl",
+            "--player",
+            MUSIC_PLAYER,
+            *args,
+        ],
+        check=False,
+    )
+
+
+def get_music_status():
+    """
+    Get the current playback state of YoutubeMusic.
+
+    Returns:
+        "Playing"
+        "Paused"
+        "Stopped"
+        or None if the player cannot be queried.
+    """
+
+    result = playerctl("status")
+
+    if result.returncode != 0:
+        return None
+
+    return result.stdout.strip()
+
+
+def get_music_volume():
+    """
+    Get the current YoutubeMusic volume.
+
+    playerctl reports volume as a value between 0.0 and 1.0.
+    """
+
+    result = playerctl("volume")
+
+    if result.returncode != 0:
+        return None
+
+    try:
+        return float(result.stdout.strip())
+    except ValueError:
+        return None
+
+
+def set_music_volume(volume):
+    """
+    Set YoutubeMusic volume.
+
+    Volume is clamped to 0.0 - 1.0.
+    """
+
+    volume = max(0.0, min(1.0, volume))
+
+    playerctl(
+        "volume",
+        str(volume),
+    )
+
+
+def fade_music(target_volume, duration):
+    """
+    Gradually change the music volume to target_volume.
+    """
+
+    current_volume = get_music_volume()
+
+    if current_volume is None:
+        return False
+
+    if FADE_STEPS <= 0:
+        set_music_volume(target_volume)
+        return True
+
+    step_delay = duration / FADE_STEPS
+
+    for step in range(1, FADE_STEPS + 1):
+
+        progress = step / FADE_STEPS
+
+        volume = current_volume + (target_volume - current_volume) * progress
+
+        set_music_volume(volume)
+
+        time.sleep(step_delay)
+
+    return True
+
+
+def pause_music():
+    global music_paused_manually
+    global original_music_volume
+
+    if music_paused_manually:
+        return
+
+    # Don't do anything if the music isn't currently playing.
+    status = get_music_status()
+
+    if status != "Playing":
+        return
+
+    log("Other audio detected -> fading music out.")
+
+    current_volume = get_music_volume()
+
+    if current_volume is None:
+        log(f"WARNING: could not read {MUSIC_PLAYER} volume. " "Aborting pause.")
+        return
+
+    # Remember the user's volume.
+    original_music_volume = current_volume
+
+    log(f"Remembered music volume: " f"{original_music_volume:.3f}")
+
+    log(f"Fading music to silence " f"({FADE_OUT_DURATION}s)...")
+
+    fade_music(
+        0.0,
+        FADE_OUT_DURATION,
+    )
+
+    result = playerctl("pause")
+
+    if result.returncode == 0:
+        music_paused_manually = True
+
+        # Restore the volume immediately while the player
+        # is paused. This means manually pressing Play later
+        # starts at the user's normal volume.
+        set_music_volume(original_music_volume)
+
+        log(f"Music paused. Restored volume to " f"{original_music_volume:.3f}.")
+
+    else:
+        log(
+            f"WARNING: {MUSIC_PLAYER} pause command failed. "
+            "Restoring original volume."
+        )
+
+        set_music_volume(original_music_volume)
+
+
+def resume_music():
+    global music_paused_manually
+    global original_music_volume
+
+    if not music_paused_manually:
+        return
+
+    # Don't do anything if the music is already playing.
+    status = get_music_status()
+
+    if status == "Playing":
+        log("YoutubeMusic is already playing. " "Clearing automatic pause state.")
+
+        music_paused_manually = False
+        return
+
+    log("Audio stopped -> resuming music.")
+
+    if original_music_volume is None:
+        log("WARNING: original music volume is unknown. " "Cannot safely resume.")
+        return
+
+    log(f"Starting music silently; target volume: " f"{original_music_volume:.3f}")
+
+    # Start silently.
+    set_music_volume(0.0)
+
+    result = playerctl("play")
+
+    if result.returncode != 0:
+        log("WARNING: YoutubeMusic play command failed. " "Restoring original volume.")
+
+        set_music_volume(original_music_volume)
+        return
+
+    # Give the player a tiny moment to start.
+    time.sleep(0.05)
+
+    log(f"Fading music in over {FADE_IN_DURATION}s...")
+
+    # Gradually restore the user's original volume.
+    fade_music(
+        original_music_volume,
+        FADE_IN_DURATION,
+    )
+
+    music_paused_manually = False
+
+    log(f"Music resumed at volume " f"{original_music_volume:.3f}.")
+
+
+# ============================================================
+# Cleanup
+# ============================================================
+
+
+def cleanup():
+    log("Cleaning up...")
+
+    global record_process
+
+    if record_process is not None:
+        log("Stopping pw-record...")
+
+        record_process.terminate()
+
+        try:
+            record_process.wait(timeout=1)
+            log("pw-record stopped.")
+
+        except subprocess.TimeoutExpired:
+            log("WARNING: pw-record did not stop within 1 second. " "Killing it.")
+
+            record_process.kill()
+
+            log("pw-record killed.")
+
+        record_process = None
+
+    for output_port, input_port in list(connected_ports.items()):
+
+        log(f"Removing link: " f"{output_port} -> {input_port}")
+
+        run(
+            [
+                "pw-link",
+                "-d",
+                output_port,
+                input_port,
+            ],
+            check=False,
+        )
+
+    connected_ports.clear()
+    connected_port_info.clear()
+
+    log("Cleanup complete.")
+
+
+def signal_handler(signum, frame):
+    sys.exit(0)
+
+
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
+
+
+# ============================================================
+# Main loop
+# ============================================================
+
+
+def main():
+
+    initialize_logging()
+
+    log("======================================")
+    log(" Audio Ducking")
+    log("======================================")
+    log(f"Log file: {LOG_FILE}")
+    log(f"Music player: {MUSIC_PLAYER}")
+    log(f"Music apps ignored by detector: {sorted(MUSIC_APPS)}")
+    log(f"Other ignored apps: {sorted(IGNORED_APPS)}")
+    log(f"Sound threshold: {SOUND_THRESHOLD}")
+    log(f"Pause delay: {PAUSE_DELAY}s")
+    log(f"Resume delay: {RESUME_DELAY}s")
+    log(f"Fade out: {FADE_OUT_DURATION}s")
+    log(f"Fade in: {FADE_IN_DURATION}s")
+
+    # Give PipeWire a moment to create the node.
+    time.sleep(0.5)
+
+    start_audio_capture()
+
+    print("\nDetector running.")
+    print("Press Ctrl+C to stop.\n")
+
+    last_discovery = 0
+
+    sound_started_at = None
+    silence_started_at = None
+
+    while True:
+
+        now = time.monotonic()
+
+        # Rediscover streams periodically.
+        if now - last_discovery >= CHECK_INTERVAL:
+            # log("DEBUG: beginning update_links()...")
+            update_links()
+            # log("DEBUG: update_links() returned.")
+            last_discovery = now
+
+        # Read audio.
+        # print("reading audio")
+        samples = read_audio_chunk(record_process)
+
+        if samples is None:
+            print("Audio capture ended.")
+            break
+
+        if samples.size == 0:
+            # print("continuing")
+            continue
+
+        rms = calculate_rms(samples)
+
+        is_sound = rms >= SOUND_THRESHOLD
+
+        if is_sound:
+
+            silence_started_at = None
+
+            if sound_started_at is None:
+                sound_started_at = now
+
+            if now - sound_started_at >= PAUSE_DELAY:
+                pause_music()
+
+        else:
+
+            sound_started_at = None
+
+            if silence_started_at is None:
+                silence_started_at = now
+
+            if now - silence_started_at >= RESUME_DELAY:
+                resume_music()
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    finally:
+        cleanup()

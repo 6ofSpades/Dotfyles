@@ -54,13 +54,14 @@ open = [
 ]
 imageedit = [
 	{ run = "gimp %s1",    desc = "Edit in GIMP", for = "linux" },
+	{ run = "inkscape %s1",    desc = "Edit in Inkscape", for = "linux" },
 ]
 reveal = [
-	{ run = "xdg-open %d1",         desc = "Reveal", for = "linux" },
-	{ run = "open -R %s1",          desc = "Reveal", for = "macos" },
-	{ run = "explorer /select,%s1", desc = "Reveal", for = "windows", orphan = true },
-	{ run = "termux-open %d1",      desc = "Reveal", for = "android" },
-	{ run = "clear; exiftool %s1; echo 'Press enter to exit'; read _", desc = "Show EXIF", for = "unix", block = true },
+	{ run = "xdg-open %d1",                                     desc = "Reveal", for = "linux" },
+	{ run = "open -R %s1",                                      desc = "Reveal", for = "macos" },
+	{ run = "explorer /select,%s1",                             desc = "Reveal", for = "windows", orphan = true },
+	{ run = "termux-open %d1",                                  desc = "Reveal", for = "android" },
+	{ run = "exiftool %s1 | nvim -c 'map <silent> q :qa!<CR>'", desc = "Show EXIF",for = "unix", block = true },
 ]
 extract = [
 	{ run = "ya pub extract --list %s", desc = "Extract here" },
@@ -112,6 +113,10 @@ fetchers = [
 
 	{ url = "*",          run = "git",         group = "git" },
 	{ url = "*/",         run = "git",         group = "git" },
+
+  { id = "simple-tag", url = "*", run = "simple-tag" ,group = "simple-tag" },
+  { id = "simple-tag", url = "*/", run = "simple-tag",group = "simple-tag" },
+  # { id = "simple-tag", url = "*/", run = 
 ]
 spotters = [
 	{ url = "*/", run = "folder" },
@@ -130,6 +135,11 @@ spotters = [
 	{ mime = "null/*", run = "null" },
 	# Fallback
 	{ url = "*", run = "file" },
+]
+prepend_spotters = [
+  { mime = "image/*", run = "spot-image" },
+  { mime = "video/*", run = "spot-video" },
+  { mime = "audio/*", run = "spot-audio" },
 ]
 preloaders = [
 	# Image

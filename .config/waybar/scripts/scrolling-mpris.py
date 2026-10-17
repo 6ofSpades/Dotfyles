@@ -1,109 +1,200 @@
+#!/usr/bin/env python3
+import html
+import json
 import subprocess
 import time
-import json
-import sys
-import html
 
-# Customization settings (easy to modify)
-GLYPH_FONT_FAMILY="Symbols Nerd Font Mono" # Set to your desired symbols font
-# Those are glyphs that will be always visible at left side of module.
-GLYPHS = {
-    "paused": " ",
-    "playing": " ",
-    "stopped": " "
-}
-DEFAULT_GLYPH = " "  # Glyph when status is unknown or default
-TEXT_WHEN_STOPPED = "               MPRIS"  # Text to display when nothing is playing
-SCROLL_TEXT_LENGTH = 55  # Length of the song title part (excludes glyph and space)
-FORCE_SCROLL = True # Set to True if you want all songs to scroll regardless of length
-REFRESH_INTERVAL = 0.5  # How often the script updates (in seconds)
-PLAYERCTL_PATH = "/usr/bin/playerctl" # Path to playerctl, use which playerctl to find yours.
+# --- CONFIGURATION ---
 
-# Function to get player status using playerctl
-def get_player_status():
+TEXT_WHEN_STOPPED = "MPRIS"
+
+SCROLL_TEXT_LENGTH = 45
+SCROLL_GAP = "   "
+REFRESH_INTERVAL = 0.2
+PLAYERCTL_PATH = "/usr/bin/playerctl"
+
+# Text between title and artist.
+SEPARATOR = "  "
+
+# Pango formatting for each metadata field.
+#
+# {} will be replaced with the safely escaped text.
+TITLE_MARKUP = "<i>{}</i>"
+ARTIST_MARKUP = "<span alpha='70%'>{}</span>"
+
+
+def run_playerctl(args):
     try:
-        result = subprocess.run([PLAYERCTL_PATH, 'status'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        status = result.stdout.decode('utf-8').strip().lower()
-        if result.returncode != 0 or not status:
-            return "stopped"  # Default to stopped if no status
-        return status
-    except Exception as e:
-        return "stopped"
-
-# Function to get currently playing song using playerctl
-def get_current_song():
-    try:
-        result = subprocess.run(
-            [PLAYERCTL_PATH, 'metadata', '--format', '  {{title}}   {{artist}}'],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        res = subprocess.run(
+            [PLAYERCTL_PATH] + args,
+            capture_output=True,
+            text=True,
+            timeout=1,
         )
-        song_info = result.stdout.decode('utf-8').strip()
-        if result.returncode != 0 or not song_info:
-            return None
-        return song_info
-    except Exception as e:
-        return None
+        return res.stdout.strip() if res.returncode == 0 else ""
+    except Exception:
+        return ""
 
-# Function to generate scrolling text with fixed length
-def scroll_text(text, length=SCROLL_TEXT_LENGTH):
-    text = text.ljust(length)  # Ensure the text is padded to the desired length
-    scrolling_text = text + ' ' + text[:length]  # Add space and repeat start for scrolling effect
-    
-    for i in range(len(scrolling_text) - length):
-        yield scrolling_text[i:i + length]  # Use a generator to yield scrolling parts
+
+def get_state():
+    status = run_playerctl(["status"]).lower()
+
+    if not status:
+        return "stopped", "", ""
+
+    title = run_playerctl(["metadata", "--format", "{{title}}"])
+    artist = run_playerctl(["metadata", "--format", "{{artist}}"])
+
+    return status, title, artist
+
+
+def get_song_parts(title, artist):
+    """
+    Return the plain-text representation of the song and the
+    positions occupied by the title and artist.
+
+    Example:
+
+        title  = "Song"
+        artist = "Artist"
+
+        plain = "Song |  Artist"
+    """
+
+    plain_song = f"{title}{SEPARATOR}{artist}"
+
+    title_start = 0
+    title_end = len(title)
+
+    artist_start = len(title) + len(SEPARATOR)
+    artist_end = artist_start + len(artist)
+
+    return (
+        plain_song,
+        title_start,
+        title_end,
+        artist_start,
+        artist_end,
+    )
+
+
+def format_window(title, artist, start):
+    (
+        plain_song,
+        title_start,
+        title_end,
+        artist_start,
+        artist_end,
+    ) = get_song_parts(title, artist)
+
+    cycle = plain_song + SCROLL_GAP
+
+    # Make the source long enough to contain any possible
+    # SCROLL_TEXT_LENGTH-sized window.
+    repetitions = (SCROLL_TEXT_LENGTH // len(cycle)) + 2
+    padded_song = cycle * repetitions
+
+    window = padded_song[start : start + SCROLL_TEXT_LENGTH]
+
+    result = []
+
+    for i, char in enumerate(window):
+        position = start + i
+        song_position = position % len(cycle)
+
+        if song_position >= len(plain_song):
+            result.append(" ")
+            continue
+
+        if title_start <= song_position < title_end:
+            result.append(TITLE_MARKUP.format(html.escape(char)))
+
+        elif artist_start <= song_position < artist_end:
+            result.append(ARTIST_MARKUP.format(html.escape(char)))
+
+        else:
+            result.append(html.escape(char))
+
+    return "".join(result)
+
+
+def format_static_song(title, artist):
+    """
+    Format the complete song for the paused state.
+
+    Metadata is escaped BEFORE being inserted into the Pango
+    templates, so song metadata can never inject its own markup.
+    """
+
+    safe_title = html.escape(title)
+    safe_artist = html.escape(artist)
+
+    return (
+        TITLE_MARKUP.format(safe_title)
+        + html.escape(SEPARATOR)
+        + ARTIST_MARKUP.format(safe_artist)
+    )
 
 
 if __name__ == "__main__":
-    scroll_generator = None
     current_song = None
+    scroll_position = 0
     last_status = None
-    last_text_frame = ""
 
     while True:
-        output = {}
+        status, title, artist = get_state()
 
-        try:
-            # Get the player status and song title
-            status = get_player_status()
-            song = get_current_song()
+        if not title:
+            display_text = html.escape(TEXT_WHEN_STOPPED.ljust(SCROLL_TEXT_LENGTH))
 
-            # Get the glyph based on player status
-            glyph = GLYPHS.get(status, DEFAULT_GLYPH)
+            class_name = "stopped"
 
-            # Detect song change → reset scrolling
+            current_song = None
+            scroll_position = 0
+
+        else:
+            class_name = status
+
+            # This is the ONLY place where the plain song
+            # representation is constructed for comparison.
+            song = f"{title}{SEPARATOR}{artist}"
+
+            # Song changed -> restart scrolling.
             if song != current_song:
-                scroll_generator = None
                 current_song = song
+                scroll_position = 0
 
-            if song:
-                if len(song) > SCROLL_TEXT_LENGTH or FORCE_SCROLL:
-                    # Only scroll when playing
-                    if scroll_generator is None:
-                        scroll_generator = scroll_text(song)
+            if status == "playing":
 
-                    if status == "playing":
-                        try:
-                            last_text_frame = next(scroll_generator)
-                        except StopIteration:
-                            scroll_generator = scroll_text(song)
-                            last_text_frame = next(scroll_generator)
-                    # if paused/stopped, keep last_text_frame as is
-                    song_text = last_text_frame
-                    if status == 'paused':
-                        song_text = current_song
-                else:
-                    song_text = song.ljust(SCROLL_TEXT_LENGTH)
-                    scroll_generator = None
+                # Just resumed -> restart scrolling.
+                if last_status != "playing":
+                    scroll_position = 0
+
+                display_text = format_window(
+                    title,
+                    artist,
+                    scroll_position,
+                )
+
+                scroll_position += 1
+
+                # Restart after reaching the end.
+                if scroll_position >= len(song) + len(SCROLL_GAP):
+                    scroll_position = 0
+
             else:
-                song_text = TEXT_WHEN_STOPPED.ljust(SCROLL_TEXT_LENGTH)
-                scroll_generator = None
+                # Paused -> show the complete formatted song.
+                display_text = format_static_song(title, artist)
 
-            escaped_song_text = html.escape(song_text)
-            output["text"] = f"<span font_family='{GLYPH_FONT_FAMILY}'>{glyph}</span> {escaped_song_text}"
+                # Resume from the beginning.
+                scroll_position = 0
 
-        except Exception as e:
-            output["text"] = f" Error: {str(e)}".ljust(SCROLL_TEXT_LENGTH + 2)
+        last_status = status
 
-        print(json.dumps(output), end='\n')
+        out_data = {
+            "text": display_text,
+            "class": [class_name],
+        }
+
+        print(json.dumps(out_data))
         time.sleep(REFRESH_INTERVAL)
-

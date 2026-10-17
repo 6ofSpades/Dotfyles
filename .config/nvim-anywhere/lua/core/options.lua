@@ -9,6 +9,10 @@ vim.opt.cursorline = true -- highlights the current line you're in
 vim.opt.scrolloff = 5 -- keep X lines visible when scrolling
 vim.opt.sidescrolloff = 5 -- keep X columns visible when side-scrolling
 
+-- Enable line wrapping
+vim.opt.wrap = true
+vim.opt.linebreak = true
+
 -- Search settings
 vim.opt.ignorecase = true -- ignore case when searching
 vim.opt.smartcase = true -- if you include mixed case in your search, assumes case-sensitive
@@ -24,16 +28,6 @@ vim.opt.fillchars = {
 	eob = " ", -- remove the tildas that appear at the end of file or on empty lines
 }
 
--- Transparency
-vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
-vim.api.nvim_set_hl(0, "LineNr", { bg = "none" })
-vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
-
--- Transparent highlights
-vim.api.nvim_set_hl(0, "CursorLine", { bg = "#484848" })
-vim.api.nvim_set_hl(0, "Visual", { bg = "#6b1498" })
-
 -- Scrollback thingys
 vim.opt.swapfile = false
 vim.opt.shada = ""
@@ -47,5 +41,18 @@ vim.opt.writebackup = false
 vim.api.nvim_create_autocmd("UIEnter", {
 	callback = function()
 		vim.o.clipboard = "unnamedplus"
+	end,
+})
+
+-- Automatically enable English spellcheck for text and markdown files
+-- English is by default, you can change language with Telescope
+-- Also wrap and linebreak
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = { "markdown", "text" },
+	callback = function()
+		vim.opt_local.spell = true
+		vim.opt_local.spelllang = "en"
+		vim.opt.wrap = true
+		vim.opt.linebreak = true
 	end,
 })

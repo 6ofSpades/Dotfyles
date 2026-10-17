@@ -22,13 +22,13 @@
     --themegray2: #616a94 !important;
     --thememagenta2: #9A28e3 !important;
     --thememagenta3: #5F00f7 !important;
-    --themeaccent: #6910c5 !important;
-    --themeaccent_darker: #290375 !important;
+    --themeaccent: #6910a5 !important;
+    --themeaccent_darker: #290355 !important;
     --themeaccent_lighter: #efaeff !important;
-    --themecursor: #6910c5 !important;
+    --themecursor: #6910a5 !important;
     --themecursor_text_color: #dddddd !important;
-    --themecursor_line: #290375 !important;
+    --themecursor_line: #290355 !important;
     --themecursor_line_number: #00ffff !important;
     --themeline_number: #414a74 !important;
-    --themeselection_bg: #060085 !important;
+    --themeselection_bg: #490375 !important;
 }

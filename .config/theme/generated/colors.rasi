@@ -22,18 +22,18 @@
     gray2: rgb(97, 106, 148);
     magenta2: rgb(154, 40, 227);
     magenta3: rgb(95, 0, 247);
-    accent: rgb(105, 16, 197);
-    accent-darker: rgb(41, 3, 117);
+    accent: rgb(105, 16, 165);
+    accent-darker: rgb(41, 3, 85);
     accent-lighter: rgb(239, 174, 255);
-    cursor: rgb(105, 16, 197);
+    cursor: rgb(105, 16, 165);
     cursor-text-color: rgb(221, 221, 221);
-    cursor-line: rgb(41, 3, 117);
+    cursor-line: rgb(41, 3, 85);
     cursor-line-number: rgb(0, 255, 255);
     line-number: rgb(65, 74, 116);
-    selection-bg: rgb(6, 0, 133);
+    selection-bg: rgb(73, 3, 117);
     rofi-bg: rgba(0,0,0,0.5);
     frecency-bg: rgba(0,0,0,0.3);
-    rofi-border: rgb(105,16,197);
-    selected-bg: rgba(41,3,117,0.4);
+    rofi-border: rgb(105,16,165);
+    selected-bg: rgba(41,3,85,0.4);
     active-fg: rgb(133,0,188);
 }

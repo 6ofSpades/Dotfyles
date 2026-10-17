@@ -21,17 +21,18 @@ hl.window_rule({
 })
 
 -- -- opacity --
-hl.window_rule({ match = { class = "^(obsidian)$" }, opacity = "0.99" }) -- makes obsidian work with blur, for some reason
+hl.window_rule({ match = { class = "^(md.Obsidian)$" }, opacity = "0.99" }) -- makes obsidian work with blur, for some reason
+hl.window_rule({ match = { class = "^(md.obsidian.Obsidian)$" }, opacity = "0.99" }) -- makes obsidian work with blur, for some reason
 hl.window_rule({ match = { class = "^(com.obsproject.Studio)$" }, opacity = "0.85" }) -- OBS
 hl.window_rule({ match = { class = "^(com.azefsw-audioconnect-desktop-app-MainKt)$" }, opacity = "0.9" }) -- Audiorelay
 hl.window_rule({ match = { class = "^(com.github.th[_-]ch.youtube[_-]music)$" }, opacity = "0.99" }) -- pear-desktop
 hl.window_rule({ match = { class = "^(spotify)$" }, opacity = "0.8" })
 hl.window_rule({ match = { class = "portmaster" }, opacity = "0.85" })
 hl.window_rule({ match = { class = "[sS]team" }, opacity = "0.85" })
-hl.window_rule({ match = { initial_title = "[sS]team" }, opacity = "0.85" }) -- steam update window
+hl.window_rule({ match = { initial_title = "[sS]team" }, opacity = "0.8" }) -- steam update window
 hl.window_rule({ match = { class = "syncthingtray" }, opacity = "0.8" })
 hl.window_rule({ match = { class = "com.github.wwmm.easyeffects" }, opacity = "0.85" })
-hl.window_rule({ match = { class = "signal" }, opacity = "0.85" })
+hl.window_rule({ match = { class = "signal" }, opacity = "0.8" })
 hl.window_rule({ match = { class = "org.telegram.desktop" }, opacity = "0.85" })
 
 -- -- floating, size, center --
@@ -53,6 +54,12 @@ hl.window_rule({ match = { class = "tridactyl-insert" }, float = true })
 hl.window_rule({ match = { class = "tridactyl-insert" }, size = "monitor_w*0.40 monitor_h*0.40" })
 hl.window_rule({ match = { class = "kitty-float" }, float = true })
 hl.window_rule({ match = { class = "kitty-float" }, size = "monitor_w*0.5 monitor_h*0.5" })
+hl.window_rule({ match = { class = "^(com.github.th[_-]ch.youtube[_-]music)$" }, float = true })
+hl.window_rule({ match = { class = "^(com.github.th[_-]ch.youtube[_-]music)$" }, center = true })
+hl.window_rule({ match = { class = "^(com.github.th[_-]ch.youtube[_-]music)$" }, size = "monitor_w*0.7 monitor_h*0.7" })
+hl.window_rule({ match = { class = "cava" }, float = true })
+hl.window_rule({ match = { class = "cava" }, center = true })
+hl.window_rule({ match = { class = "cava" }, size = "monitor_w*0.68 monitor_h*0.68" })
 
 -- -- workspaces --
 hl.window_rule({ match = { class = "zen" }, workspace = "2" })
@@ -68,14 +75,20 @@ hl.window_rule({ match = { content = "3" }, workspace = "10" }) -- windows with 
 hl.window_rule({ match = { initial_title = "^(qBittorrent)$" }, workspace = "3 silent" })
 hl.window_rule({ match = { class = "solaar" }, workspace = "special:magic silent" })
 hl.window_rule({ match = { class = "^(com.github.th[_-]ch.youtube[_-]music)$" }, workspace = "special:music silent" })
+hl.window_rule({ match = { class = "cava" }, workspace = "special:music silent" })
 hl.window_rule({ match = { class = "portmaster" }, workspace = "special:portmaster silent" })
+
+-- -- grouped windows --
+hl.window_rule({ match = { group = true }, animation = "popin" })
+-- -- groups --
+hl.window_rule({ match = { class = "net.lutris.Lutris" }, group = "set" })
 
 -- -- blur --
 hl.window_rule({ match = { class = "steam_app_default" }, no_blur = true })
 hl.window_rule({ match = { class = "gamescope" }, no_blur = true })
 
 -- -- workspace rules --
-hl.workspace_rule({ workspace = "special:magic", gaps_out = 25 })
+hl.workspace_rule({ workspace = "s[true]", gaps_out = 25 })
 
 -- -- animation overrides --
 hl.window_rule({ match = { class = "pytab" }, animation = "gnomed" })
@@ -140,6 +153,17 @@ hl.window_rule({
 	stay_focused = true,
 })
 hl.window_rule({
+	name = "clipse",
+	match = { class = "clipse" },
+
+	float = true,
+	animation = "popin",
+	size = "monitor_w*0.37 monitor_h*0.64",
+	-- move = { "monitor_w / 2 - (monitor_w * 0.4 / 2)", "monitor_h - monitor_h * 0.64 - 2" },
+	center = true,
+	stay_focused = true,
+})
+hl.window_rule({
 	name = "quick-notes",
 	match = { class = "quick-notes" },
 
@@ -152,7 +176,7 @@ hl.window_rule({
 -- -- layer rules --
 hl.layer_rule({ match = { namespace = "waybar" }, blur = true })
 hl.layer_rule({ match = { namespace = "waybar" }, blur_popups = true })
-hl.layer_rule({ match = { namespace = "waybar" }, ignore_alpha = 0 })
+hl.layer_rule({ match = { namespace = "waybar" }, ignore_alpha = 0.3 })
 
 -- dunst, mako, etc
 hl.layer_rule({ match = { namespace = "notifications" }, blur = true })
@@ -178,3 +202,5 @@ hl.layer_rule({ match = { namespace = "selection" }, animation = "fade" })
 
 -- wvkbd virtual keyboard
 hl.layer_rule({ match = { namespace = "wvkbd" }, blur = true })
+hl.layer_rule({ match = { namespace = "wvkbd" }, xray = true })
+hl.layer_rule({ match = { namespace = "wvkbd" }, animation = "slide" })

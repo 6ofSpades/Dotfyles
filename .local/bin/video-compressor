@@ -1,0 +1,757 @@
+#!/usr/bin/env python3
+
+import argparse
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+# ============================================================
+# Configuration
+# ============================================================
+
+DEFAULT_ENCODER = "libx264"
+DEFAULT_QUALITY = 24
+DEFAULT_PRESET = "superfast"
+DEFAULT_AUDIO_BITRATE = "96k"
+DEFAULT_HEIGHT = 720
+DEFAULT_FPS = 27
+
+CPU_ENCODERS = {
+    "libx264",
+    "libx265",
+}
+
+NVENC_ENCODERS = {
+    "h264_nvenc",
+    "hevc_nvenc",
+    "av1_nvenc",
+}
+
+CPU_PRESETS = {
+    "ultrafast",
+    "superfast",
+    "veryfast",
+    "faster",
+    "fast",
+    "medium",
+    "slow",
+    "slower",
+    "veryslow",
+    "placebo",
+}
+
+NVENC_PRESETS = {
+    "p1",
+    "p2",
+    "p3",
+    "p4",
+    "p5",
+    "p6",
+    "p7",
+}
+
+VIDEO_EXTENSIONS = {
+    ".mp4",
+    ".mkv",
+    ".mov",
+    ".avi",
+    ".webm",
+    ".m4v",
+}
+
+
+# ============================================================
+# NOTE ABOUT NVIDIA / NVENC
+# ============================================================
+
+# a note for my dumb future self
+
+# GPU/NVENC support was tested on GTX 1070.
+#
+# The GTX 1070 itself supports NVENC, but the installed NVIDIA
+# driver exposes NVENC API 13.0 while the current Arch FFmpeg
+# package was built against NVENC API 13.1.
+#
+# As a result, h264_nvenc currently fails with:
+#
+#   Required: 13.1
+#   Found: 13.0
+#
+# FFmpeg reports that driver 610+ is required for that API.
+#
+# This is an NVENC API / driver / FFmpeg compatibility problem,
+# NOT a lack of NVENC hardware support.
+#
+# An attempt was also made to rebuild against NVIDIA Video Codec
+# SDK 13.0.19, but the downloaded SDK archive was not a valid
+# ZIP containing the expected files, so that was postponed.
+#
+# The script nevertheless keeps NVENC support because it should
+# work when a compatible NVIDIA driver/FFmpeg combination is used.
+
+
+# ============================================================
+# Helpers
+# ============================================================
+
+
+def find_ffmpeg():
+    ffmpeg = shutil.which("ffmpeg")
+
+    if not ffmpeg:
+        print("Error: ffmpeg was not found in PATH.")
+        sys.exit(1)
+
+    return ffmpeg
+
+
+def parse_optional_number(value):
+    if value.lower() == "none":
+        return None
+
+    try:
+        number = float(value)
+
+        if number <= 0:
+            raise ValueError
+
+        return number
+
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            f"expected a positive number or 'none', got '{value}'"
+        )
+
+
+def parse_optional_height(value):
+    if value.lower() == "none":
+        return None
+
+    try:
+        height = int(value)
+
+        if height <= 0:
+            raise ValueError
+
+        return height
+
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            f"expected a positive integer or 'none', got '{value}'"
+        )
+
+
+def validate_options(args, parser):
+    # --------------------------------------------------------
+    # Preset compatibility
+    # --------------------------------------------------------
+
+    if args.encoder in CPU_ENCODERS:
+        if args.preset not in CPU_PRESETS:
+            parser.error(
+                f"preset '{args.preset}' is not valid for CPU encoder "
+                f"'{args.encoder}'.\n"
+                f"CPU presets: {', '.join(sorted(CPU_PRESETS))}"
+            )
+
+    elif args.encoder in NVENC_ENCODERS:
+        if args.preset not in NVENC_PRESETS:
+            parser.error(
+                f"preset '{args.preset}' is not valid for NVIDIA encoder "
+                f"'{args.encoder}'.\n"
+                f"NVIDIA presets: {', '.join(sorted(NVENC_PRESETS))}"
+            )
+
+    # --------------------------------------------------------
+    # Quality
+    # --------------------------------------------------------
+
+    if not 0 <= args.quality <= 51:
+        parser.error("quality must be between 0 and 51.")
+
+    # --------------------------------------------------------
+    # Audio bitrate
+    # --------------------------------------------------------
+
+    if args.audio_bitrate is not None:
+        if not args.audio_bitrate.endswith(("k", "M")):
+            parser.error(
+                "audio bitrate must look like '96k', '128k', '192k', "
+                "etc., or use 'none' to copy the original audio."
+            )
+
+
+def build_video_filter(height, fps):
+    filters = []
+
+    # --------------------------------------------------------
+    # Maximum height
+    #
+    # Never upscale. If the input is already smaller than the
+    # requested height, its original dimensions are preserved.
+    # --------------------------------------------------------
+
+    if height is not None:
+        filters.append(f"scale=" f"'if(gt(ih,{height}),-2,iw)':" f"'min(ih,{height})'")
+
+    # --------------------------------------------------------
+    # Maximum FPS
+    #
+    # The fps filter is only added when requested. Its expression
+    # prevents lower-FPS sources from being increased.
+    # --------------------------------------------------------
+
+    if fps is not None:
+        filters.append(f"fps='min(source_fps,{fps:g})'")
+
+    if not filters:
+        return None
+
+    return ",".join(filters)
+
+
+def build_ffmpeg_command(
+    ffmpeg,
+    input_path,
+    output_path,
+    encoder,
+    quality,
+    preset,
+    height,
+    fps,
+    audio_bitrate,
+):
+    cmd = [
+        ffmpeg,
+        "-hide_banner",
+        "-y",
+    ]
+
+    # --------------------------------------------------------
+    # NVIDIA hardware decoding
+    # --------------------------------------------------------
+
+    if encoder in NVENC_ENCODERS:
+        cmd.extend(
+            [
+                "-hwaccel",
+                "cuda",
+            ]
+        )
+
+    cmd.extend(
+        [
+            "-i",
+            str(input_path),
+        ]
+    )
+
+    # --------------------------------------------------------
+    # Video
+    # --------------------------------------------------------
+
+    cmd.extend(
+        [
+            "-c:v",
+            encoder,
+        ]
+    )
+
+    if encoder in CPU_ENCODERS:
+        cmd.extend(
+            [
+                "-crf",
+                str(quality),
+                "-preset",
+                preset,
+            ]
+        )
+
+    elif encoder in NVENC_ENCODERS:
+        # NVENC uses CQ rather than x264/x265 CRF.
+        cmd.extend(
+            [
+                "-cq",
+                str(quality),
+                "-preset",
+                preset,
+            ]
+        )
+
+    # --------------------------------------------------------
+    # Video filters
+    # --------------------------------------------------------
+
+    video_filter = build_video_filter(height, fps)
+
+    if video_filter:
+        cmd.extend(
+            [
+                "-vf",
+                video_filter,
+            ]
+        )
+
+    # --------------------------------------------------------
+    # Audio
+    # --------------------------------------------------------
+
+    if audio_bitrate is None:
+        # Keep the original audio stream untouched.
+        cmd.extend(
+            [
+                "-c:a",
+                "copy",
+            ]
+        )
+
+    else:
+        cmd.extend(
+            [
+                "-c:a",
+                "aac",
+                "-b:a",
+                audio_bitrate,
+            ]
+        )
+
+    # --------------------------------------------------------
+    # Output
+    # --------------------------------------------------------
+
+    cmd.append(str(output_path))
+
+    return cmd
+
+
+def get_output_path(input_path, overwrite):
+    if overwrite:
+        # The actual temporary file is created later.
+        return input_path
+
+    return input_path.with_name(f"{input_path.stem}_compressed{input_path.suffix}")
+
+
+def format_size(size):
+    units = ["B", "KB", "MB", "GB", "TB"]
+
+    for unit in units:
+        if size < 1024:
+            return f"{size:.2f} {unit}"
+
+        size /= 1024
+
+    return f"{size:.2f} PB"
+
+
+# ============================================================
+# Compression
+# ============================================================
+
+
+def compress_video(
+    ffmpeg,
+    input_path,
+    args,
+):
+    original_size = input_path.stat().st_size
+
+    final_output = get_output_path(
+        input_path,
+        args.overwrite,
+    )
+
+    # --------------------------------------------------------
+    # Don't overwrite an existing _compressed file unless
+    # --overwrite was explicitly requested.
+    # --------------------------------------------------------
+
+    if not args.overwrite and final_output.exists():
+        print(f"Skipping: {final_output.name} already exists.")
+        return False
+
+    # --------------------------------------------------------
+    # Always encode into a temporary file first.
+    #
+    # This means:
+    #
+    #   - failed encodes never leave a seemingly-valid output
+    #   - --overwrite never reads/writes the same file
+    #   - replacement happens only after FFmpeg succeeds
+    # --------------------------------------------------------
+
+    temp_file = tempfile.NamedTemporaryFile(
+        prefix=f".{input_path.stem}_compressing_",
+        suffix=input_path.suffix,
+        dir=input_path.parent,
+        delete=False,
+    )
+
+    temp_path = Path(temp_file.name)
+    temp_file.close()
+
+    try:
+        command = build_ffmpeg_command(
+            ffmpeg=ffmpeg,
+            input_path=input_path,
+            output_path=temp_path,
+            encoder=args.encoder,
+            quality=args.quality,
+            preset=args.preset,
+            height=args.height,
+            fps=args.fps,
+            audio_bitrate=args.audio_bitrate,
+        )
+
+        print()
+        print(f"Input:  {input_path}")
+        print(f"Output: {final_output}")
+        print()
+
+        try:
+            subprocess.run(command, check=True)
+
+        except subprocess.CalledProcessError:
+            print()
+            print("Error: FFmpeg failed.")
+            print(f"Temporary file kept at: {temp_path}")
+            return False
+
+        # ----------------------------------------------------
+        # FFmpeg succeeded.
+        #
+        # Now perform the final replacement.
+        #
+        # os.replace() is atomic on the same filesystem and,
+        # importantly, doesn't require deleting the original
+        # first.
+        # ----------------------------------------------------
+
+        os.replace(temp_path, final_output)
+
+        final_size = final_output.stat().st_size
+
+        savings = original_size - final_size
+
+        if original_size > 0:
+            percentage = (savings / original_size) * 100
+        else:
+            percentage = 0
+
+        print()
+        print("Done!")
+        print(f"Original:  {format_size(original_size)}")
+        print(f"Compressed: {format_size(final_size)}")
+
+        if savings >= 0:
+            print(f"Saved:     {format_size(savings)} " f"({percentage:.1f}%)")
+        else:
+            print(
+                f"Larger by: {format_size(abs(savings))} " f"({abs(percentage):.1f}%)"
+            )
+
+        return True
+
+    except Exception:
+        # If anything unexpected happens, try to clean up the
+        # temporary file without touching the original.
+        if temp_path.exists():
+            try:
+                temp_path.unlink()
+            except OSError:
+                pass
+
+        raise
+
+
+# ============================================================
+# File discovery
+# ============================================================
+
+
+def get_video_files(path, recursive):
+    if path.is_file():
+        if path.suffix.lower() in VIDEO_EXTENSIONS:
+            return [path]
+
+        return []
+
+    if not path.is_dir():
+        return []
+
+    if recursive:
+        files = path.rglob("*")
+    else:
+        files = path.iterdir()
+
+    return sorted(
+        file
+        for file in files
+        if (
+            file.is_file()
+            and file.suffix.lower() in VIDEO_EXTENSIONS
+            and "_compressed" not in file.stem
+        )
+    )
+
+
+# ============================================================
+# CLI
+# ============================================================
+
+
+def create_parser():
+    parser = argparse.ArgumentParser(
+        prog="video-compress",
+        description=(
+            "Compress videos using CPU or NVIDIA GPU encoders while "
+            "giving independent control over video quality, preset, "
+            "resolution, FPS, and audio."
+        ),
+        epilog="""
+Examples:
+
+  Compress one video:
+    video-compress video.mp4
+
+  Compress a folder:
+    video-compress ~/Videos
+
+  Compress recursively:
+    video-compress ~/Videos --recursive
+
+  Limit video to 480p / 25 FPS:
+    video-compress video.mp4 --height 480 --fps 25
+
+  Preserve original resolution and FPS:
+    video-compress video.mp4 --height none --fps none
+
+  Keep original audio untouched:
+    video-compress video.mp4 --audio-bitrate none
+
+  Use slower CPU encoding for better compression:
+    video-compress video.mp4 --preset slower
+
+  Use NVIDIA NVENC:
+    video-compress video.mp4 --encoder h264_nvenc --preset p7
+
+  Replace the original only after successful compression:
+    video-compress video.mp4 --overwrite
+
+
+PRESETS:
+
+  CPU encoders (libx264 / libx265):
+
+    ultrafast → fastest, least compression efficiency
+    superfast
+    veryfast
+    faster
+    fast
+    medium
+    slow
+    slower
+    veryslow
+    placebo  → extremely slow, usually little practical benefit
+
+  In general, slower CPU presets spend more time searching for
+  compression improvements. They can produce smaller files at
+  the same quality, but the size improvement is not proportional
+  to the extra encoding time.
+
+  NVIDIA NVENC:
+
+    p1 → fastest
+    p2
+    p3
+    p4
+    p5
+    p6
+    p7 → slowest, generally best compression efficiency
+
+  CPU and NVIDIA presets are NOT interchangeable. For example,
+  --encoder h264_nvenc --preset superfast is an error because
+  "superfast" is an x264/x265 preset, not an NVENC preset.
+
+
+QUALITY:
+
+  --quality controls video quality.
+
+  CPU encoders use CRF internally.
+  NVIDIA NVENC encoders use CQ internally.
+
+  The number is therefore a convenient common quality setting,
+  but CRF and NVENC CQ are not mathematically equivalent scales.
+
+
+AUDIO:
+
+  --audio-bitrate 96k
+      Re-encode audio as AAC at 96 kbps.
+
+  --audio-bitrate 192k
+      Re-encode audio as AAC at 192 kbps.
+
+  --audio-bitrate none
+      Copy the original audio stream without re-encoding it.
+
+
+OUTPUT:
+
+  Without --overwrite:
+      video.mp4 → video_compressed.mp4
+
+  With --overwrite:
+      video.mp4 → compressed temporary file → video.mp4
+
+  The original is only replaced after FFmpeg successfully
+  finishes encoding.
+""",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+
+    parser.add_argument(
+        "input",
+        nargs="?",
+        help="video file or directory to process",
+    )
+
+    parser.add_argument(
+        "-r",
+        "--recursive",
+        action="store_true",
+        help="recursively process videos inside directories",
+    )
+
+    parser.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="replace the original after successful compression",
+    )
+
+    parser.add_argument(
+        "--encoder",
+        choices=sorted(CPU_ENCODERS | NVENC_ENCODERS),
+        default=DEFAULT_ENCODER,
+        help=("video encoder " "(default: %(default)s)"),
+    )
+
+    parser.add_argument(
+        "--quality",
+        type=int,
+        default=DEFAULT_QUALITY,
+        help=(
+            "video quality; CRF for CPU, CQ for NVENC "
+            f"(default: {DEFAULT_QUALITY}). 23 = balanced | 26-28 = higher compression."
+        ),
+    )
+
+    parser.add_argument(
+        "--preset",
+        default=DEFAULT_PRESET,
+        help=(
+            "encoding preset; CPU uses x264/x265 presets, "
+            "NVENC uses p1-p7 "
+            f"(default: {DEFAULT_PRESET})"
+        ),
+    )
+
+    parser.add_argument(
+        "--height",
+        type=parse_optional_height,
+        default=DEFAULT_HEIGHT,
+        help=(
+            f"maximum video height, or 'none' to preserve it "
+            f"(default: {DEFAULT_HEIGHT})"
+        ),
+    )
+
+    parser.add_argument(
+        "--fps",
+        type=parse_optional_number,
+        default=DEFAULT_FPS,
+        help=(f"maximum FPS, or 'none' to preserve it " f"(default: {DEFAULT_FPS})"),
+    )
+
+    parser.add_argument(
+        "--audio-bitrate",
+        default=DEFAULT_AUDIO_BITRATE,
+        type=lambda value: (None if value.lower() == "none" else value),
+        help=(
+            f"AAC bitrate, or 'none' to preserve/copy original audio "
+            f"(default: {DEFAULT_AUDIO_BITRATE})"
+        ),
+    )
+
+    return parser
+
+
+def main():
+    parser = create_parser()
+    args = parser.parse_args()
+
+    # No arguments → show the complete help.
+    if args.input is None:
+        parser.print_help()
+        return
+
+    validate_options(args, parser)
+
+    ffmpeg = find_ffmpeg()
+
+    input_path = Path(args.input).expanduser().resolve()
+
+    if not input_path.exists():
+        print(f"Error: '{input_path}' does not exist.")
+        sys.exit(1)
+
+    video_files = get_video_files(
+        input_path,
+        args.recursive,
+    )
+
+    if not video_files:
+        print("No supported video files found.")
+        sys.exit(1)
+
+    print(f"Found {len(video_files)} video(s).")
+    print(f"Encoder: {args.encoder}")
+    print(f"Quality: {args.quality}")
+    print(f"Preset: {args.preset}")
+
+    if args.height is None:
+        print("Maximum height: original")
+
+    else:
+        print(f"Maximum height: {args.height}p")
+
+    if args.fps is None:
+        print("Maximum FPS: original")
+
+    else:
+        print(f"Maximum FPS: {args.fps:g}")
+
+    if args.audio_bitrate is None:
+        print("Audio: original (copied)")
+
+    else:
+        print(f"Audio: AAC {args.audio_bitrate}")
+
+    print(f"Overwrite: {'yes' if args.overwrite else 'no'}")
+
+    successful = 0
+
+    for video in video_files:
+        if compress_video(ffmpeg, video, args):
+            successful += 1
+
+    print()
+    print(f"Finished: {successful}/{len(video_files)} video(s).")
+
+
+if __name__ == "__main__":
+    main()

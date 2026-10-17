@@ -28,8 +28,8 @@ colors:
   magenta3: "#5F00f7"
 
 ui:
-  accent: "#6910c5"
-  accent_darker: "#290375" #240a41
+  accent: "#6910a5"
+  accent_darker: "#290355" #240a41
   accent_lighter: "#efaeff"
 
   cursor: accent
@@ -41,7 +41,7 @@ ui:
   line_number: black_bright
 
   selection_fg:
-  selection_bg: "#060085"
+  selection_bg: "#490375"
 
 kitty:
   background_opacity: 0.7
@@ -279,7 +279,7 @@ hyprland:
   border_group_locked_active: yellow
   border_group_locked_inactive: border_inactive
 
-  groupbar_active: rgba(cursor_line,0.7)
+  groupbar_active: rgba(accent,0.6)
   groupbar_inactive: rgba(black_bright,0.5)
 
   hyprlock_input_bg: rgba($colors.bg,0.4)
@@ -482,7 +482,7 @@ wiremix:
   themes.default.meter_center_inactive.fg: black_bright
   themes.default.meter_center_active.fg: green
 
-  themes.default.dropdown_border.fg: blue
+  themes.default.dropdown_border.fg: accent
   themes.default.dropdown_selected.bg: cursor_line
   themes.default.dropdown_more.fg: black_bright
   themes.default.help_more.fg: black_bright
@@ -660,3 +660,116 @@ gdu:
 
 wlogout:
   buttons: $colors.fg
+
+gtk:
+  fg_unfocused: rgba(fg, 0.7)
+  fg_disabled: black_bright
+
+  bg1: rgba(bg, 0.6) # base background
+  bg2: rgba(bg, 0.6) # text areas
+  bg3: rgba(gray1, 0.5) # disabled widgets
+  bg4: rgba(bg, 0.9) # popover.background {
+
+  borders: black_bright
+
+  link: cyan
+  link_visited: blue
+
+qt:
+  ### Here comes the painful Kvantum SVG
+  ## Widgets
+  # background colors
+  "#000000": $colors.bg+80
+  # accent color
+  "#6910a5": $ui.accent
+  # accent darker color
+  "#290355": $ui.accent_darker+80
+  # fg color
+  "#c0caf5": $colors.fg
+  # borders and disabled widgets color
+  "#414a74": $colors.black_bright
+  # other borders and disabled things? dont remember this
+  "#161626": $colors.gray1
+
+  ## Configuration file
+  GeneralColors.window.color: bg+99
+  GeneralColors.base.color: bg+99
+  GeneralColors.alt.base.color: bg+99
+  GeneralColors.button.color: bg+99
+  GeneralColors.light.color: bg+99
+  GeneralColors.mid.light.color: bg+99
+  GeneralColors.dark.color: bg+99
+  GeneralColors.mid.color: bg+99
+  GeneralColors.highlight.color: selection_bg
+  GeneralColors.inactive.highlight.color: selection_bg
+  GeneralColors.text.color: $colors.fg
+  GeneralColors.window.text.color: $colors.fg
+  GeneralColors.button.text.color: $colors.fg
+  GeneralColors.disabled.text.color: $gtk.fg_disabled
+  GeneralColors.tooltip.text.color: $colors.fg
+  GeneralColors.highlight.text.color: white_bright
+  GeneralColors.link.color: $gtk.link
+  GeneralColors.link.visited.color: $gtk.link_visited
+  GeneralColors.progress.indicator.text.color: $colors.fg
+
+  PanelButtonCommand.text.normal.color: $colors.fg
+  PanelButtonCommand.text.focus.color: white
+  PanelButtonCommand.text.press.color: white_bright
+  PanelButtonCommand.text.toggle.color: white_bright
+
+  Dock.text.normal.color: $colors.fg
+
+  DockTitle.text.normal.color: $colors.fg
+  DockTitle.text.focus.color: white
+
+  IndicatorSpinBox.text.normal.color: $colors.fg
+
+  RadioButton.text.normal.color: $colors.fg
+  RadioButton.text.focus.color: white
+
+  CheckBox.text.normal.color: $colors.fg
+  CheckBox.text.focus.color: white
+
+  ToolboxTab.text.normal.color: $colors.fg
+  ToolboxTab.text.focus.color: white
+  ToolboxTab.text.press.color: white_bright
+
+  Tab.text.normal.color: $colors.fg
+  Tab.text.focus.color: $colors.fg
+  Tab.text.toggle.color: $colors.fg
+
+  HeaderSection.text.normal.color: $colors.fg
+  HeaderSection.ext.focus.color: white
+  HeaderSection.ext.press.color: white_bright
+  HeaderSection.ext.toggle.color: white_bright
+
+  Toolbar.text.normal.color: $colors.fg
+  Toolbar.text.focus.color: white
+
+  Progressbar.text.normal.color: $colors.fg
+  Progressbar.text.focus.color: white
+  Progressbar.text.press.color: white_bright
+  Progressbar.text.toggle.color: $colors.fg
+
+  ItemView.text.normal.color: $colors.fg
+  ItemView.text.focus.color: white
+  ItemView.text.press.color: white_bright
+  ItemView.text.toggle.color: white_bright
+
+  MenuItem.text.normal.color: $colors.fg
+  MenuItem.text.focus.color: white
+
+  MenuBar.text.normal.color: $colors.fg
+
+  MenuBarItem.text.normal.color: $colors.fg
+  MenuBarItem.text.focus.color: white
+
+  TitleBar.text.normal.color: $colors.fg
+  TitleBar.text.focus.color: white
+
+  ComboBox.text.press.color: white_bright
+
+  Menu.text.normal.color: $colors.fg
+
+  GroupBox.text.normal.color: $colors.fg
+  GroupBox.text.focus.color: white

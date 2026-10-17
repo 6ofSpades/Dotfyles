@@ -5,7 +5,7 @@
 #|___|_| |_|_|\__|_|\__,_|_|  \___/ \__,_|\__| .__/ \__,_|\__|
 #                                            |_|              
 # Initial output
-fastfetch -s none | lolcat --force -F 0.1 -S 21 -p 20| fastfetch --raw - --logo-width 38 --logo-height 20
+fastfetch
 # ---
 
 # ____  _  ___  _  __
@@ -35,15 +35,20 @@ fastfetch -s none | lolcat --force -F 0.1 -S 21 -p 20| fastfetch --raw - --logo-
 # \____\___/|_|\___/|_|  |___/
 # Colors
 ## This will set the default prompt to chosen theme
-# Good if you don't wanna use p10k or starship
-#prompt fire "#2d0861" "#55007c" "#6f00a2" white white magenta
+## Good if you don't wanna use p10k or starship
+## autoload -Uz promptinit
+## promptinit
+## prompt fire "#2d0861" "#55007c" "#6f00a2" white white magenta
 
 # ls colors
 # 35 will make directories purple instead of blue, etc.
 LS_COLORS=$LS_COLORS:'di=1;34:' ; export LS_COLORS
 
+# grep colors
+GREP_COLORS=$GREP_COLORS:'ms=1;36:' ; export GREP_COLORS
+
 # fzf colors
-export FZF_DEFAULT_OPTS_FILE="/home/six/.config/fzf/fzfrc"
+export FZF_DEFAULT_OPTS_FILE="$HOME/.config/fzf/fzfrc"
 
 # gum colors
 export GUM_INPUT_CURSOR_FOREGROUND=1
@@ -117,11 +122,12 @@ export PATH
 export EDITOR=nvim
 export SYSTEMD_EDITOR=nvim
 
+# export XDG_CONFIG_HOME="$HOME/.config"
+
 zstyle ':completion:*' menu select
 zstyle ':completion::complete:*' gain-privileges 1
 
-# stop the "go" folder from being created in home
-# I guess
+# stop the "go" folder from being created in your home
 export GOPATH="$HOME/.cache/go"
 # ---
 
@@ -224,7 +230,7 @@ alias locate='locate -i' # ignore case in locate by default
 history() {
   print -z $(
     ([ -n "$ZSH_NAME" ] && fc -li 1 || history) |
-    fzf --style full +s --tac |
+    fzf --style full --tac |
     sed -E 's/^[[:space:]]*[0-9]+[[:space:]]+[0-9-]+[[:space:]]+[0-9:]+[[:space:]]+//' |
     sed -E 's/\\/\\\\/g'
   )
@@ -252,6 +258,8 @@ alias snaplist='sudo snapper list | bat -l sql --paging never'  # easily list sn
 alias snaproll='sudo snapper-rollback'  # rollback. less things to type
 
 alias cd='z'
+
+alias clock='termdown -a -b'
 # ---
 
 # __   __        _ 
@@ -287,7 +295,21 @@ ZSH_HIGHLIGHT_STYLES[arg0]=fg=blue
 
 ## zsh-vi-mode plugin config
 ZVM_SYSTEM_CLIPBOARD_ENABLED=true
-ZVM_VI_HIGHLIGHT_BACKGROUND=#690086
+# get selection color if terminal is kitty
+if [[ -n "$KITTY_WINDOW_ID" ]] && command -v kitty &>/dev/null; then
+    ZVM_VI_HIGHLIGHT_BACKGROUND=$(kitty @ get-colors | awk '$1 == "selection_background" {print $2}')
+# otherwise fallback to some generic color
+else
+    ZVM_VI_HIGHLIGHT_BACKGROUND="#3b4252"
+fi
+
+# export variable so starship can use it
+# default value of insert mode for when opening the terminal
+export ZVM_MODE="${ZVM_MODE:-INSERT}"
+# update exported variable when mode changes
+function zvm_after_select_vi_mode() {
+  export ZVM_MODE
+}
 
 # zsh-vi-mode key overrides
 function zvm_after_lazy_keybindings() {
@@ -296,6 +318,20 @@ function zvm_after_lazy_keybindings() {
   zvm_bindkey vicmd 'P' zvm_paste_clipboard_before
   zvm_bindkey visual 'p' zvm_visual_paste_clipboard
   zvm_bindkey visual 'P' zvm_visual_paste_clipboard
+
+  function hints() {
+    kitten @ kitten hints --program "@" --type=line --alphabet=abcdefghijklmnopqrstuvwxyz
+  }
+  function pager() {
+    kitten @ action show_scrollback
+  }
+  zvm_define_widget hints
+  zvm_define_widget pager
+
+  # zvm_bindkey vicmd 'j' scrolld
+  # zvm_bindkey vicmd 'k' scrollu
+  # zvm_bindkey vicmd 'ff' hints
+  zvm_bindkey vicmd 'n' pager
 }
 
 ## Zoxide

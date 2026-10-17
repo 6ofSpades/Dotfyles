@@ -47,3 +47,41 @@ if [[ "$1" == blur-all ]]; then
   esac
   exit 0
 fi
+
+if [[ "$1" == resize-percent ]]; then
+  percent="$2"
+
+  # Ctrl+0 = 100%
+  if [[ "$percent" == "0" ]]; then
+    percent=100
+  fi
+
+  # Get the focused monitor dimensions
+  monitor_width=$(hyprctl monitors -j | jq -r '
+    .[] | select(.focused == true) | .width
+  ')
+
+  monitor_height=$(hyprctl monitors -j | jq -r '
+    .[] | select(.focused == true) | .height
+  ')
+
+  # Get current active window dimensions
+  current_width=$(hyprctl activewindow -j | jq -r '.size[0]')
+  current_height=$(hyprctl activewindow -j | jq -r '.size[1]')
+
+  # Calculate target dimensions
+  target_width=$((monitor_width * percent / 100))
+  target_height=$((monitor_height * percent / 100))
+
+  # Calculate resize delta
+  delta_width=$((target_width - current_width))
+  delta_height=$((target_height - current_height))
+
+  # Use the Lua dispatcher API
+  hyprctl dispatch "hl.dsp.window.resize({ x = $delta_width, y = $delta_height, relative = true })"
+
+  # and center the window
+  hyprctl dispatch "hl.dsp.window.center()"
+
+  exit 0
+fi

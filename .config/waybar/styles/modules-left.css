@@ -9,24 +9,20 @@
   font-weight: bold;
   text-decoration: underline;
   background-color: @overlay3;
+  border-radius: 8px 0px 0px 8px;
+  color: @yellow;
 }
-#submap.MAIN {
-  color: @blue;
+#submap.MAINS {
+  color: @submap-mains;
 }
 #submap.MOUSE {
-  color: @yellow;
+  color: @submap-mouse;
 }
 #submap.PLCTL {
-  color: @red;
+  color: @submap-plctl;
 }
 #submap.MVRSW {
-  color: @cyan;
-}
-#submap.DYNAM {
-  color: @yellow;
-}
-#submap.NVIMA {
-  color: @green;
+  color: @submap-mvrsw;
 }
 
 /* workspaces */
@@ -41,14 +37,48 @@
   padding: 0 1px;
   background-color: @overlay4;
 }
+#workspaces label {
+  font-size: 9pt;
+  color: @themefg;
+}
 #workspaces .active label {
-  font-size: 23px;
-  color: @accent;
+  font-size: 9pt;
+  color: @themewhite_bright;
+  font-weight: bold;
+}
+#workspaces .empty label {
+  font-size: 9pt;
+  color: @themeblack_bright;
+}
+#workspaces button.active {
+  background-color: @workspace-current-bg;
+  border: 1px solid @workspace-current-border;
+}
+
+#custom-privacydot_cam {
+  margin-left: 4px;
+  margin-right: 4px;
+}
+#custom-privacydot_cam.on {
+  color: @privacydotcam;
+}
+#custom-privacydot_cam.off {
+  color: @themeblack_bright;
+}
+#custom-privacydot_loc {
+  margin-left: 4px;
+  margin-right: 4px;
+}
+#custom-privacydot_loc.on {
+  color: @privacydotloc;
+}
+#custom-privacydot_loc.off {
+  color: @themeblack_bright;
 }
 
 /* window title */
 #window {
-  margin-left: 10px;
+  margin-left: 5px;
 }
 #window label {
   font-weight: normal;

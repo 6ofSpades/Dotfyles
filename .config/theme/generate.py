@@ -16,6 +16,7 @@ import tomlkit
 import yaml
 
 BASE_DIR = Path.home() / ".config"
+TEMPLATES_DIR = BASE_DIR / "theme" / "templates"
 OUTPUT_DIR = BASE_DIR / "theme" / "generated"
 
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -201,6 +202,8 @@ tlrc = resolved_theme["tlrc"]
 gdu = resolved_theme["gdu"]
 fastfetch = resolved_theme["fastfetch"]
 wlogout = resolved_theme["wlogout"]
+gtk = resolved_theme["gtk"]
+qt = resolved_theme["qt"]
 
 
 # ============================================================
@@ -354,12 +357,12 @@ def generate_hyprland_lua():
 def generate_gtk_css():
     lines = []
 
-    for section in (colors, ui):
+    for section in (colors, ui, gtk):
         for key, value in section.items():
             if value is None:
                 continue
 
-            lines.append(f"@define-color {key} {value};")
+            lines.append(f"@define-color theme{key} {value};")
 
     write_file(
         OUTPUT_DIR / "colors-gtk.css",
@@ -537,7 +540,7 @@ def generate_dunst():
 """.strip()
 
     write_file(
-        OUTPUT_DIR / "01-dunstcolors.conf",
+        BASE_DIR / "dunst" / "dunstrc.d" / "01-dunstcolors.conf",
         dunstcolors,
     )
 
@@ -766,6 +769,90 @@ def patch_yaml_file(source, output, replacements):
     )
 
 
+def patch_svg(source, output, replacements):
+    with open(source, encoding="utf-8") as f:
+        svg = f.read()
+
+    # Convert #RRGGBB or #RRGGBBAA into
+    # an SVG fill color and opacity.
+    #
+
+    def split_alpha(color):
+        color = color.strip()
+
+        if not re.fullmatch(r"#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?", color):
+            raise ValueError(f"Invalid SVG hex color: {color}")
+
+        if len(color) == 7:
+            return color, "1"
+
+        alpha = int(color[7:9], 16) / 255
+        opacity = f"{alpha:.6f}".rstrip("0").rstrip(".")
+
+        return color[:7], opacity
+
+    #
+    # Replace standardized colors only inside
+    # SVG style attributes.
+
+    def patch_style(match):
+        style = match.group(1)
+
+        for old_color, new_color in replacements.items():
+            if new_color is None:
+                continue
+
+            fill, opacity = split_alpha(new_color)
+
+            for color_property, opacity_property in (
+                ("fill", "fill-opacity"),
+                ("stroke", "stroke-opacity"),
+            ):
+                color_pattern = re.compile(
+                    r"(?<![\w-])"
+                    + re.escape(color_property)
+                    + r"(\s*:\s*)"
+                    + re.escape(old_color)
+                    + r"(?![0-9a-fA-F])",
+                    re.IGNORECASE,
+                )
+
+                if not color_pattern.search(style):
+                    continue
+
+                style = color_pattern.sub(
+                    lambda m: color_property + m.group(1) + fill,
+                    style,
+                )
+
+                # Only override opacity when the replacement has an alpha channel.
+                # Otherwise, preserve the original SVG opacity.
+                if opacity is not None:
+                    opacity_pattern = re.compile(
+                        r"(?<![\w-])" + re.escape(opacity_property) + r"(\s*:\s*)[^;]+",
+                        re.IGNORECASE,
+                    )
+
+                    if opacity_pattern.search(style):
+                        style = opacity_pattern.sub(
+                            lambda m: opacity_property + m.group(1) + opacity,
+                            style,
+                        )
+                    else:
+                        style += f";{opacity_property}:{opacity}"
+
+        return f'style="{style}"'
+
+    svg = re.sub(
+        r'\bstyle="([^"]*)"',
+        patch_style,
+        svg,
+    )
+
+    with open(output, "w", encoding="utf-8") as f:
+        f.write(svg)
+
+
 def patch_fastfetch(source, output, replacements):
     with open(source) as f:
         data = json5.load(f)
@@ -975,6 +1062,21 @@ def generate_wlkbptr():
     )
 
 
+def generate_qt():
+    patch_sectioned_config(
+        BASE_DIR / "Kvantum" / "Sweet-Breeze" / "Sweet-Breeze.kvconfig",
+        BASE_DIR / "Kvantum" / "Sweet-Breeze" / "Sweet-Breeze.kvconfig",
+        # OUTPUT_DIR / "sweet-breeze-config",
+        qt,
+    )
+    patch_svg(
+        TEMPLATES_DIR / "Sweet-Breeze.svg",
+        BASE_DIR / "Kvantum" / "Sweet-Breeze" / "Sweet-Breeze.svg",
+        # OUTPUT_DIR / "theme.svg",
+        qt,
+    )
+
+
 def generate_git():
     patch_sectioned_config(
         Path.home() / ".gitconfig",
@@ -1050,6 +1152,7 @@ def main():
     generate_hyprland_lua()
     generate_waybar()
     generate_gtk_css()
+    generate_qt()
     generate_web_css()
     generate_mpv()
     generate_zathura()

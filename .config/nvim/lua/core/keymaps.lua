@@ -17,8 +17,21 @@ vim.keymap.set({ "n" }, "K", "<C-w>k")
 vim.keymap.set({ "n" }, "L", "<C-w>l")
 
 -- Window management
-vim.keymap.set("n", "<leader>sv", "<C-w>v", { desc = "Split window vertically" })
-vim.keymap.set("n", "<leader>sh", "<C-w>s", { desc = "Split window horizontally" })
+-- Split right
+vim.keymap.set("n", "<leader>sl", "<C-w>v", { desc = "Split window right" })
+
+-- Split left
+vim.keymap.set("n", "<leader>sh", function()
+	vim.cmd("leftabove vsplit")
+end, { desc = "Split window left" })
+
+-- Split below
+vim.keymap.set("n", "<leader>sj", "<C-w>s", { desc = "Split window below" })
+
+-- Split above
+vim.keymap.set("n", "<leader>sk", function()
+	vim.cmd("leftabove split")
+end, { desc = "Split window above" })
 
 vim.keymap.set(
 	"n",
@@ -63,8 +76,10 @@ vim.keymap.set("i", "<a-d>", "<Right><Esc>cw")
 
 vim.keymap.set("i", "<a-0>", "<Home>")
 vim.keymap.set("i", "<a-$>", "<End>")
+vim.keymap.set("i", "<a-i>", "<Home>")
+vim.keymap.set("i", "<a-a>", "<End>")
 
-vim.keymap.set("i", "<C-BS>", "<Esc>vbc")
+vim.keymap.set("i", "<C-BS>", "<C-w>")
 
 -- Select all with Ctrl-a
 vim.keymap.set("n", "<C-a>", "ggVG", { desc = "Select all" })
@@ -76,7 +91,7 @@ vim.keymap.set("v", "y", "ygv<Esc>")
 vim.keymap.set("v", "p", "pgv")
 
 -- Don't end of line in blank character when in visual mode
-vim.keymap.set("v", "$", "$h")
+-- vim.keymap.set("v", "$", "$h")
 
 -- swap ' and ` just cause it's easier on ABNT keyboard
 vim.keymap.set("n", "'", "`")
