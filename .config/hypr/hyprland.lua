@@ -82,6 +82,9 @@ hl.exec_cmd('gsettings set org.gnome.desktop.wm.preferences theme "Breeze-Dark"'
 hl.env("QT_QPA_PLATFORMTHEME", "qt6ct") -- for Qt apps
 -- hl.env("QT_STYLE_OVERRIDE", "kvantum")
 hl.env("GTK_THEME", "Breeze-Dark") -- very important, makes things like Tor Browser use dark mode
+-- this makes blur start working again for gtk4
+-- it might still not work for flatpak gtk4 apps, they need this variable too.
+hl.env("GDK_WAYLAND_DISABLE", "ext_background_effect_manager_v1")
 
 hl.env("XCURSOR_SIZE", "24")
 hl.env("XCURSOR_THEME", "Sweet-cursors")
