@@ -145,10 +145,11 @@ hyprpm
 qt5-wayland
 qt6-wayland
 kitty
-foot
 neovim
 tree-sitter
 tree-sitter-cli
+zip
+unzip
 xdg-desktop-portal
 xdg-desktop-portal-gtk
 xdg-desktop-portal-hyprland
