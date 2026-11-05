@@ -1,0 +1,7 @@
+#!/bin/bash
+
+wayvncctl --wait --reconnect event-receive | while read -r line; do
+  if [[ "$line" == *"client-connected"* ]]; then
+    notify-send "Wayvnc" "Remote desktop session connected!" -a "Wayvnc" -i preferences-desktop-remote-desktop
+  fi
+done

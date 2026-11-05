@@ -1,0 +1,6 @@
+address=0.0.0.0
+port=5900
+enable_auth=true
+enable_pam=true
+rsa_private_key_file=rsa_key.pem
+use_relative_paths=true

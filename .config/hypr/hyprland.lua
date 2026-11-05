@@ -53,6 +53,16 @@ hl.on("hyprland.start", function()
 	-- portmaster is running on startup with the service, this is just the ui
 	hl.exec_cmd("portmaster")
 
+	-- long thing just to get the hostname into lua
+	local file = io.open("/proc/sys/kernel/hostname", "r")
+	local host = file and file:read("*l") or "unknown_host"
+	if file then
+		file:close()
+	end
+	-- wayvnc so you can connect remotely
+	hl.exec_cmd("wayvnc -g -n " .. host)
+	hl.exec_cmd("wayvnc-notify-script") -- background script to notify when someone connects
+
 	-- Scripts:
 	-- hl.exec_cmd(os.getenv("HOME") .. "/.local/bin/dolphin-context-fix")
 
@@ -128,6 +138,12 @@ hl.permission("/usr/(bin|local/bin)/hyprlock", "screencopy", "allow")
 hl.permission("/usr/(bin|local/bin)/hyprpicker", "screencopy", "allow")
 -- wl-kbptr permission to activate floating auto-detection mode
 hl.permission("/usr/(bin|loca/bin)/wl-kbptr", "screencopy", "allow")
+-- wayvnc and sunshine permission for unattended access
+hl.permission("/usr/(bin|loca/bin)/wayvnc", "screencopy", "allow")
+hl.permission("/usr/(bin|loca/bin)/sunshine", "screencopy", "allow")
+hl.permission("/usr/(bin|loca/bin)/wayvnc", "cursorpos", "allow")
+hl.permission("/usr/(bin|loca/bin)/sunshine", "cursorpos", "allow")
+
 hl.permission("/usr/(bin|local/bin)/hyprpm", "plugin", "allow")
 
 hl.permission("/usr/(lib|libexec|lib64)/xdg-desktop-portal-hyprland", "screencopy", "allow")

@@ -221,6 +221,7 @@ imagemagick
 mediainfo
 perl-image-exiftool
 autotrash
+wayvnc
 python-pillow
 python-pyfiglet
 "
@@ -337,6 +338,11 @@ if [[ "$scripts" == "y" ]]; then
   # pear-desktop
   if [[ $(yay -Qs pear-desktop) ]]; then
     sed -i "s|/home/user|/home/$USER|g" "$HOME/.config/YouTube Music/config.json"
+  fi
+  # generate rsa key for wayvnc
+  if [[ $(yay -Qs wayvnc) ]]; then
+    mkdir -p ~/.config/wayvnc
+    ssh-keygen -m pem -f ~/.config/wayvnc/rsa_key.pem -t rsa -N ""
   fi
 
   # this thing was moved
