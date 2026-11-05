@@ -170,12 +170,12 @@ span.TridactylHintUppercase > span {
 
 #completions .focused {
   background: rgb(from var(--themecursor_line) r g b / 0.5);
-  color: var(--themewhite);
+  color: var(--themewhite_bright);
 }
 
 #completions .focused .url {
   background: rgb(from var(--themecursor_line) r g b / 0.5);
-  color: var(--themewhite);
+  color: var(--themewhite_bright);
 }
 /* #Ocean-normal { */
 /*  border-color: green !important; */

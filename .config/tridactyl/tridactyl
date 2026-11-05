@@ -20,7 +20,7 @@ set update.checkintervalsecs 86400
 
 " External Editor Configuration
 " Press <C-i> on the browser when in an input text to fire this.
-set editorcmd kitty --class nvim-anywhere -o background_opacity=0.5 env NVIM_APPNAME=nvim-anywhere nvim 63<&0 0</dev/null '+norm G$' '+startinsert!' -u "~/.config/nvim-anywhere/init.lua"
+set editorcmd kitty --class nvim-anywhere -o background_opacity=0.65 env NVIM_APPNAME=nvim-anywhere nvim 63<&0 0</dev/null '+norm G$' '+startinsert!' -u "~/.config/nvim-anywhere/init.lua" -c "set filetype=markdown"
 
 " Search engine shortcuts
 set searchurls.y https://www.youtube.com/results?search_query=%s
