@@ -1,0 +1,39 @@
+# Tickloom configuration (restart after editing).
+[font]
+mode = "figlet" # "figlet" or "ttf"
+figlet = "~/.local/figlet/fonts/phm-lcdmatrix.flf"
+# Empty selects an installed DejaVu/Liberation monospace font.
+ttf = "/usr/share/fonts/TTF/JetBrainsMonoNerdFont-Regular.ttf"
+size = 32 # TTF pixel height; adjustable with = and -
+
+[keys]
+start_pause = "SPACE"
+reset = "r"
+input = "/"
+switch_mode = "TAB"
+grow = "="
+shrink = "-"
+stop_alarm = "a"
+quit = "q"
+
+[colors]
+normal = "#c0caf5"
+paused = "#6910a5"
+finished = "#cc00fc"
+footer_key = "#00ffff"
+footer_separator = "#414a74"
+footer_section_separator = "#303aff"
+footer_action = "#414a74"
+status = "#6910a5"
+input = "#e0af68"
+
+[footer]
+separator = " "
+section_separator = " · "
+
+[alarm]
+enabled = true
+file = "~/.local/share/sounds/digital-alarm-buzzer.mp3" # Absolute path to an audio file, e.g. /home/me/alarm.mp3
+# Optional player command array. {file} is replaced with the audio path.
+# Empty automatically selects ffplay, mpv, paplay, or aplay.
+command = []

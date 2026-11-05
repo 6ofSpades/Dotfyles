@@ -522,6 +522,17 @@ traytui:
   colors.bg_highlighted: cursor_line
   colors.fg_highlighted: white_bright
 
+tickloom:
+  colors.normal: $colors.fg
+  colors.paused: $ui.accent
+  colors.finished: $colors.red
+  colors.footer_key: $colors.cyan
+  colors.footer_separator: $colors.black_bright
+  colors.footer_section_separator: $colors.blue
+  colors.footer_action: $colors.black_bright
+  colors.status: $ui.accent
+  colors.input: $colors.yellow
+
 clipse:
   titlefore: white
   titleback: accent

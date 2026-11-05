@@ -221,6 +221,8 @@ imagemagick
 mediainfo
 perl-image-exiftool
 autotrash
+python-pillow
+python-pyfiglet
 "
 # Prompt selection
 if ! $NONINTERACTIVE; then

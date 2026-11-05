@@ -1,0 +1,11 @@
+[Desktop Entry]
+Categories=Stopwatch;Timer;Countdown;
+Comment=TUI timer
+Exec=tickloom
+GenericName=Timer
+Icon=ktimer
+Keywords=timer;stopwatch;countdown;counter;terminal;tty;
+Name=Tickloom
+Terminal=true
+Type=Application
+Version=1.0

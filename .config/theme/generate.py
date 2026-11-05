@@ -188,6 +188,7 @@ dunst = resolved_theme["dunst"]
 flameshot = resolved_theme["flameshot"]
 btop = resolved_theme["btop"]
 yazi = resolved_theme["yazi"]
+tickloom = resolved_theme["tickloom"]
 traytui = resolved_theme["traytui"]
 clipse = resolved_theme["clipse"]
 wiremix = resolved_theme["wiremix"]
@@ -1030,6 +1031,14 @@ def generate_yazi():
     )
 
 
+def generate_tickloom():
+    patch_toml_file(
+        BASE_DIR / "tickloom" / "config.toml",
+        BASE_DIR / "tickloom" / "config.toml",
+        tickloom,
+    )
+
+
 def generate_wiremix():
     patch_toml_file(
         BASE_DIR / "wiremix" / "wiremix.toml",
@@ -1161,6 +1170,7 @@ def main():
     generate_rasi()
     generate_btop()
     generate_yazi()
+    generate_tickloom()
     generate_traytui()
     generate_clipse()
     generate_wiremix()
