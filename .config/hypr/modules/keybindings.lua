@@ -178,7 +178,7 @@ hl.define_submap("GROUP", function()
 	hl.bind("SHIFT + K", hl.dsp.submap("reset"))
 	hl.bind("SHIFT + J", hl.dsp.submap("reset"))
 
-	hl.bind("L", hl.dsp.group.lock_active())
+	hl.bind("L", hl.dsp.group.lock())
 	hl.bind("L", hl.dsp.submap("reset"))
 
 	-- returns to the global submap
@@ -318,8 +318,8 @@ hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:mag
 hl.bind(mainMod .. " + CTRL + M", hl.dsp.workspace.toggle_special("music"))
 
 -- Scroll through existing workspaces with mainMod + scroll
-hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e-1" }))
-hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "e+1" }))
+hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
+hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "e-1" }))
 
 -- Laptop multimedia keys for volume and LCD brightness
 hl.bind(
@@ -664,6 +664,7 @@ end)
 ----------------------------- DYNAMIC BINDS -----------------------------
 local dynamic_classes = {
 	zen = true,
+	librewolf = true,
 	vesktop = true,
 	["discord-canary"] = true,
 	["Mullvad Browser"] = true,
@@ -701,16 +702,24 @@ end
 
 local function bind_dynamic()
 	-- Vim-style cursor movement
-	hl.bind("ALT + H", hl.dsp.send_shortcut({ mods = "", key = "LEFT", window = "activewindow" }), { repeating = true })
+	hl.bind(
+		"ALT + H",
+		hl.dsp.send_shortcut({ mods = "", key = "LEFT", window = "activewindow" }),
+		{ repeating = false }
+	)
 
-	hl.bind("ALT + J", hl.dsp.send_shortcut({ mods = "", key = "DOWN", window = "activewindow" }), { repeating = true })
+	hl.bind(
+		"ALT + J",
+		hl.dsp.send_shortcut({ mods = "", key = "DOWN", window = "activewindow" }),
+		{ repeating = false }
+	)
 
-	hl.bind("ALT + K", hl.dsp.send_shortcut({ mods = "", key = "UP", window = "activewindow" }), { repeating = true })
+	hl.bind("ALT + K", hl.dsp.send_shortcut({ mods = "", key = "UP", window = "activewindow" }), { repeating = false })
 
 	hl.bind(
 		"ALT + L",
 		hl.dsp.send_shortcut({ mods = "", key = "RIGHT", window = "activewindow" }),
-		{ repeating = true }
+		{ repeating = false }
 	)
 
 	-- Word movement
@@ -730,7 +739,7 @@ local function bind_dynamic()
 			key = "LEFT",
 			window = "activewindow",
 		}))
-	end, { repeating = true })
+	end, { repeating = false })
 
 	hl.bind(
 		"ALT + B",
@@ -739,7 +748,7 @@ local function bind_dynamic()
 			key = "LEFT",
 			window = "activewindow",
 		}),
-		{ repeating = true }
+		{ repeating = false }
 	)
 
 	hl.bind(
@@ -749,7 +758,7 @@ local function bind_dynamic()
 			key = "RIGHT",
 			window = "activewindow",
 		}),
-		{ repeating = true }
+		{ repeating = false }
 	)
 
 	hl.bind(
@@ -759,7 +768,7 @@ local function bind_dynamic()
 			key = "Delete",
 			window = "activewindow",
 		}),
-		{ repeating = true }
+		{ repeating = false }
 	)
 
 	hl.bind(
@@ -769,7 +778,7 @@ local function bind_dynamic()
 			key = "Delete",
 			window = "activewindow",
 		}),
-		{ repeating = true }
+		{ repeating = false }
 	)
 
 	-- Beginning / end of line
@@ -780,7 +789,7 @@ local function bind_dynamic()
 			key = "Home",
 			window = "activewindow",
 		}),
-		{ repeating = true }
+		{ repeating = false }
 	)
 
 	hl.bind(
@@ -790,7 +799,7 @@ local function bind_dynamic()
 			key = "Home",
 			window = "activewindow",
 		}),
-		{ repeating = true }
+		{ repeating = false }
 	)
 
 	hl.bind(
@@ -800,7 +809,7 @@ local function bind_dynamic()
 			key = "End",
 			window = "activewindow",
 		}),
-		{ repeating = true }
+		{ repeating = false }
 	)
 
 	hl.bind(
@@ -810,7 +819,7 @@ local function bind_dynamic()
 			key = "End",
 			window = "activewindow",
 		}),
-		{ repeating = true }
+		{ repeating = false }
 	)
 
 	-- Browser tabs

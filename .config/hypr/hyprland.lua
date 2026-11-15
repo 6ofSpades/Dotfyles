@@ -50,8 +50,8 @@ hl.on("hyprland.start", function()
 	-- If playerctld is running, Playerctl will act on players in order of their last activity
 	hl.exec_cmd("playerctld")
 	-- hl.exec_cmd("waydroid session start") -- start waydroid session
-	-- portmaster is running on startup with the service, this is just the ui
-	hl.exec_cmd("portmaster")
+	-- -- portmaster is running on startup with the service, this is just the ui
+	-- hl.exec_cmd("WEBKIT_DISABLE_DMABUF_RENDERER=1 portmaster")
 
 	-- long thing just to get the hostname into lua
 	local file = io.open("/proc/sys/kernel/hostname", "r")
@@ -62,6 +62,9 @@ hl.on("hyprland.start", function()
 	-- wayvnc so you can connect remotely
 	hl.exec_cmd("wayvnc -g -n " .. host)
 	hl.exec_cmd("wayvnc-notify-script") -- background script to notify when someone connects
+
+	-- syncthingtray for syncthing
+	hl.exec_cmd("syncthingtray --wait")
 
 	-- Scripts:
 	-- hl.exec_cmd(os.getenv("HOME") .. "/.local/bin/dolphin-context-fix")
