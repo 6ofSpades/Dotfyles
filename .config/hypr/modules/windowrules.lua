@@ -60,6 +60,8 @@ hl.window_rule({ match = { class = "^(com.github.th[_-]ch.youtube[_-]music)$" },
 hl.window_rule({ match = { class = "cava" }, float = true })
 hl.window_rule({ match = { class = "cava" }, center = true })
 hl.window_rule({ match = { class = "cava" }, size = "monitor_w*0.68 monitor_h*0.68" })
+hl.window_rule({ match = { class = "scrcpy" }, float = true })
+hl.window_rule({ match = { class = "scrcpy" }, keep_aspect_ratio = true })
 
 -- -- workspaces --
 hl.window_rule({ match = { class = "zen" }, workspace = "2" })

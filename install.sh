@@ -222,6 +222,7 @@ mediainfo
 perl-image-exiftool
 autotrash
 wayvnc
+scrcpy
 python-pillow
 python-pyfiglet
 "
