@@ -4,9 +4,6 @@
 -- 	type = ui.Border.ROUNDED,
 -- })
 
--- recycle-bin plugin
-require("recycle-bin"):setup()
-
 -- restore closed tabs
 require("close-and-restore-tab"):setup()
 

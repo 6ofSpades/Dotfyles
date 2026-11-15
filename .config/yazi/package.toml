@@ -14,16 +14,6 @@ rev = "72f9e3c"
 hash = "46cbdc05596a3ecd730b288e28c7079d"
 
 [[plugin.deps]]
-use = "XYenon/clipboard"
-rev = "0f4982a"
-hash = "dcda5f179482ee8cc191ad679c9d72e0"
-
-[[plugin.deps]]
-use = "uhs-robert/recycle-bin"
-rev = "82da16a"
-hash = "7383d80862d3cdcc85f8658dac7b90c2"
-
-[[plugin.deps]]
 use = "boydaihungst/gvfs"
 rev = "ebdb87c"
 hash = "69c24ef7e0a591864c76ac6e6dedc805"
@@ -102,6 +92,21 @@ hash = "1e3ea3fe62450615ceca63910c9b629b"
 use = "AminurAlam/yazi-plugins:spot-audio"
 rev = "28eea47"
 hash = "4eb64572721410a8b05629de4c93dd38"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:diff"
+rev = "9166202"
+hash = "14558d2829c0aa05e99c57de8f74d199"
+
+[[plugin.deps]]
+use = "GianniBYoung/rsync"
+rev = "b5c657a"
+hash = "72828957273094ed0ef52792e3290900"
+
+[[plugin.deps]]
+use = "XYenon/clipboard"
+rev = "4b4b6c5"
+hash = "cdcc9c84c9757d585af78c87b012f38b"
 
 [flavor]
 deps = []
