@@ -448,6 +448,7 @@ def start_audio_capture():
             f'"node.name":"{DETECTOR_NAME}"'
             "}"
         ),
+        "--raw",
         "--format",
         "f32",
         "--rate",
