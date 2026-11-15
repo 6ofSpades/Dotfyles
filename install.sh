@@ -216,6 +216,7 @@ poppler
 zathura
 zathura-pdf-mupdf
 zathura-cb
+doxx
 ffmpeg
 imagemagick
 mediainfo
