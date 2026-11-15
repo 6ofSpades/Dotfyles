@@ -13,23 +13,42 @@ return {
 		-- vim.g.no_go_maps = true
 	end,
 	config = function()
-		-- keymaps
-		-- You can use the capture groups defined in `textobjects.scm`
+		require("nvim-treesitter-textobjects").setup({
+			select = {
+				enable = true,
+				lookahead = true,
+			},
+		})
+		-- Function textobjects
 		vim.keymap.set({ "x", "o" }, "af", function()
 			require("nvim-treesitter-textobjects.select").select_textobject("@function.outer", "textobjects")
-		end)
+		end, { desc = "Select outer function" })
 		vim.keymap.set({ "x", "o" }, "if", function()
 			require("nvim-treesitter-textobjects.select").select_textobject("@function.inner", "textobjects")
-		end)
+		end, { desc = "Select inner function" })
+
+		-- Class textobjects
 		vim.keymap.set({ "x", "o" }, "ac", function()
 			require("nvim-treesitter-textobjects.select").select_textobject("@class.outer", "textobjects")
-		end)
+		end, { desc = "Select outer class" })
 		vim.keymap.set({ "x", "o" }, "ic", function()
 			require("nvim-treesitter-textobjects.select").select_textobject("@class.inner", "textobjects")
-		end)
-		-- You can also use captures from other query groups like `locals.scm`
+		end, { desc = "Select inner class" })
+
+		-- Scope textobjects
 		vim.keymap.set({ "x", "o" }, "as", function()
 			require("nvim-treesitter-textobjects.select").select_textobject("@local.scope", "locals")
-		end)
+		end, { desc = "Select local scope" })
+
+		-- Markdown Fenced Code Block textobjects
+		local select = require("nvim-treesitter-textobjects.select")
+
+		vim.keymap.set({ "x", "o" }, "aC", function()
+			select.select_textobject("@code_block.outer", "textobjects")
+		end, { desc = "Around Markdown code block" })
+
+		vim.keymap.set({ "x", "o" }, "iC", function()
+			select.select_textobject("@code_block.inner", "textobjects")
+		end, { desc = "Inside Markdown code block" })
 	end,
 }

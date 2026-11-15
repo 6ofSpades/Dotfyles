@@ -12,6 +12,9 @@ vim.opt.wrap = false -- ":h wrap" to see what this does
 vim.opt.relativenumber = true
 vim.opt.number = true
 
+-- conceal level for markdown and obsidian
+vim.opt.conceallevel = 2
+
 -- folding
 vim.opt.foldmethod = "expr"
 vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"

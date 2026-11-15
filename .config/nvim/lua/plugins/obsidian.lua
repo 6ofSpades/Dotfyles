@@ -18,6 +18,7 @@ return {
 			return title
 		end,
 
+		notes_subdir = "Notes",
 		new_notes_location = "Notes",
 
 		-- templates folder
