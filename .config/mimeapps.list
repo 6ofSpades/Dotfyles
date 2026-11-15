@@ -35,6 +35,7 @@ image/x-portable-graymap=swayimg.desktop
 image/x-portable-pixmap=swayimg.desktop
 image/x-targa=swayimg.desktop
 image/x-tga=swayimg.desktop
+audio/flac=mpv.desktop
 
 [Added Associations]
 x-scheme-handler/http=zen.desktop;
