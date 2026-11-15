@@ -10,23 +10,40 @@ DEPENDENCIES="
   ### 🛠️ Required Dependencies Checklist:
   Make sure you have the following CLI tools installed on your system:
   * **Core TUI:** \`gum\`
+  * **File Detection:** \`file\`
   * **Images:** \`imagemagick\` (provides \`magick\`), \`inkscape\` (SVG -> PNG conversion)
   * **Audio/Video:** \`ffmpeg\`
   * **Documents:** \`pandoc-cli\`
   * **PDF Output:** \`typst\` (required by pandoc to generate PDFs without LaTeX)
   * **Font Utilities:** \`fontconfig\` (required to detect system fonts dynamically)
-  * **E-Books:** \`libmobi\` / \`libmobi\` (required for .mobi to .epub conversion)
+  * **E-Books:** \`libmobi\` (required for .mobi to .epub conversion)
 
   ### 🌟 Optional Enhancements:
   * **Office Layout Precision:** \`libreoffice-still\` (not required, but highly recommended if you want flawless \`.docx\` to \`.pdf\` conversion with accurate font substitution)
   * **Fonts:** \`ttf-liberation\` (optional but good for converting to pdf when using typst instead of libreoffice)
   "
 
-while [[ -z "$FILE" ]]; do
+usage() {
+  printf 'Usage: %s [FILE]\n' "${0##*/}"
+}
 
+if [[ $# -gt 1 ]]; then
+  usage >&2
+  exit 2
+fi
+if [[ ${1-} == --help || ${1-} == -h ]]; then
+  usage
+  exit 0
+fi
+for dependency in gum file; do
+  if ! command -v "$dependency" >/dev/null 2>&1; then
+    printf 'Missing required tool: %s\n' "$dependency" >&2
+    exit 1
+  fi
+done
+
+show_title() {
   clear
-
-  # cool title
   gum style \
     --foreground 6 \
     --border-foreground 5 \
@@ -38,196 +55,227 @@ while [[ -z "$FILE" ]]; do
   gum style \
     --margin "1 0" \
     "Not that I hate convertio, I just like using my own terminal"
+}
 
-  # 1. Select the file
-  FILE=$(
-    gum input --placeholder "File path here" \
+convert_file() {
+  # Keep conversion settings local so each file starts fresh.
+  local FILE="$1" FILENAME MIME_TYPE msg1 msg2 TARGET CMD_TYPE OUTPUT_FILE
+  local FONT RESIZE SIZE="" WIDTH HEIGHT
+  local -a RESIZE_ARGS=() choose_color=(--header.foreground 4 --cursor.foreground 5)
+
+  # An absolute path also protects filenames starting with a dash.
+  [[ "$FILE" == /* ]] || FILE="$PWD/$FILE"
+  if [[ ! -f "$FILE" ]]; then
+    printf '❌ Error: File does not exist: %s\n' "$FILE" >&2
+    return 1
+  fi
+
+  # Extract base name without extension
+  FILENAME="${FILE##*/}"
+  # Only strip an extension from the basename, not a dotted parent directory.
+  if [[ "$FILENAME" == ?*.* ]]; then
+    FILENAME="${FILENAME%.*}"
+  fi
+  FILENAME="${FILE%/*}/$FILENAME"
+
+  # 2. Detect the TRUE MIME type
+  MIME_TYPE=$(file --mime-type -b -- "$FILE") || return 1
+  msg1=$(gum style " Detected true file type: ")
+  msg2=$(gum style " $MIME_TYPE " --foreground 6 --background 8)
+  gum join "$msg1" "$msg2"
+
+  # 3. Determine output options based on MIME type categories
+  if [[ "$MIME_TYPE" == image/* ]]; then
+    echo "󰓾 Select output image format:"
+    TARGET=$(gum choose "png" "jpg" "webp" "gif" "avif" "${choose_color[@]}")
+    CMD_TYPE="image"
+  elif [[ "$MIME_TYPE" == video/* ]]; then
+    echo "󰓾  Select output video or audio extraction format:"
+    TARGET=$(gum choose "mp4" "mkv" "mov" "mp3" "wav" "${choose_color[@]}")
+    CMD_TYPE="video"
+  elif [[ "$MIME_TYPE" == audio/* ]]; then
+    echo "󰓾  Select output audio format:"
+    TARGET=$(gum choose "mp3" "wav" "flac" "ogg" "${choose_color[@]}")
+    CMD_TYPE="audio"
+  # Detect mobipocket files
+  elif [[ "$MIME_TYPE" == "application/x-mobipocket-ebook" ]]; then
+    echo "󰓾 Select output e-book format:"
+    TARGET=$(gum choose "epub" "${choose_color[@]}")
+    CMD_TYPE="ebook"
+  elif [[ "$MIME_TYPE" == text/* || "$MIME_TYPE" == "application/pdf" || "$MIME_TYPE" == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ]]; then
+    echo "󰓾 Select output document format:"
+    TARGET=$(gum choose "md" "pdf" "docx" "html" "txt" "${choose_color[@]}")
+    CMD_TYPE="document"
+  else
+    echo "󰓾 Unknown MIME type. Select any output format:"
+    TARGET=$(gum choose "png" "jpg" "pdf" "txt" "mp4" "mp3" "epub" "${choose_color[@]}")
+    CMD_TYPE="fallback"
+  fi
+
+  [[ -z "$TARGET" ]] && { echo "Cancelled."; return 0; }
+  OUTPUT_FILE="${FILENAME}.${TARGET}"
+
+  if [[ "$FILE" == "$OUTPUT_FILE" ]] || { [[ -e "$OUTPUT_FILE" ]] && [[ "$FILE" -ef "$OUTPUT_FILE" ]]; }; then
+    echo "❌ Input and output are the same file. Choose a different format."
+    return 1
+  fi
+  if [[ -e "$OUTPUT_FILE" ]]; then
+    gum confirm "Output already exists. Overwrite $OUTPUT_FILE?" || return 0
+  fi
+
+  # Detect fonts only when producing a PDF with Pandoc.
+  FONT="sans-serif"
+  if [[ "$TARGET" == pdf ]] && command -v fc-match >/dev/null 2>&1; then
+    FONT=$(fc-match -f '%{family}' 'Liberation Sans')
+  fi
+
+  # Ask whether to resize output if it's image
+  if [[ "$CMD_TYPE" == "image" ]]; then
+    echo ""
+    RESIZE=$(
+      gum choose "No" "Yes" \
+        --header "󰩨 Resize output?"
+    )
+
+    [[ -z "$RESIZE" ]] && { echo "Cancelled."; return 0; }
+    if [[ "$RESIZE" == "Yes" ]]; then
+      SIZE=$(gum input \
+        --header "
+      󰩨 Enter output size
+      # Basic
+      1920x1080
+      100x100
+
+      # Advanced - Doesn't work when converting from SVG to PNG
+      1920x1080! -> force exactly 1920x1080 (may distort)
+      500x500> -> only shrink if larger
+      500x500< -> only enlarge if smaller
+      50% -> scale to half size
+      2000x -> set width only
+      x1200 -> set height only
+      100 -> 100x100
+      " \
+        --placeholder "100x100")
+
+      if [[ -n "$SIZE" ]]; then
+        RESIZE_ARGS=(-resize "$SIZE")
+      fi
+    fi
+  fi
+
+  # 4. Perform conversion based on the logic category
+  echo ""
+  gum spin --spinner dot --title "Converting to $TARGET..." -- sleep 0.5
+
+  case "$CMD_TYPE" in
+  "image")
+    if [[ "$MIME_TYPE" == "image/svg+xml" ]] && [[ "$TARGET" == "png" ]]; then
+      if [[ "$SIZE" =~ ^([0-9]+)x([0-9]+)$ ]]; then
+        WIDTH="${BASH_REMATCH[1]}"
+        HEIGHT="${BASH_REMATCH[2]}"
+
+        inkscape "$FILE" \
+          --export-type=png \
+          --export-width="$WIDTH" \
+          --export-height="$HEIGHT" \
+          --export-filename="$OUTPUT_FILE"
+      else
+        inkscape "$FILE" \
+          --export-type=png \
+          --export-filename="$OUTPUT_FILE"
+      fi
+    else
+      magick "$FILE" "${RESIZE_ARGS[@]}" "$OUTPUT_FILE"
+    fi
+    ;;
+  "video")
+    if [[ "$TARGET" =~ ^(mp3|wav)$ ]]; then
+      ffmpeg -nostdin -hide_banner -loglevel error -y -i "$FILE" -vn "$OUTPUT_FILE"
+    else
+      ffmpeg -nostdin -hide_banner -loglevel error -y -i "$FILE" "$OUTPUT_FILE"
+    fi
+    ;;
+  "audio")
+    ffmpeg -nostdin -hide_banner -loglevel error -y -i "$FILE" "$OUTPUT_FILE"
+    ;;
+  # Execution logic for .mobi conversion
+  "ebook")
+    if [ "$TARGET" == "epub" ]; then
+      mobitool -e "$FILE"
+      # Note: mobitool automatically outputs file names as "${FILENAME}.epub"
+    fi
+    ;;
+  "document")
+    if [ "$TARGET" == "pdf" ] && [[ "$MIME_TYPE" == *"officedocument"* ]] && command -v libreoffice &>/dev/null; then
+      # If it's a docx and LibreOffice exists, use it for perfect visual translation
+      libreoffice --headless --convert-to pdf --outdir "${OUTPUT_FILE%/*}" "$FILE"
+    elif [ "$TARGET" == "pdf" ]; then
+      # Fallback to Pandoc + Typst if LibreOffice is missing or it's a text/md file
+      pandoc "$FILE" --pdf-engine=typst -V mainfont="$FONT" -o "$OUTPUT_FILE"
+    else
+      pandoc "$FILE" -o "$OUTPUT_FILE"
+    fi
+    ;;
+  *)
+    if [[ "$TARGET" =~ ^(png|jpg|webp)$ ]]; then
+      magick "$FILE" "${RESIZE_ARGS[@]}" "$OUTPUT_FILE"
+    elif [[ "$TARGET" == "epub" ]]; then
+      mobitool -e "$FILE"
+    elif [[ "$TARGET" =~ ^(md|pdf|docx|html)$ ]]; then
+      if [ "$TARGET" == "pdf" ]; then
+        if [[ "$MIME_TYPE" == *"officedocument"* ]] && command -v libreoffice &>/dev/null; then
+          libreoffice --headless --convert-to pdf --outdir "${OUTPUT_FILE%/*}" "$FILE"
+        else
+          pandoc "$FILE" --pdf-engine=typst -V mainfont="$FONT" -o "$OUTPUT_FILE"
+        fi
+      else
+        pandoc "$FILE" -o "$OUTPUT_FILE"
+      fi
+    else
+      ffmpeg -nostdin -hide_banner -loglevel error -y -i "$FILE" "$OUTPUT_FILE"
+    fi
+    ;;
+  esac
+
+  # 5. Success check
+  if [[ $? -eq 0 && -f "$OUTPUT_FILE" ]]; then
+    msg1=$(gum style "✔ Success! Saved as " --foreground 2)
+    msg2=$(gum style " $OUTPUT_FILE " --foreground 6 --background 8)
+    gum join "$msg1" "$msg2"
+  else
+    echo ""
+    gum format "❌ **Error:** Conversion failed."
+    gum format "$DEPENDENCIES"
+  fi
+
+}
+
+FILE=${1-}
+while true; do
+  show_title
+  if [[ -z "$FILE" ]]; then
+    FILE=$(gum input --placeholder "File path here" \
       --header "
      Select the file you want to convert
     - Enter q to quit
     - Enter f to use the file picker
     - Enter d for dependencies checklist
-    " --placeholder.foreground 8 --header.foreground 8
-  )
-
-  [ -z "$FILE" ] && continue
-  [ "$FILE" == "q" ] && exit 0
-  [ "$FILE" == "f" ] && FILE=$(gum file)
-  [ "$FILE" == "d" ] && gum format "$DEPENDENCIES" --theme="pink" && FILE= && read -p "Press enter to continue"
+    " --placeholder.foreground 8 --header.foreground 8) || exit 0
+    case "$FILE" in
+      "") continue ;;
+      q) exit 0 ;;
+      f) FILE=$(gum file) || FILE="" ;;
+      d)
+        gum format "$DEPENDENCIES" --theme="pink"
+        read -r -p "Press enter to continue" || exit 0
+        FILE=""
+        continue
+        ;;
+    esac
+  fi
+  [[ -z "$FILE" ]] && continue
+  convert_file "$FILE"
+  FILE=""
+  read -r -p "Press enter to convert another file (q to quit): " REPLY || exit 0
+  [[ "$REPLY" == q ]] && exit 0
 done
-
-# Verify file exists
-if [ ! -f "$FILE" ]; then
-  gum format "❌ **Error:** File \`$FILE\` does not exist."
-  exit 1
-fi
-
-# Extract base name without extension
-FILENAME="${FILE%.*}"
-
-# 2. Detect the TRUE MIME type
-MIME_TYPE=$(file --mime-type -b "$FILE")
-msg1=$(gum style " Detected true file type: ")
-msg2=$(gum style " $MIME_TYPE " --foreground 6 --background 8)
-gum join "$msg1" "$msg2"
-
-# 3. Determine output options based on MIME type categories
-choose_color="--header.foreground 4 --cursor.foreground 5"
-if [[ "$MIME_TYPE" == image/* ]]; then
-  echo "󰓾 Select output image format:"
-  TARGET=$(gum choose "png" "jpg" "webp" "gif" "avif" $choose_color)
-  CMD_TYPE="image"
-elif [[ "$MIME_TYPE" == video/* ]]; then
-  echo "󰓾  Select output video or audio extraction format:"
-  TARGET=$(gum choose "mp4" "mkv" "mov" "mp3" "wav" $choose_color)
-  CMD_TYPE="video"
-elif [[ "$MIME_TYPE" == audio/* ]]; then
-  echo "󰓾  Select output audio format:"
-  TARGET=$(gum choose "mp3" "wav" "flac" "ogg" $choose_color)
-  CMD_TYPE="audio"
-# Detect mobipocket files
-elif [[ "$MIME_TYPE" == "application/x-mobipocket-ebook" ]]; then
-  echo "󰓾 Select output e-book format:"
-  TARGET=$(gum choose "epub" $choose_color)
-  CMD_TYPE="ebook"
-elif [[ "$MIME_TYPE" == text/* || "$MIME_TYPE" == "application/pdf" || "$MIME_TYPE" == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ]]; then
-  echo "󰓾 Select output document format:"
-  TARGET=$(gum choose "md" "pdf" "docx" "html" "txt" $choose_color)
-  CMD_TYPE="document"
-else
-  echo "󰓾 Unknown MIME type. Select any output format:"
-  TARGET=$(gum choose "png" "jpg" "pdf" "txt" "mp4" "mp3" "epub" $choose_color)
-  CMD_TYPE="fallback"
-fi
-
-[ -z "$TARGET" ] && echo "Cancelled." && exit 0
-OUTPUT_FILE="${FILENAME}.${TARGET}"
-
-# Setup a generic safe font for Pandoc fallbacks
-FONT="Liberation Sans"
-if ! fc-list : family | grep -qxi "Liberation Sans"; then
-  if fc-list : family | grep -qxi "Arial"; then
-    FONT="Arial"
-  else
-    FONT="sans-serif"
-  fi
-fi
-
-# Ask whether to resize output if it's image
-RESIZE_ARGS=""
-if [[ "$CMD_TYPE" == "image" ]]; then
-  echo ""
-  RESIZE=$(
-    gum choose "No" "Yes" \
-      --header "󰩨 Resize output?"
-  )
-
-  if [[ "$RESIZE" == "Yes" ]]; then
-    SIZE=$(gum input \
-      --header "
-    󰩨 Enter output size 
-    # Basic
-    1920x1080
-    100x100
-
-    # Advanced - Doesn't work when converting from SVG to PNG
-    1920x1080! -> force exactly 1920x1080 (may distort)
-    500x500> -> only shrink if larger
-    500x500< -> only enlarge if smaller
-    50% -> scale to half size
-    2000x -> set width only
-    x1200 -> set height only
-    100 -> 100x100
-    " \
-      --placeholder "100x100")
-
-    if [[ -n "$SIZE" ]]; then
-      RESIZE_ARGS="-resize $SIZE"
-    fi
-  fi
-fi
-
-# 4. Perform conversion based on the logic category
-echo ""
-gum spin --spinner dot --title "Converting to $TARGET..." -- sleep 0.5
-
-case "$CMD_TYPE" in
-"image")
-  if [[ "$MIME_TYPE" == "image/svg+xml" ]] && [[ "$TARGET" == "png" ]]; then
-    if [[ "$SIZE" =~ ^([0-9]+)x([0-9]+)$ ]]; then
-      WIDTH="${BASH_REMATCH[1]}"
-      HEIGHT="${BASH_REMATCH[2]}"
-
-      inkscape "$FILE" \
-        --export-type=png \
-        --export-width="$WIDTH" \
-        --export-height="$HEIGHT" \
-        --export-filename="$OUTPUT_FILE"
-    else
-      inkscape "$FILE" \
-        --export-type=png \
-        --export-filename="$OUTPUT_FILE"
-    fi
-  else
-    magick "$FILE" $RESIZE_ARGS "$OUTPUT_FILE"
-  fi
-  ;;
-"video")
-  if [[ "$TARGET" =~ ^(mp3|wav)$ ]]; then
-    ffmpeg -i "$FILE" -vn -acodec libmp3lame "$OUTPUT_FILE" -y -loglevel quiet
-  else
-    ffmpeg -i "$FILE" "$OUTPUT_FILE" -y -loglevel quiet
-  fi
-  ;;
-"audio")
-  ffmpeg -i "$FILE" "$OUTPUT_FILE" -y -loglevel quiet
-  ;;
-# Execution logic for .mobi conversion
-"ebook")
-  if [ "$TARGET" == "epub" ]; then
-    mobitool -e "$FILE"
-    # Note: mobitool automatically outputs file names as "${FILENAME}.epub"
-  fi
-  ;;
-"document")
-  if [ "$TARGET" == "pdf" ] && [[ "$MIME_TYPE" == *"officedocument"* ]] && command -v libreoffice &>/dev/null; then
-    # If it's a docx and LibreOffice exists, use it for perfect visual translation
-    libreoffice --headless --convert-to pdf "$FILE"
-  elif [ "$TARGET" == "pdf" ]; then
-    # Fallback to Pandoc + Typst if LibreOffice is missing or it's a text/md file
-    pandoc "$FILE" --pdf-engine=typst -V mainfont="$FONT" -o "$OUTPUT_FILE"
-  else
-    pandoc "$FILE" -o "$OUTPUT_FILE"
-  fi
-  ;;
-*)
-  if [[ "$TARGET" =~ ^(png|jpg|webp)$ ]]; then
-    magick "$FILE" $RESIZE_ARGS "$OUTPUT_FILE"
-  elif [[ "$TARGET" == "epub" ]]; then
-    mobitool -e "$FILE"
-  elif [[ "$TARGET" =~ ^(md|pdf|docx|html)$ ]]; then
-    if [ "$TARGET" == "pdf" ]; then
-      if [[ "$MIME_TYPE" == *"officedocument"* ]] && command -v libreoffice &>/dev/null; then
-        libreoffice --headless --convert-to pdf "$FILE"
-      else
-        pandoc "$FILE" --pdf-engine=typst -V mainfont="$FONT" -o "$OUTPUT_FILE"
-      fi
-    else
-      pandoc "$FILE" -o "$OUTPUT_FILE"
-    fi
-  else
-    ffmpeg -i "$FILE" "$OUTPUT_FILE" -y -loglevel quiet
-  fi
-  ;;
-esac
-
-# 5. Success check
-if [ $? -eq 0 ]; then
-  msg1=$(gum style "✔ Success! Saved as " --foreground 2)
-  msg2=$(gum style " $OUTPUT_FILE " --foreground 6 --background 8)
-  gum join "$msg1" "$msg2"
-else
-  echo ""
-  gum format "❌ **Error:** Conversion failed."
-  gum format "$DEPENDENCIES"
-fi
