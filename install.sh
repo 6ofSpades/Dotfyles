@@ -296,6 +296,29 @@ git clone https://github.com/6ofSpades/pyhist /tmp/pyhist
 cp /tmp/pyhist/pyhist.py ~/.config/tridactyl/
 cp /tmp/pyhist/history_server.sh ~/.config/tridactyl/
 
+# auto install flowkeep
+install_flowkeep() {
+  mkdir -p "$HOME/Projects" "$HOME/.local/bin" || return 1
+  git clone https://github.com/6ofSpades/flowkeep "$HOME/Projects/flowkeep" || return 1
+  python3 -m venv "$HOME/Projects/flowkeep/.venv" || return 1
+  "$HOME/Projects/flowkeep/.venv/bin/python" -m pip install -e "$HOME/Projects/flowkeep" || return 1
+  [ -x "$HOME/Projects/flowkeep/.venv/bin/flowkeep" ] || return 1
+  ln -s "$HOME/Projects/flowkeep/.venv/bin/flowkeep" "$HOME/.local/bin/flowkeep" || return 1
+}
+
+if ! install_flowkeep; then
+  echo "ERROR: flowkeep installation failed. See the error above." >&2
+  if $NONINTERACTIVE; then
+    exit 1
+  fi
+  flowkeep_action=$(gum choose --header "flowkeep installation failed. What next?" \
+    "Stop installation" "Skip flowkeep and continue") || exit 1
+  if [[ "$flowkeep_action" != "Skip flowkeep and continue" ]]; then
+    exit 1
+  fi
+  echo "Skipping flowkeep setup; it may need to be repaired before use."
+fi
+
 # auto install theemr
 install_theemr() {
   mkdir -p "$HOME/Projects" "$HOME/.local/bin" "$HOME/.config/theemr" || return 1
