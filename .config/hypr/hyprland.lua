@@ -161,8 +161,8 @@ hl.window_rule({ match = { class = "quick-notes" }, no_screen_share = true })
 
 -- Theme colors, previously pulled in via `source = ~/.config/theme/generated/hyprland.conf`
 -- See note (1) above.
-local theme = os.getenv("HOME") .. "/.config/theme/generated/theme.lua"
-local hypr_theme = os.getenv("HOME") .. "/.config/theme/generated/hyprland.lua"
+local theme = os.getenv("HOME") .. "/.config/theemr/generated/theme.lua"
+local hypr_theme = os.getenv("HOME") .. "/.config/theemr/generated/hyprland.lua"
 local theme = require(theme)
 local hypr_theme = require(hypr_theme)
 

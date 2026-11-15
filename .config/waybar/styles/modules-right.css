@@ -103,7 +103,7 @@
   color: @overlay1;
 }
 #backlight {
-  background-color: @overlay2;
+  background-color: @overlay4;
 }
 
 /* battery */

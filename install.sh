@@ -296,6 +296,41 @@ git clone https://github.com/6ofSpades/pyhist /tmp/pyhist
 cp /tmp/pyhist/pyhist.py ~/.config/tridactyl/
 cp /tmp/pyhist/history_server.sh ~/.config/tridactyl/
 
+# auto install theemr
+install_theemr() {
+  mkdir -p "$HOME/Projects" "$HOME/.local/bin" "$HOME/.config/theemr" || return 1
+  git clone https://github.com/6ofSpades/theemr "$HOME/Projects/theemr" || return 1
+  python3 -m venv "$HOME/Projects/theemr/.venv" || return 1
+  "$HOME/Projects/theemr/.venv/bin/python" -m pip install \
+    -r "$HOME/Projects/theemr/requirements.txt" || return 1
+  [ -f "$HOME/Projects/theemr/generate.py" ] || return 1
+  # Seed the palette only if dotfiles haven't already provided one.
+  if [ ! -e "$HOME/.config/theemr/colors.yaml" ]; then
+    cp "$HOME/Projects/theemr/examples/colors.yaml" \
+      "$HOME/.config/theemr/colors.yaml" || return 1
+  fi
+  cat >"$HOME/.local/bin/theemr" <<'EOF' || return 1
+#!/usr/bin/env bash
+exec "$HOME/Projects/theemr/.venv/bin/python" \
+  "$HOME/Projects/theemr/generate.py" "$@"
+EOF
+  chmod +x "$HOME/.local/bin/theemr" || return 1
+}
+
+if ! install_theemr; then
+  echo "ERROR: theemr installation failed. See the error above." >&2
+  # Without an interactive prompt, stop instead of silently skipping the failure.
+  if $NONINTERACTIVE; then
+    exit 1
+  fi
+  theemr_action=$(gum choose --header "theemr installation failed. What next?" \
+    "Stop installation" "Skip theemr and continue") || exit 1
+  if [[ "$theemr_action" != "Skip theemr and continue" ]]; then
+    exit 1
+  fi
+  echo "Skipping theemr setup; it may need to be repaired before use."
+fi
+
 gum confirm --default "Install and enable ydotool service?" && ydot_serv="y" || ydot_serv="n"
 if [[ "$ydot_serv" == "y" ]]; then
   USER_UID=$(id -u)

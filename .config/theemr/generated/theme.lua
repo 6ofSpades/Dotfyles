@@ -33,7 +33,6 @@ return {
         cursor_line = "#290355",
         cursor_line_number = "#00ffff",
         line_number = "#414a74",
-        selection_fg = "None",
         selection_bg = "#490375",
     },
     nvim = {

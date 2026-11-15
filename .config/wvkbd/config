@@ -1,0 +1,11 @@
+--text c0caf5
+--text-sp dddddd
+--text-press ffffff
+--text-press-sp ffffff
+--bg 00000080
+--fg 000000b3
+--fg-sp 000000cc
+--press 290355cc
+--press-sp 290355cc
+-R 10
+-L 350

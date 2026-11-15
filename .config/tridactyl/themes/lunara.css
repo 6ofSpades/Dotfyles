@@ -1,4 +1,4 @@
-@import "~/.config/theme/generated/colors-web.css";
+@import "~/.config/theemr/generated/colors-web.css";
 
 :root {
   --tridactyl-fg: var(--themefg);

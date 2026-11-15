@@ -854,7 +854,7 @@ end)
 update_dynamic_binds(hl.get_active_window())
 
 ----------------------------- DYNAMIC ALT INDICATOR -----------------------------
-local hypr_theme = os.getenv("HOME") .. "/.config/theme/generated/hyprland.lua"
+local hypr_theme = os.getenv("HOME") .. "/.config/theemr/generated/hyprland.lua"
 local hypr_theme = require(hypr_theme)
 
 local alt_down = false

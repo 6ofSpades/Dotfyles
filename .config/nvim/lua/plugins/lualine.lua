@@ -6,7 +6,7 @@ return {
 		local lualine = require("lualine")
 		local lazy_status = require("lazy.status") -- to configure lazy pending updates count
 
-		local theme = dofile(vim.fn.expand("~/.config/theme/generated/theme.lua"))
+		local theme = dofile(vim.fn.expand("~/.config/theemr/generated/theme.lua"))
 
 		local my_lualine_theme = {
 			normal = {

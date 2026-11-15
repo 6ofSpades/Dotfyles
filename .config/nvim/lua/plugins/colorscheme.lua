@@ -6,7 +6,7 @@ return {
 	enabled = true,
 	priority = 1000,
 	config = function()
-		local theme = dofile(vim.fn.expand("~/.config/theme/generated/theme.lua"))
+		local theme = dofile(vim.fn.expand("~/.config/theemr/generated/theme.lua"))
 
 		require("tokyonight").setup({
 			style = "night",

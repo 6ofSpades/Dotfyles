@@ -1,9 +1,9 @@
 {
   "colors": {
     "normal": "#c0caf5",
-    "active": "#6910c5",
+    "active": "#6910a5",
     "discarded": "#414a74",
-    "cursor_bg": "#290375",
+    "cursor_bg": "#290355",
     "border": "#303aff",
     "footer": "#414a74",
     "prompt": "#00ffff",

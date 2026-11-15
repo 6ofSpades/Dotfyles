@@ -1,6 +1,6 @@
 /* Credits to Newman Sanchez (https://github.com/newmanls) */
 
-@import "../../theme/generated/colors.rasi"
+@import "../../theemr/generated/colors.rasi"
 
 configuration {
   show-icons: true;

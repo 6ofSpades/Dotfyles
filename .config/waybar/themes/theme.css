@@ -1,5 +1,5 @@
 /* Blur-Glass */
-@import "../../theme/generated/colors-gtk.css";
+@import "../../theemr/generated/colors-gtk.css";
 
 @define-color overlay5    rgba(0, 0, 0, 0.70);
 @define-color overlay4    rgba(0, 0, 0, 0.38);

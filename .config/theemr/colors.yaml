@@ -533,6 +533,36 @@ tickloom:
   colors.status: $ui.accent
   colors.input: $colors.yellow
 
+flowkeep:
+  # Color pairs are [foreground, background]; -1 keeps the terminal default.
+  colors.normal: [$colors.fg, $colors.bg]
+  colors.accent: [$ui.accent, $colors.bg]
+  colors.muted: [$colors.black_bright, $colors.bg]
+  colors.blocked: [$colors.red, $colors.bg]
+  colors.selected: [$colors.white_bright, $ui.cursor_line]
+  colors.confirm: [$colors.bg, $colors.yellow]
+  colors.details: [$colors.fg, $colors.bg]
+  colors.details_title: [$colors.fg, $colors.bg]
+  colors.details_hint: [$colors.black_bright, $colors.bg]
+  colors.error: [$colors.red, $colors.bg]
+  colors.key: [$colors.cyan, $colors.bg]
+  colors.key_description: [$colors.black_bright, $colors.bg]
+  colors.key_separator: [$colors.blue, $colors.bg]
+  colors.filter: [$colors.blue, $colors.bg]
+  colors.no_matches: [$colors.black_bright, $colors.bg]
+  colors.tab: [$colors.fg, $colors.bg]
+  colors.tab_bracket: [$colors.blue, $colors.bg]
+  colors.tab_selected: [$ui.accent, $colors.bg]
+  colors.activity_allowed: [$colors.green, $colors.bg]
+  colors.activity_blocked: [$colors.red, $colors.bg]
+  colors.activity_unknown: [$colors.yellow, $colors.bg]
+  colors.activity_header: [$colors.blue, $colors.bg]
+  colors.activity_filter_error: [$colors.red, $colors.bg]
+  colors.unblocked: [$colors.green, $colors.bg]
+  colors.activity_detail_key: [$colors.blue, $colors.bg]
+  colors.activity_detail_value: [$colors.fg, $colors.bg]
+  colors.overridden: [$colors.cyan, $colors.bg]
+
 clipse:
   titlefore: white
   titleback: accent

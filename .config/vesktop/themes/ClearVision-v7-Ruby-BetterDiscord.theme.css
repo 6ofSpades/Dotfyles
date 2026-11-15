@@ -137,7 +137,7 @@
 }
 
 /* chat selection, breeze theme style */
-.interactive__972a0.interactiveSelected__972a0::before {
+.interactive_zln_tS.interactiveSelected_zln_tS::before {
   background: rgb(from var(--themecursor_line) r g b / 0.5);
   border: 1px solid var(--themeaccent);
 }
