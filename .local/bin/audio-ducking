@@ -18,11 +18,22 @@ import numpy as np
 
 # Applications whose audio should NOT trigger ducking.
 #
+# PipeWire application names to exclude from audio detection.
 # These are matched case-insensitively.
+#
+# To find the current name:
+#   wpctl status
+#
+# Look under "Audio -> Streams" while the music app is playing.
+# Use the application name shown there (not the numeric stream ID).
 MUSIC_APPS = {
-    "Chromium",
+    "com.github.th-ch.youtube-music",
 }
 
+# MPRIS player name used by playerctl to control playback.
+#
+# To list available players:
+#   playerctl -l
 MUSIC_PLAYER = "YoutubeMusic"
 
 # PipeWire nodes that we don't want to monitor.
